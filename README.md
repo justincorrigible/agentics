@@ -1,0 +1,75 @@
+# softeng/agentics
+
+A template for structured AI agent collaboration. Copy it into any project and your agent knows how to behave.
+
+## Quick start
+
+If this repo is accessible to your agent, say:
+
+> "Set up my AI collaboration environment for this project using the agentics template."
+
+Your agent will copy the template files into your project, ask you a few setup questions, and configure itself. That's it.
+
+**What your agent will ask:**
+
+1. What role best describes your work: developer, bioinformatician, AI engineering, or general
+2. Whether you are on the softeng team (applies supplementary team conventions if yes)
+3. Whether you already have agent conventions for this project (merges rather than replaces)
+4. Whether you'd like it to suggest when patterns could be reused across projects
+
+It stores your answers in project memory and does not ask again.
+
+---
+
+## What gets installed
+
+```
+CLAUDE.md                   project-specific conventions; dispatch to global context for universal rules
+AGENTS.md                   comprehensive inline reference for agents without global context
+CLAUDE.softeng.md           softeng team addendum: applied conditionally at session start
+DEVELOPMENT.md              human developer setup and onboarding guide (fill in per project)
+.dev/
+  roadmap.md                planned work across features and phases
+  tech-debt.md              known issues with standalone/blocked tags
+  sessions.md               dated log of decisions and open threads
+```
+
+**Optional bootstrapping files** (skip if already covered by your agent's global context):
+
+```
+CLAUDE.roles/               role-specific conventions (skip if role is defined globally)
+CLAUDE.softeng.md           softeng team conventions (skip if already in global context)
+conventions/                universal code style, testing, security, session discipline
+                            (skip if your agent's global context defines these)
+.claude/settings.json       credential file protection hook (Claude only;
+                            prefer adding to ~/.claude/settings.json globally)
+```
+
+The project `CLAUDE.md` and `AGENTS.md` should contain only project-specific content once your global context is set up. `conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are for bootstrapping agents without a comprehensive global context, or for project-specific overrides of those conventions.
+
+---
+
+## If this repo is not yet in your agent's working directories
+
+Add it, or clone it and point your agent at the local path. Then repeat the quick start prompt above.
+
+For a manual adoption instead: copy the files from [`template/`](template/) into your project root and follow [`template/README.md`](template/README.md).
+
+---
+
+## Design
+
+- **Dispatch, not dump**: `CLAUDE.md` stays lean; convention detail lives in separate files loaded only when relevant. This keeps the context window free for actual work.
+- **Agent-neutral**: the template works with Claude, Codex, Copilot, and others. Role files, convention files, and `AGENTS.md` use no agent-specific paths.
+- **Additive**: roles and org layers (softeng) add to the base; they do not replace it. Merging with your existing setup is always the right choice.
+- **Contribution ladder**: good practices discovered in a project can bubble up: project memory → agent global context → PR to agentics.
+
+## Keeping up to date
+
+The version tag in your project's `CLAUDE.md` (`<!-- agentics-template-version: X.Y.Z -->`) tracks which version you adopted. Compare it against [CHANGELOG.md](CHANGELOG.md) to see what has changed since.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes and how to create new role files.
+
+If you discover a convention in your project that could benefit other teams, open a PR. Your agent will flag likely candidates as they surface.

@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "python3 -c \"\nimport json, sys, re\ninput_data = json.load(sys.stdin)\nparams = input_data.get('tool_input', {})\npath = params.get('filePath', params.get('path', ''))\npatterns = [\n    r'(^|/)\\.env$',\n    r'(^|/)\\.env\\.',\n    r'\\.npmrc$',\n    r'\\.keystore$',\n    r'\\.jks$',\n    r'\\.p12$',\n    r'\\.pfx$',\n    r'\\.pem$',\n    r'\\.key$',\n    r'(^|/)id_rsa$',\n    r'(^|/)id_ed25519$',\n    r'(^|/)id_ecdsa$',\n    r'(^|/)id_dsa$',\n    r'(^|/)\\.aws/credentials$',\n    r'credentials\\.json$',\n    r'serviceAccountKey\\.json$'\n]\nif any(re.search(p, path) for p in patterns):\n    print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse', 'permissionDecision': 'deny', 'permissionDecisionReason': 'Sensitive file excluded for security: ' + path}}))\n    sys.exit(0)\nprint(json.dumps({'hookSpecificOutput': {'hookEventName': 'PreToolUse', 'permissionDecision': 'allow'}}))\n\""
+      }
+    ]
+  }
+}
