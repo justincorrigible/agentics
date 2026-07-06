@@ -10,6 +10,10 @@ Breaking: `yes` (downstream copies require manual update) / `no` (additive or cl
 
 ## Unreleased
 
+- `2026-06-30 | conventions | no | dependency-version-verification`: add "Dependency version verification" to template/conventions/code-style.md after Library awareness: always run `npm view <package> version` (or equivalent) before writing a version into any config; do not use versions from training data; "already used in this repo" does not imply currency
+
+- `2026-06-30 | template | no | purpose-alignment`: add "verify purpose alignment before implementing" to Interaction parameters in template/CLAUDE.md, CLAUDE.md, and AGENTS.md: when a task names a goal, the agent must check whether the chosen approach achieves that goal directly rather than something adjacent; lead with the gap as an objection before writing anything
+
 - `2026-06-30 | repo | no | agent-security-docs`: add `docs/agent-security.md` covering 7 AI agent attack vectors (configuration injection/CBSE, indirect prompt injection, Comment and Control, MCP server poisoning, supply chain attacks, self-replicating worms, memory/RAG poisoning); session-start integrity check guidance; what agents cannot catch automatically; threat intelligence sources; extend session-discipline.md git log check to include `.claude/settings.json`
 
 - `2026-06-28 | conventions | no | session-effects-not-style`: add "write about effects, not style" rule to conventions/session-discipline.md: session bullets must describe what the code now does for operators, users, or callers; style choices, refactoring approach, and helper names are noise

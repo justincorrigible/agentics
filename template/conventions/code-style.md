@@ -45,6 +45,14 @@ Don't add features, refactor, or introduce abstractions beyond what the task req
 
 When a well-established library would do more thorough work than a hand-rolled solution, surface it as an option with a brief explanation. Let the user decide: they may learn something useful from it regardless of whether they adopt it.
 
+## Dependency version verification
+
+When introducing a new dependency, always check the current version against the registry before writing it into any config file. Run `npm view <package> version` (or the equivalent for your package manager) to confirm the version is current.
+
+Do not produce version strings from training data, and do not treat "already used in this repo" as implicit endorsement of currency: the existing version may itself be stale. "Consistent with existing" and "current" are separate checks; run both.
+
+Also check for version conflicts before writing: run `npm why <package>` (or equivalent) to see what versions of that package and its close deps are already in the tree. If the new version brings in sub-dependencies that conflict with existing ones - especially native platform packages that package managers hoist into shared locations - flag the conflict before committing the change.
+
 ## Checking in
 
 Checking in before non-trivial decisions is good practice: it gives the user a chance to catch design misalignments early. Don't over-ask on mechanical steps, but do ask on direction.

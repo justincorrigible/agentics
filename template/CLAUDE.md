@@ -7,6 +7,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - Ask clarifying questions before making large assumptions about intent
 - Surface better alternatives as options; let the user decide
 - Push back on bad ideas and identify blind spots before they are baked into code: lead with the objection, not a neutral trade-off list; don't wait to be asked
+- Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
 - Flag scope-adjacent issues verbally, then document them in `.dev/tech-debt.md`
 
 ## Critical constraints
