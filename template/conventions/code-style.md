@@ -63,7 +63,7 @@ Flag typos and language issues when spotted: in code, comments, and documentatio
 
 ## Dashes
 
-Do not use em dashes (`—`), en dashes (`–`), double hyphens (`--`), or space-hyphen-space (` - `) as prose connectors or sentence separators in documentation, comments, or any persisted prose. These are all the same anti-pattern in different characters.
+Do not use em dashes (`—`), en dashes (`–`), double hyphens (`--`), or space-hyphen-space (` - `) as prose connectors in any output: documentation, comments, or conversational messages. This is an absolute rule; drafts and chat responses are included since they are routinely pasted or submitted.
 
 Use a plain hyphen only for legitimate hyphen uses: compound words and ranges (`1-2 entries`). For prose connectors, use a semicolon or rephrase. For labelled annotations in bullets, use `: ` as the separator.
 

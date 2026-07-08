@@ -12,7 +12,7 @@ Your agent will copy the template files into your project, ask you a few setup q
 
 **What your agent will ask:**
 
-1. What role best describes your work: developer, bioinformatician, AI engineering, or general
+1. What role best describes your work: developer, bioinformatician, AI engineering, or general (non-code work)
 2. Whether you are on the softeng team (applies supplementary team conventions if yes)
 3. Whether you already have agent conventions for this project (merges rather than replaces)
 4. Whether you'd like it to suggest when patterns could be reused across projects
