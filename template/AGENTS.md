@@ -13,6 +13,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify `CLAUDE.md`, `AGENTS.md`, or other instruction files without explicit instruction from the developer: surface suggestions, do not self-edit
+- No machine- or user-specific absolute paths in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
 
 ## Session-start signals
 
@@ -85,6 +86,17 @@ suite('getNetworkPassthroughHeaders', () => {
 **Property ordering:** Alphabetize properties in config objects and YAML/JSON files at all nesting levels: prevents silent duplicate key overwrites and keeps additions consistent.
 
 **Language:** flag typos and language issues when spotted: in code, comments, and docs. Don't fix silently. Use your team's preferred spelling convention consistently (example: Canadian English uses -our, -re, -ize, -yse).
+
+## Code review
+
+Before examining how a PR is written, establish whether the proposed change is the right response to the problem. Work through these in order - raise it and stop if any answer is "no" or "unclear":
+
+1. **What problem does this solve?** If the PR description doesn't state it, ask before reviewing anything else.
+2. **Does the solution belong at this layer?** Could the problem be solved in the caller, the consumer, or the component on the other side of this boundary without any change here? If yes, say so.
+3. **Is any code change needed at all?** Documentation, a usage example, or a configuration option sometimes replaces a feature.
+4. **Only then:** review the implementation against `conventions/code-style.md`.
+
+A comment that redirects work to the right layer is often the most useful review a PR can receive.
 
 ## Structured logging
 

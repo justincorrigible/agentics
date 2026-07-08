@@ -14,4 +14,5 @@ The agent-neutral convention files under `conventions/` carry the same content f
 ## Files
 
 - `projects.md`: cross-project map: paths, memory locations, and relationships between your projects
+- `roadmap.md`: template and convention for global roadmaps, including how to split by work context (professional vs personal)
 - `security-guidelines.md`: OWASP-aligned security patterns, threat model, and code review triggers

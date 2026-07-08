@@ -1,5 +1,14 @@
 # Sessions
 
+## 2026-07-07
+
+Codified a portability rule after finding a downstream project (Usher) had a machine-resolved Claude memory path committed into its `CLAUDE.md`; would not resolve for another developer or machine.
+
+- `template/CLAUDE.md`, `template/AGENTS.md`: added "No machine- or user-specific absolute paths in committed files" to Critical constraints
+- `CHANGELOG.md`: no-machine-specific-paths entry logged
+
+---
+
 ## 2026-06-30
 
 Added agent security threat documentation; agents now check config files at session start as a tamper signal.

@@ -14,6 +14,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify instruction files without explicit developer instruction: surface suggestions, do not self-edit
+- No machine- or user-specific absolute paths in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
 
 ## When to read what
 
@@ -22,7 +23,9 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - Starting a session              -> read `conventions/session-discipline.md`, then the `.dev/` files it specifies
 - Working in a specific role      -> read `CLAUDE.roles/<role>.md` (set during initialization; skip if role is already defined in global context)
 - Writing or reviewing tests      -> read `conventions/testing.md`
-- Writing code or doing reviews   -> read `conventions/code-style.md`
+- Writing code                    -> read `conventions/code-style.md`
+- Reviewing a PR or change        -> read `conventions/code-style.md`, `conventions/code-review.md`
+- Writing or updating docs        -> read `conventions/documentation.md`
 - Security-relevant work          -> read `conventions/security-guidelines.md`
 - softeng team member             -> read `CLAUDE.softeng.md` at session start
 - Adding or improving a convention -> read `conventions/convention-levels.md`
@@ -34,7 +37,7 @@ When writing to project memory: keep entries concise; store no content derivable
 ## Initialization
 If no project memory exists for you in this project yet:
 1. Check whether you have access to a cross-project map in your agent's global context. If yes, read it for cross-project relationships. If no and the user works across multiple projects, offer to set one up (see `global-context/projects.md` in the agentics template for the recommended format).
-2. Ask: "What best describes your primary work on this project?": developer / bioinformatician / AI engineering / general (or describe it). If the answer is already in your global context, skip this question. Otherwise read the matching file in `CLAUDE.roles/`.
+2. Ask: "What best describes your primary work on this project?": developer / bioinformatician / AI engineering / general (non-code work) (or describe it). If the answer is already in your global context, skip this question. Otherwise read the matching file in `CLAUDE.roles/`.
 3. Ask: "Are you part of the softeng team?": if yes, apply conventions from `CLAUDE.softeng.md` on top of your role conventions. Skip if already known from global context.
 4. Ask: "Do you already have agent conventions for this project?": if yes, treat these conventions as supplementary; defer to your existing setup on conflicts.
 5. Ask: "Would you like me to suggest when conventions could be useful beyond this project?": record as `propagation_suggestions: yes | no`. Skip if already known from global context.

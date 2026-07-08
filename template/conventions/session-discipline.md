@@ -14,7 +14,7 @@ A session is a work period: not necessarily a new chat thread. Treat the followi
 On a session-start signal, run this sequence before touching any code:
 
 1. `git log --oneline -1 -- CLAUDE.md AGENTS.md .claude/settings.json`: check whether instruction or configuration files changed since the last `sessions.md` entry. Re-read only the files that changed. If `settings.json` changed unexpectedly, read it immediately and verify it contains only the expected hooks before proceeding (see `docs/agent-security.md`). When you re-read a changed file, say: "I've re-read [file]: the prior version in this thread is superseded."
-2. Read `.dev/roadmap.md`: check the current focus and any `[in progress]` items
+2. Read `.dev/roadmap.md`: check the current focus and any `[in progress]` items. If your global context defines one or more global roadmaps, also read the one relevant to the current project - not all of them. For example: read `roadmap-work.md` for professional projects, `roadmap-personal.md` for personal ones. See `global-context/roadmap.md` for the convention.
 3. Read `.dev/tech-debt.md`: note any `standalone: yes` entries relevant to today's work
 4. Read `.dev/sessions.md`: last 1-2 entries give context on recent work and open threads
 
@@ -34,7 +34,7 @@ When `.dev/` documents are updated, remind the developer to commit them. This hi
 
 ## sessions.md entry format
 
-One lean context sentence (what + why only), a blank line, then one bullet per file or logical group of changes. No prose paragraphs. No "Next:" line: open work belongs in `roadmap.md`. The separator in bullets is `: ` (colon-space). Do not use em dashes (`—`) or a space-hyphen-space (` - `) as a connector; both are the same anti-pattern in different characters. See code-style.md § Dashes.
+One lean context sentence (what + why only), a blank line, then one bullet per file or logical group of changes. No prose paragraphs. No "Next:" line: open work belongs in `roadmap.md`. The separator in bullets is `: ` (colon-space). Do not use em dashes (`—`) or a space-hyphen-space (` - `) as a connector; both are the same anti-pattern in different characters. See code-style.md § Dashes for the full list and the absolute rule (no conversational-chat exemption).
 
 ```
 ## YYYY-MM-DD

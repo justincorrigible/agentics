@@ -10,6 +10,20 @@ Breaking: `yes` (downstream copies require manual update) / `no` (additive or cl
 
 ## Unreleased
 
+- `2026-07-08 | conventions | no | dash-rule-absolute`: strengthen dash avoidance in code-style.md and session-discipline.md: rule is now absolute with no conversational-chat exemption; drafts and chat responses are explicitly included since they are routinely pasted or submitted; drops "persisted prose" scope qualifier
+
+- `2026-07-08 | template | no | general-role-label`: clarify "general" role option in README.md and template/CLAUDE.md initialization block: add "(non-code work)" parenthetical so new adopters understand what the option covers without reading the role file first
+
+- `2026-07-08 | conventions | no | code-review`: add `conventions/code-review.md`: pre-review gate requiring purpose, layer ownership, and necessity to be established before examining implementation; update `template/CLAUDE.md` dispatch to split "writing code or doing reviews" into separate writing and reviewing entries (reviewing reads both code-style and code-review); add inline "Code review" section to `template/AGENTS.md`
+
+- `2026-07-07 | conventions | no | global-roadmap-split`: add `global-context/roadmap.md` template and convention for splitting global roadmaps by work context (e.g. `roadmap-work.md` vs `roadmap-personal.md`); extend session-start checklist in `session-discipline.md` step 2 to read only the roadmap relevant to the current project context; update `global-context/README.md` file list
+
+- `2026-07-07 | conventions | no | documentation-structure`: add `conventions/documentation.md` defining the two-tier docs model (`/docs` for consumers, `.dev/docs` for contributors), cross-linking over duplication, and the rule that `/docs` links to `.dev/docs` files must use full GitHub URLs (relative paths break on hosted docs sites); add dispatch entry to `template/CLAUDE.md`
+
+- `2026-07-07 | conventions | no | name-code-not-people`: add "Name code, not people" rule to `conventions/session-discipline.md` and `template/CLAUDE.md`: attribute work to features, modules, and systems - not to individuals; attribution belongs in git history, not in sessions.md, tech-debt, docs, or any other persisted content
+
+- `2026-07-07 | template | no | no-machine-specific-paths`: add "No machine- or user-specific absolute paths in committed files" to Critical constraints in template/CLAUDE.md and template/AGENTS.md: a resolved local resource path (e.g. a per-project memory path) breaks for other developers, other machines, and after the repo moves; use a generic placeholder instead. Found via a leaked Claude project-memory path committed in a downstream project's CLAUDE.md.
+
 - `2026-06-30 | conventions | no | dependency-version-verification`: add "Dependency version verification" to template/conventions/code-style.md after Library awareness: always run `npm view <package> version` (or equivalent) before writing a version into any config; do not use versions from training data; "already used in this repo" does not imply currency
 
 - `2026-06-30 | template | no | purpose-alignment`: add "verify purpose alignment before implementing" to Interaction parameters in template/CLAUDE.md, CLAUDE.md, and AGENTS.md: when a task names a goal, the agent must check whether the chosen approach achieves that goal directly rather than something adjacent; lead with the gap as an objection before writing anything
