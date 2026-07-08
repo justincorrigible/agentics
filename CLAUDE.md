@@ -15,7 +15,7 @@ This is the agentics repo itself. Its purpose is to maintain and distribute the 
 - This repo is the upstream source for other teams; keep content general and publicly safe
 
 ## When to read what
-- Starting a session → read `.dev/roadmap.md`, `.dev/tech-debt.md`, `.dev/sessions.md`
+- Starting a session → read `.dev/roadmap.md`, `.dev/tech-debt.md`, `.dev/sessions/`
 - Reviewing or editing template files → read `template/CLAUDE.md` first to understand what we are maintaining
 - Adding to project memory → check: could this be global? Could it be a template improvement?
 

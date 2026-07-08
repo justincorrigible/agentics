@@ -28,7 +28,7 @@ The `.dev/` directory contains living documents maintained alongside the codebas
 
 - `.dev/roadmap.md`: planned features and architectural direction; read at session start
 - `.dev/tech-debt.md`: known issues, scope-adjacent problems, and deferred work
-- `.dev/sessions.md`: brief session log (done, decisions, open threads)
+- `.dev/sessions/`: one file per contributor per day (`YYYY-MM-DDTHHMMSS.md`), brief log of what changed and why
 - `.dev/docs/`: service-specific deployment notes and operational guides; indexed at `.dev/docs/index.md`; one subdirectory per service (e.g. `.dev/docs/postgres/`, `.dev/docs/kafka/`)
 
 Read the `.dev/` files at the start of each session before beginning work. Read the relevant `docs/<service>/` guide before deploying or debugging a specific service. Update these at the end of any session that produces meaningful output.

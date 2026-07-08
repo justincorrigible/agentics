@@ -49,5 +49,5 @@ Brief note on what it is and why it's parked.
 ## Notes on use
 
 - This file is read by the agent, not executed. Keep entries short enough to be useful in a context window.
-- Completed items are removed, not marked done: `sessions.md` (at the project level) is the historical record.
+- Completed items are removed, not marked done: `.dev/sessions/` (at the project level) is the historical record.
 - Items that belong to a specific project should live in that project's `.dev/roadmap.md`, not here. Global roadmaps hold cross-project work and initiatives that have no single home.

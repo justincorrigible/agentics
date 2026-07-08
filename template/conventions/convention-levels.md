@@ -10,6 +10,8 @@ Applies to this project only: domain vocabulary, key file paths, test commands, 
 **Global**
 Applies to all the developer's projects: behavioural conventions (testing style, scope discipline, checking in), tooling preferences, interaction style. Belongs in `~/.claude/CLAUDE.md`. Always loaded: updating it once propagates to every project automatically.
 
+If you've adopted the agentics template as your base, global should not hold a full copy of a convention that already lives there: it should reference agentics and add only the refinements that are actually local (things agentics doesn't cover, or a deliberate override, stated as such). A duplicated convention drifts the moment either copy changes; a referenced one can't.
+
 **Shareable (template)**
 Structural patterns that benefit other teams: dispatch table wiring, `.dev/` layout, initialization flow, the credential file hook. Belongs in the [agentics template](https://github.com/oicr-softeng/agentics). Adopted by copying and adapting.
 
@@ -31,6 +33,6 @@ If the user opted in during initialization (`propagation_suggestions: yes`), sur
 
 One sentence is enough: name the level and why. Example: "This validation pattern looks applicable across projects: worth adding to your global context?"
 
-Let the user decide without pressure. If they say yes, make the change and record it in `sessions.md`.
+Let the user decide without pressure. If they say yes, make the change and record it in `.dev/sessions/`.
 
 **Agentics contributors:** if `agentics_contributor: yes` is set in project memory, propagation is always on without asking: and the agentics repo is always named as an explicit candidate alongside the other levels. See `CONTRIBUTING.md` in the agentics repo for how to set this up.

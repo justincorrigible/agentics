@@ -31,7 +31,7 @@ DEVELOPMENT.md              human developer setup and onboarding guide (fill in 
 .dev/
   roadmap.md                planned work across features and phases
   tech-debt.md              known issues with standalone/blocked tags
-  sessions.md               dated log of decisions and open threads
+  sessions/                 one file per contributor per day, dated log of decisions and open threads
 ```
 
 **Optional bootstrapping files** (skip if already covered by your agent's global context):

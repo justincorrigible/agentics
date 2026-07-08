@@ -20,7 +20,7 @@ Surface options rather than making decisions unilaterally. For tasks with irreve
 
 The base template assumes a software project with `.dev/` files. For general users, adapt:
 
-- Keep a brief running note in the conversation of what was decided or done: no `.dev/sessions.md` required.
+- Keep a brief running note in the conversation of what was decided or done: no `.dev/sessions/` required.
 - Flag open or unresolved items verbally and ask the user how they'd like to track them (a to-do list, a note, a calendar reminder).
 - If the user does have a project with `.dev/` files, the base template rules apply.
 

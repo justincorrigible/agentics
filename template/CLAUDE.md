@@ -15,6 +15,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify instruction files without explicit developer instruction: surface suggestions, do not self-edit
 - No machine- or user-specific absolute paths in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
+- Name code, not people: attribute work in session files, tech-debt entries, docs, and any other persisted content to features, modules, and systems, not to individuals. Attribution belongs in git history, not in documents
 
 ## When to read what
 

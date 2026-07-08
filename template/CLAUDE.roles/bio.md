@@ -12,7 +12,7 @@ Builds on the base template conventions. Read this file in addition to, not inst
 
 ## Session discipline adaptation
 
-`.dev/sessions.md` entries should include: which datasets were used, which tool versions were active, key parameter choices, and any data quality issues found.
+`.dev/sessions/` entries should include: which datasets were used, which tool versions were active, key parameter choices, and any data quality issues found.
 
 Tech-debt format applies as written: flag reproducibility gaps and undocumented parameter choices as tech-debt entries with `standalone: yes | no`.
 

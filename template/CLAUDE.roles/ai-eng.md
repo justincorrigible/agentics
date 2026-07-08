@@ -16,7 +16,7 @@ Applies when the project involves building, evaluating, or maintaining AI system
 
 Do not ship a prompt or model change without an eval. Even a small hand-labelled set is better than none. Document: what was measured, on what data, with what baseline.
 
-Log eval runs in `.dev/sessions.md` with: model/version, dataset, metric, result. This is the audit trail for model decisions.
+Log eval runs in `.dev/sessions/` with: model/version, dataset, metric, result. This is the audit trail for model decisions.
 
 ## Agentic and multi-agent patterns
 
@@ -30,7 +30,7 @@ Log eval runs in `.dev/sessions.md` with: model/version, dataset, metric, result
 
 When working on agentic infrastructure itself (instruction files, memory systems, convention propagation):
 
-- Surface design decisions in `.dev/sessions.md`, not just in conversation.
+- Surface design decisions in `.dev/sessions/`, not just in conversation.
 - When a pattern works, document why: not just what it does.
 - Convention propagation is part of the work. The instructions are as important as the code.
 

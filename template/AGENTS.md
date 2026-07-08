@@ -23,10 +23,10 @@ A session is a work period: not necessarily a new chat thread. Treat greetings (
 
 On a session-start signal, before touching any code:
 1. If a cross-project map exists in your agent's global context (for Claude: `~/.claude/projects.md`), read it. If it does not exist and the user works across multiple projects, offer to create one using `global-context/projects.md` as a template.
-2. Check whether instruction files changed since the last `sessions.md` entry: `git log --oneline -1 -- CLAUDE.md AGENTS.md`. Re-read only changed files. When you do, say: "I've re-read [file]: the prior version in this thread is superseded."
+2. Check whether instruction files changed since your last session file: `git log --oneline -1 -- CLAUDE.md AGENTS.md`. Re-read only changed files. When you do, say: "I've re-read [file]: the prior version in this thread is superseded."
 3. Read `.dev/roadmap.md`: check current focus and any `[in progress]` items
 4. Read `.dev/tech-debt.md`: note `standalone: yes` entries relevant to today's work
-5. Read `.dev/sessions.md`: last 1-2 entries give context on recent work and open threads
+5. Read the most recent 1-2 files in `.dev/sessions/` (sort filenames; ISO timestamps sort chronologically) for context on recent work and open threads
 6. softeng team member → read `CLAUDE.softeng.md`
 
 **On context efficiency:** re-reading mid-thread adds content: it does not replace the prior version. Both consume tokens. Only re-read files that actually changed (step 2). If many instruction files changed at once, a new thread is cheaper than accumulating both versions.
@@ -35,9 +35,15 @@ On a session-start signal, before touching any code:
 
 Update `.dev/roadmap.md` or `.dev/tech-debt.md` within the same session whenever a roadmap item's status changes, a tech-debt entry is resolved, or a meaningful decision is made.
 
-After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in `sessions.md`. Do not wait for a "session over" signal; work rarely ends cleanly. Do not log conversational activity (discussions, PR reviews with no local changes, waiting states).
+After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file. Do not wait for a "session over" signal; work rarely ends cleanly. Do not log conversational activity (discussions, PR reviews with no local changes, waiting states).
 
 When `.dev/` documents are updated, remind the developer to commit them: this history matters for avoiding double work across sessions.
+
+## Session file identity
+
+Each session's log lives in its own file under `.dev/sessions/`, named `YYYY-MM-DDTHHMMSS.md`, keyed by contributor and day rather than one shared file: this is what prevents merge conflicts when several people work the same project the same day. No descriptive slug in the filename: the timestamp's only job is uniqueness.
+
+To find your file for today: list `.dev/sessions/` for today's date prefix, then check authorship of any match (`git log -1 --format=%ae -- <file>` vs `git config user.email`; an uncommitted match is yours by definition). If a match is yours, extend it; otherwise create a new file with the current timestamp. This gives at most one file per (day, contributor), not one per session. Two concurrent sessions by the same person can still race on the same file: that's a self-conflict for that person to resolve, not the cross-contributor case this targets.
 
 ## Tech-debt entry format
 
@@ -112,7 +118,7 @@ Be aware of the current OWASP Top 10 (verify the current edition at https://owas
 
 For security-relevant work, read `conventions/security-guidelines.md`: it maps each OWASP category to concrete patterns and code review triggers. Your agent may also have a global copy of these guidelines in its personal context directory (for Claude: `~/.claude/security-guidelines.md`).
 
-**Quick threat model (A06):** before building anything with security implications, answer: what are we building? what could go wrong? what are we doing about it? Record in `sessions.md`.
+**Quick threat model (A06):** before building anything with security implications, answer: what are we building? what could go wrong? what are we doing about it? Record in `.dev/sessions/`.
 
 ## Convention placement and propagation
 

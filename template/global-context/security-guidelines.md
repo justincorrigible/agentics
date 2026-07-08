@@ -8,7 +8,7 @@ These guidelines are derived from the team's working review of OWASP Top 10:2025
 
 ## Quick threat model: A06: Insecure Design
 
-Before implementing any feature with security implications, answer three questions. Aim for five minutes; record the result in `sessions.md` under the feature name.
+Before implementing any feature with security implications, answer three questions. Aim for five minutes; record the result in `.dev/sessions/` under the feature name.
 
 **1. What are we building?**
 One sentence.

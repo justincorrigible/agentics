@@ -48,7 +48,7 @@ Only approve packages you have reviewed. Treat a new entry in `allowBuilds` the 
 
 ## Quick threat model (A06: Insecure Design)
 
-Before implementing a feature with security implications, answer three questions and record in `sessions.md`:
+Before implementing a feature with security implications, answer three questions and record in `.dev/sessions/`:
 
 1. **What are we building?** (one sentence)
 2. **What could go wrong?** (consider: unauthorized access, injection, resource exhaustion, data exposure, supply chain)
