@@ -1,5 +1,7 @@
 # Agent security threats
 
+Dual audience: human maintainers, to understand the threat model, and AI agents, to actually run the session-start integrity check it describes (dispatched from `conventions/session-discipline.md`). Both readings are intentional; this isn't a mis-filed agent-instructions file.
+
 AI agents are categorically more vulnerable than human developers to certain attack classes. A human who encounters a malicious prompt in a document notices it and stops. An agent processes it, acts on it, and may report success.
 
 This document covers the threat landscape relevant to agentics users, the session-start integrity checks agents should run, and an honest account of what cannot be caught automatically.

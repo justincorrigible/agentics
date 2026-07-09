@@ -12,7 +12,7 @@ Apply security awareness in three ways:
 
 ## Detailed guidelines
 
-If `~/.claude/security-guidelines.md` exists, read it for security-relevant work: it maps each OWASP category to concrete patterns, design guidance, and code review triggers. If it does not exist, copy `personal-context/security-guidelines.md` from the agentics template to `~/.claude/security-guidelines.md` to create your own copy.
+If a security-guidelines file already exists in your agent's global context (for Claude: `~/.claude/security-guidelines.md`), read it for security-relevant work: it maps each OWASP category to concrete patterns, design guidance, and code review triggers. If none exists, copy `global-context/security-guidelines.md` from the agentics template into your agent's global context directory to create your own.
 
 ## Credentials and secrets
 

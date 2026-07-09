@@ -31,7 +31,7 @@ This directory contains template files for setting up AI agent collaboration in 
 
 ## Keeping up to date
 
-The version tag in `CLAUDE.md` (`<!-- agentics-template-version: X.Y.Z -->`) tracks which version of this template you adopted. Compare it against the [agentics CHANGELOG](../CHANGELOG.md) to see what has changed since your last update.
+On adoption, extend the version tag in `CLAUDE.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is agentics' current `HEAD` at the time you copy the template. If your global context has `propagation_suggestions: yes`, your agent checks this automatically at session start (see `conventions/convention-levels.md` § Checking for upstream updates) and surfaces what's changed since, no manual CHANGELOG comparison needed. Without that opt-in, compare the tag against the [agentics CHANGELOG](../CHANGELOG.md) yourself.
 
 ## Already have an existing setup?
 

@@ -1,6 +1,8 @@
 <!-- agentics-template-version: 0.1.0 -->
 # Agent collaboration conventions
 
+**For AI agents:** this file is instructions your agent reads and follows; it is not documentation written for people. If you're a person looking for how this project works, see this project's own README or development guide instead.
+
 Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This is the comprehensive reference for agents that do not load files on demand. If you are Claude, prefer `CLAUDE.md`: it dispatches to more detailed convention files.
 
 ## Interaction parameters
@@ -13,7 +15,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify `CLAUDE.md`, `AGENTS.md`, or other instruction files without explicit instruction from the developer: surface suggestions, do not self-edit
-- No machine- or user-specific absolute paths in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
+- No machine- or user-specific absolute paths, usernames, or individuals' real names in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
 
 ## Session-start signals
 
@@ -27,13 +29,16 @@ On a session-start signal, before touching any code:
 3. Read `.dev/roadmap.md`: check current focus and any `[in progress]` items
 4. Read `.dev/tech-debt.md`: note `standalone: yes` entries relevant to today's work
 5. Read the most recent 1-2 files in `.dev/sessions/` (sort filenames; ISO timestamps sort chronologically) for context on recent work and open threads
-6. softeng team member → read `CLAUDE.softeng.md`
+6. If `propagation_suggestions: yes` is set, or you're an agentics contributor (`agentics_contributor: yes` in your global context) without `agentics_upstream_check: no` set for this project or globally, check whether this project has adopted agentics at all (a tag, or just a mention of agentics in `AGENTS.md`/`CLAUDE.md`) and, if so, check for upstream updates: see `conventions/convention-levels.md` § Checking for upstream updates. A missing or incomplete tag means this project needs the tag added, not that the check should be skipped. For contributors this is mandatory and recurs every session for an unresolved gap, not just once
+7. softeng team member → read `CLAUDE.softeng.md`
 
 **On context efficiency:** re-reading mid-thread adds content: it does not replace the prior version. Both consume tokens. Only re-read files that actually changed (step 2). If many instruction files changed at once, a new thread is cheaper than accumulating both versions.
 
 ## Keeping `.dev/` current
 
 Update `.dev/roadmap.md` or `.dev/tech-debt.md` within the same session whenever a roadmap item's status changes, a tech-debt entry is resolved, or a meaningful decision is made.
+
+Before writing any of these updates: marking an item done, closing a tech-debt entry, changing a status: verify against the actual current code or file state, not against a prior description or session summary. An assumption carried forward unverified is exactly how these documents drift from what they claim.
 
 After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file. Do not wait for a "session over" signal; work rarely ends cleanly. Do not log conversational activity (discussions, PR reviews with no local changes, waiting states).
 
@@ -129,6 +134,10 @@ Conventions live at one of three levels: always ask which level is correct:
 - **Shareable**: could benefit other teams; flag as a potential PR to the agentics repo
 
 When adding or improving a convention anywhere, ask: is this at the right level? If a convention just improved in one project, ask whether sibling projects carry the same convention and would benefit: moving it to global covers all of them at once. Check your cross-project map for the list of related projects. Surface these questions explicitly.
+
+## Upgrading agentics adoption
+
+If a developer asks to upgrade this project's agentics integration, or the session-start check above finds a missing/stale tag: read `conventions/upgrading-adoption.md` and follow it. It covers confirming this project is actually meant to track agentics (including the case where it shares the conventions with no textual link back to agentics at all), diagnosing what's stale against the current template, and applying fixes with per-change consent. Don't patch just the tag in isolation: session-file migration and `AGENTS.md` completeness usually need the same pass.
 
 ## Memory hygiene
 

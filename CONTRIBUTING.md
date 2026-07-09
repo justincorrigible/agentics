@@ -7,31 +7,36 @@ This repo distributes the devctx collaboration template. Changes here propagate 
 - **Dispatch over inline**: `CLAUDE.md` stays lean (~30 lines); convention detail lives in separate files loaded on demand
 - **Agent-neutral**: template files must not reference Claude-specific paths (`~/.claude/`); use "your agent's global context directory" with a parenthetical for Claude users where needed
 - **No credentials**: no secrets, private URLs, or internal endpoints anywhere in this repo: ever
+- **No personal identifying details**: no local usernames, real names of individual contributors, machine-specific absolute paths, or personal account handles (e.g. a personal fork under your own GitHub username) anywhere in this repo. It's read by people with no context for who you are or what machine you use, this session's history included: a personal GitHub username and a contributor's first name both made it into committed docs before being caught. Use generic placeholders instead: "the developer," "the repo's lead developer" (see "Name code, not people" in `session-discipline.md`), "a local clone," "your global context"
 - **Additive, not prescriptive**: role and org files add or modify the base; they do not replace it
 - **Lean project files**: downstream project `CLAUDE.md`/`AGENTS.md` should be lean: project-specific content inline, universal conventions as pointers to this template
+- **Explicit audience**: don't rely on filename or folder structure alone to signal that a file is agent instructions rather than human documentation — a person unfamiliar with the convention won't necessarily infer it. `CLAUDE.md`/`AGENTS.md` (both root and template) say so explicitly in their opening lines; a file that's genuinely dual-audience (e.g. `docs/agent-security.md`) says that instead. Apply the same to any new agent-facing file whose purpose isn't obvious from context
 
 ## Agent setup for contributors
 
-If you use an AI agent and are actively contributing to agentics, set the following in your project memory for this repo:
+If you use an AI agent and are actively contributing to agentics, set the following in your **global context** (not just this repo's project memory — it needs to apply in every project you work in, not only sessions inside agentics itself):
 
 ```
 agentics_contributor: yes
 ```
 
-This enables two behaviours without needing to opt in per session:
+This enables three behaviours without needing to opt in per session or per project:
 - Propagation suggestions are always on: your agent surfaces convention improvements proactively
 - The agentics repo is always named as an explicit candidate, alongside the project and global levels
+- The upstream-update check becomes mandatory, not opt-in, in every project you work in — regardless of that project's own `propagation_suggestions` setting — and keeps recurring every session for an unresolved gap rather than surfacing it once and going quiet. This is deliberately more insistent than the standard opt-in tier: contributing to agentics implies keeping the ecosystem you're helping build actually current is part of the job. It stops only on an explicit "stop for this project" (recorded in that project's memory) or "stop for all projects" (recorded in your global context), never inferred from silence — someone who'd rather turn this off entirely than deal with it is signalling something about how invested they actually are in contributing, which is fine, but it's their call to make explicitly.
 
-Your agent will ask about this on the first session in this repo (initialization block in `CLAUDE.md`). You can also set it manually in project memory at any time.
+Your agent will ask about this on the first session in this repo (initialization block in `CLAUDE.md`), and should record the answer in your global context, not (only) this repo's project memory. You can also set it manually in your global context at any time.
 
-See `template/conventions/convention-levels.md` for what propagation suggestions look like in practice.
+See `template/conventions/convention-levels.md` § Checking for upstream updates for what this looks like in practice.
 
 ## Proposing changes
 
 1. Identify which level the change belongs at: see `template/conventions/convention-levels.md`
 2. Make the change and add a CHANGELOG entry under `## Unreleased`
-3. Do not bump the version tag in `template/CLAUDE.md` until the previous version is committed to remote
-4. Mark `breaking: yes` in the CHANGELOG if downstream copies need a manual update
+3. Before committing, run `grep -rn '~/\.claude\|Claude Code' template/` and check every hit: it needs either a `(for Claude: X; for other agents: Y)` parenthetical or a reason it's genuinely Claude-only (e.g. `.claude/settings.json`). The "Agent-neutral" principle above has drifted back into the template more than once despite being written down; the grep catches what a read-through misses.
+4. Also before committing, grep the diff for anything identifying you specifically: your OS username (`whoami`), your git identity (`git config user.name`/`user.email`), and any personal account or fork name you know is yours (e.g. `git remote -v` if you're working from a personal fork). This isn't hypothetical: it's how the check ended up written this way.
+5. Do not bump the version tag in `template/CLAUDE.md` until the previous version is committed to remote
+6. Mark `breaking: yes` in the CHANGELOG if downstream copies need a manual update
 
 ## Creating a new role file
 

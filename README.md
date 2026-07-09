@@ -66,7 +66,7 @@ For a manual adoption instead: copy the files from [`template/`](template/) into
 
 ## Keeping up to date
 
-The version tag in your project's `CLAUDE.md` (`<!-- agentics-template-version: X.Y.Z -->`) tracks which version you adopted. Compare it against [CHANGELOG.md](CHANGELOG.md) to see what has changed since.
+On adoption, extend the version tag in the adopting project's `CLAUDE.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/convention-levels.md` § Checking for upstream updates) instead of requiring a manual CHANGELOG comparison.
 
 ## Contributing
 

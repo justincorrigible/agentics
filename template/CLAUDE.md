@@ -1,6 +1,8 @@
 <!-- agentics-template-version: 0.1.0 -->
 # Agent collaboration conventions
 
+**For AI agents:** this file is instructions your agent reads and follows; it is not documentation written for people. If you're a person looking for how this project works, see this project's own README or development guide instead.
+
 Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To get updates, compare this file's version tag against the agentics CHANGELOG.
 
 ## Interaction parameters
@@ -14,7 +16,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify instruction files without explicit developer instruction: surface suggestions, do not self-edit
-- No machine- or user-specific absolute paths in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
+- No machine- or user-specific absolute paths, usernames, or individuals' real names in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
 - Name code, not people: attribute work in session files, tech-debt entries, docs, and any other persisted content to features, modules, and systems, not to individuals. Attribution belongs in git history, not in documents
 
 ## When to read what
@@ -30,6 +32,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - Security-relevant work          -> read `conventions/security-guidelines.md`
 - softeng team member             -> read `CLAUDE.softeng.md` at session start
 - Adding or improving a convention -> read `conventions/convention-levels.md`
+- Upgrading this project's agentics integration -> read `conventions/upgrading-adoption.md`
 - Deploying or debugging a service -> read `.dev/docs/<service>/` if it exists
 
 ## Memory and contribution hygiene

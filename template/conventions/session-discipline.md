@@ -17,7 +17,8 @@ On a session-start signal, run this sequence before touching any code:
 2. Read `.dev/roadmap.md`: check the current focus and any `[in progress]` items. If your global context defines one or more global roadmaps, also read the one relevant to the current project - not all of them. For example: read `roadmap-work.md` for professional projects, `roadmap-personal.md` for personal ones. See `global-context/roadmap.md` for the convention.
 3. Read `.dev/tech-debt.md`: note any `standalone: yes` entries relevant to today's work
 4. Read the most recent 1-2 files in `.dev/sessions/` for context on recent work and open threads. ISO-formatted filenames sort chronologically, so `ls .dev/sessions | sort | tail -2` finds them without an index file.
-5. Determine your session file for today: see "Session file identity" below.
+5. If your global context has `propagation_suggestions: yes`, or you're an agentics contributor (`agentics_contributor: yes` in your global context) without `agentics_upstream_check: no` set for this project or globally, check whether this project has adopted agentics at all (a tag, or just a mention of agentics in `AGENTS.md`/`CLAUDE.md`) and, if so, check for upstream updates: see `conventions/convention-levels.md` § Checking for upstream updates. A missing or incomplete tag doesn't mean skip it: it means this project needs the tag added, which that section covers. For contributors, this is mandatory and recurs every session for an unresolved gap — don't let it quietly stop repeating just because it went unanswered before.
+6. Determine your session file for today: see "Session file identity" below.
 
 **On context efficiency:** re-reading a file mid-thread adds it to context: it does not replace the prior version. Both consume tokens. To stay efficient: only re-read files that actually changed (step 1 tells you which), and explicitly mark the old version superseded. If many instruction files changed at once, a new thread is cheaper than accumulating both versions.
 
@@ -26,6 +27,8 @@ On a session-start signal, run this sequence before touching any code:
 At session start, before starting new work, do a quick staleness pass on `roadmap.md` and `tech-debt.md`: mark completed items done, close resolved PINNED entries, remove addressed tech-debt entries. This is not a full audit: just enough to prevent documents drifting out of sync with reality.
 
 Update `.dev/roadmap.md` or `.dev/tech-debt.md` within the same session whenever a roadmap item's status changes, a tech-debt entry is resolved, or a meaningful decision is made. These documents are shared memory across sessions: they should reflect current reality, not just initial planning.
+
+Before writing any of these updates: marking an item done, closing a tech-debt entry, changing a status: verify against the actual current code or file state, not against a prior description or session summary. An assumption carried forward unverified is exactly how these documents drift from what they claim.
 
 After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file (see "Session file identity" below). Do not wait for an explicit "session over" signal: work rarely ends cleanly, and the update will be missed if it depends on one.
 

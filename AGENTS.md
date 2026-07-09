@@ -1,6 +1,8 @@
 <!-- agentics-repo-version: 0.1.0 -->
 # Agent collaboration conventions: softeng/agentics
 
+**For AI agents:** this file is instructions your agent reads and follows; it is not documentation written for people. If you're a person looking to use or contribute to this repo, read [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md) instead.
+
 This is the agentics repo itself. Its purpose is to maintain and distribute the devctx collaboration template to softeng team members and developers broadly.
 
 This file is the agent-neutral companion to `CLAUDE.md`. If you are Claude, prefer `CLAUDE.md`; otherwise use this file.
@@ -15,6 +17,7 @@ This file is the agent-neutral companion to `CLAUDE.md`. If you are Claude, pref
 ## Critical constraints
 - No credentials, secrets, or private URLs in any file in this repo: ever
 - This repo is the upstream source for other teams; keep content general and publicly safe
+- No personal identifying details: no local usernames, real names of individual contributors, machine-specific absolute paths, or personal account/fork handles anywhere in this repo. Use generic placeholders instead: "the developer," "the repo's lead developer," "a local clone." Before committing, grep the diff for your own OS username, git identity, and any personal fork name you know is yours: this has leaked into committed docs before
 
 ## When to read what
 - Starting a session → read `.dev/roadmap.md`, `.dev/tech-debt.md`, `.dev/sessions/`
@@ -32,6 +35,6 @@ When writing to project memory: keep entries concise; store no content derivable
 ## Initialization
 If no project memory exists for you in this repo yet:
 1. Check whether the user's role is already known from your agent's global context. If not, ask: "What best describes your primary work?": developer / bioinformatician / AI engineering / general.
-2. If role is developer or AI engineer: ask "Are you an agentics contributor?": if yes, record `agentics_contributor: yes`. This enables propagation suggestions always on and names the agentics repo as an explicit candidate whenever convention improvements surface in any project.
+2. If role is developer or AI engineer: ask "Are you an agentics contributor?": if yes, record `agentics_contributor: yes` **in your global context, not just this project's memory** — it needs to apply in every project, not only sessions inside agentics itself. This enables always-on propagation suggestions, names the agentics repo as an explicit candidate, and makes the upstream-update check mandatory (not opt-in) everywhere: see `CONTRIBUTING.md` § Agent setup for contributors.
 3. Check whether softeng status is already known from global context: if not, ask.
-Record answers in project memory. Do not ask again.
+Record role and softeng answers in project memory; record `agentics_contributor` in global context per above. Do not ask again.
