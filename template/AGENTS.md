@@ -59,6 +59,8 @@ context: [roadmap item reference or brief note: required when standalone: no]
 ```
 
 `standalone: yes`: can be picked up freely.
+
+Separate the issue from the fix, even in this minimal form: a description with no recommended direction means whoever picks it up next re-derives the same analysis. At scale (dozens of entries across a large codebase), consider a richer per-entry structure instead — File / Severity / Kind / Issue / Fix / Standalone — for triage and scanability. This is a genuine tradeoff, not a strict upgrade: it costs more friction to log each entry, which loses more than it gains for a short list. Pick based on the actual list's size.
 `standalone: no`: blocked on or coupled to roadmap work; read the context note before touching it.
 
 ## Testing
@@ -96,7 +98,7 @@ suite('getNetworkPassthroughHeaders', () => {
 
 **Property ordering:** Alphabetize properties in config objects and YAML/JSON files at all nesting levels: prevents silent duplicate key overwrites and keeps additions consistent.
 
-**Language:** flag typos and language issues when spotted: in code, comments, and docs. Don't fix silently. Use your team's preferred spelling convention consistently (example: Canadian English uses -our, -re, -ize, -yse).
+**Language:** flag typos and language issues when spotted: in code, comments, and docs. Don't fix silently. Use your team's preferred spelling convention consistently (example: Canadian English uses -our, -re, -ize, -yze).
 
 ## Code review
 

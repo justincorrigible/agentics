@@ -18,7 +18,7 @@ Key rules:
 - `-re` suffixes: "centre", "fibre", "theatre"
 - `-ue` suffixes: "catalogue", "dialogue", "analogue"
 - `-ize` (not `-ise`): "organize", "prioritize", "recognize": Canadian uses -ize
-- `-yse`: "analyse", "paralyse" (Canadian prefers -yse over -yze)
+- `-yze`: "analyze", "paralyze" (despite the -ise/-ize split above, Canadian does not diverge here; both use -yze)
 
 For new text: apply from the start. For existing identifiers: flag the inconsistency and note it as a rename task; renames deserve a dedicated commit.
 

@@ -40,3 +40,5 @@ Locate the current agentics template: prefer a local clone (`Repo URL`/`Path` lo
 ## 3. Record it
 
 Log the upgrade in this project's own session file (create `.dev/sessions/` now if this run is what introduces it) and remind the developer to commit and push, so other contributors pick up the change on their next pull — not automatically, and not until then.
+
+This procedure reads a lot: multiple files, diffs, CHANGELOG history, back-and-forth diagnosis. None of that has ongoing value once the migration is applied, and it stays in context adding token weight to whatever comes next in the same thread. If your harness gives you no way to reset or clear your own context window, recommend the developer start a fresh chat or session for subsequent work rather than continuing in this one — the same "new thread is cheaper than accumulating" reasoning already in `session-discipline.md` § Starting a session, just more pronounced here given how much this specific procedure tends to read.

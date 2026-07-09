@@ -71,7 +71,7 @@ When cleaning up em dashes in bulk: `sed -i '' 's/ — /: /g'`, then verify with
 
 ## Spelling and language convention
 
-[Team placeholder: configure your preferred spelling convention here. Example: Canadian English uses `-our` suffixes (colour, behaviour), `-re` suffixes (centre, fibre), `-ize` (not `-ise`), and `-yse` (analyse, paralyse).]
+[Team placeholder: configure your preferred spelling convention here. Example: Canadian English uses `-our` suffixes (colour, behaviour), `-re` suffixes (centre, fibre), `-ize` (not `-ise`), and `-yze` (analyze, paralyze; unlike the -ise/-ize split, Canadian does not diverge from American here).]
 
 ## Searching before writing
 
