@@ -3,18 +3,22 @@
 Global index of known projects, memory locations, and key cross-project relationships.
 Place this file at `~/.claude/projects.md`. Update it when a new project is set up or when paths change.
 
+**Repo URL vs local Path:** when a task references a project's GitHub URL (a doc link, a PR target, "check the latest conventions"), prefer reading the local `Path` over fetching the URL: it's faster and may be ahead of origin (uncommitted or unpushed work). Verify freshness first with `git log @{u}..` in that directory, since local can also be behind origin if someone else pushed. If you're the sole maintainer of a given repo, note that as an exception and skip the freshness check for it.
+
 ---
 
 ## Projects
 
 ### [project-name]
 - **Path:** `/path/to/project`
+- **Repo URL:** `https://github.com/org/repo`
 - **Memory:** `~/.claude/projects/[encoded-path]/memory/`
 - **What:** one-line description of what this project is and does
 - **Cross-project:** [what it depends on or what depends on it: omit if standalone]
 
 ### [another-project]
 - **Path:** `/path/to/project`
+- **Repo URL:** `https://github.com/org/repo`
 - **Memory:** `~/.claude/projects/[encoded-path]/memory/`
 - **What:** one-line description
 
