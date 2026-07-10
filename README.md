@@ -2,6 +2,10 @@
 
 A template for structured AI agent collaboration. Copy it into any project and your agent knows how to behave.
 
+This is AI-native documentation applied to a whole codebase, not just a docs site: not just markdown that reads well, but instructions structured so an agent parses them correctly, fetches them reliably, and doesn't drown its own context window doing it.
+
+This template goes further, though: its conventions also shape how the agent reasons and collaborates, not just what it can parse, a critical aspect other similar tools don't cover. In essence, an agent following it "questions" ideas instead of simply executing them blindly, whenever possible surfaces better alternatives, and checks that a proposed approach actually serves the stated goal before committing to one.
+
 ## Quick start
 
 If this repo is accessible to your agent, say:
