@@ -63,11 +63,17 @@ Flag typos and language issues when spotted: in code, comments, and documentatio
 
 ## Dashes
 
-Do not use em dashes (`—`), en dashes (`–`), double hyphens (`--`), or space-hyphen-space (` - `) as prose connectors in any output: documentation, comments, or conversational messages. This is an absolute rule; drafts and chat responses are included since they are routinely pasted or submitted.
+Never use em dashes, en dashes, double hyphens as dash substitutes, or space-hyphen-space as sentence connectors in any output: documentation, code comments, persisted files, or conversational messages. This applies to all text content without exception. Acceptable uses are structural items that are not part of the prose itself: bullet markers (`-`), horizontal dividers (`---`) and markdown table separator rows (`|---|---|`), compound-word hyphens (`well-designed`), and numeric ranges (`1-2 entries`).
 
-Use a plain hyphen only for legitimate hyphen uses: compound words and ranges (`1-2 entries`). For prose connectors, use a semicolon or rephrase. For labelled annotations in bullets, use `: ` as the separator.
+Do not use in text:
+- Em dashes (`—`, U+2014)
+- En dashes (`–`, U+2013)
+- Double hyphens (`--`) as a dash substitute
+- Space-hyphen-space (` - `) as a sentence connector
 
-When cleaning up em dashes in bulk: `sed -i '' 's/ — /: /g'`, then verify with `grep -c '—' <file>`. Space-hyphen-space violations need case-by-case review since ` - ` is also a valid list bullet prefix.
+For mid-sentence connectors, use a semicolon or rephrase. For inline annotations in bullets (`.dev/sessions/` entries, `roadmap.md`, etc.), use `: ` as the separator: `` `path/to/file`: what changed ``. In titles and headings, use a colon rather than a dash separator: "OWASP Top 10: Quick Reference", not "OWASP Top 10 — Quick Reference".
+
+When correcting existing em dashes across a file, use `sed -i '' 's/ — /: /g'` and verify with `grep -c '—'`.
 
 ## Spelling and language convention
 
@@ -99,4 +105,8 @@ Set up structured logging before writing application logic, the same way you set
 
 ## Git
 
-[Team placeholder: configure your preferred commit discipline here. Example: never commit without explicit user instruction; the user handles all git work.]
+Never commit without explicit user instruction: the user handles all git work themselves.
+
+Never stage changes (`git add`) without being explicitly asked to, either: staging is the user's call, same as committing. Making an edit does not stage it: changes sit in the working tree, unstaged, until staged deliberately. When reporting on changes made, state their actual git state plainly rather than just "the changes are there": a user who expects staging and finds none wastes real time looking for something that was never where they expected it.
+
+[Team placeholder: adjust this default if your team has a different commit or staging discipline.]
