@@ -11,6 +11,7 @@ This repo distributes the devctx collaboration template. Changes here propagate 
 - **Additive, not prescriptive**: role and org files add or modify the base; they do not replace it
 - **Lean project files**: downstream project `CLAUDE.md`/`AGENTS.md` should be lean: project-specific content inline, universal conventions as pointers to this template
 - **Explicit audience**: don't rely on filename or folder structure alone to signal that a file is agent instructions rather than human documentation — a person unfamiliar with the convention won't necessarily infer it. `CLAUDE.md`/`AGENTS.md` (both root and template) say so explicitly in their opening lines; a file that's genuinely dual-audience (e.g. `docs/agent-security.md`) says that instead. Apply the same to any new agent-facing file whose purpose isn't obvious from context
+- **Adopt agentics, not pieces of it**: write about adoption at the level of "adopted agentics" (fully or partially), not "adopted a convention from agentics." The latter frames agentics as a menu to pick items from rather than a system to bring in; whether a given convention ends up copied locally or left as a live pointer is an implementation detail underneath that, not the framing itself
 
 ## Agent setup for contributors
 

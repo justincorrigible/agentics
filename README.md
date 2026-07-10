@@ -59,10 +59,22 @@ For a manual adoption instead: copy the files from [`template/`](template/) into
 
 ## Design
 
-- **Dispatch, not dump**: `CLAUDE.md` stays lean; convention detail lives in separate files loaded only when relevant. This keeps the context window free for actual work.
+- **Dispatch, not dump**: `CLAUDE.md` stays lean; convention detail lives in separate files loaded only when relevant. See "Two tiers" below for what decides which conventions get copied in versus left as a live pointer.
 - **Agent-neutral**: the template works with Claude, Codex, Copilot, and others. Role files, convention files, and `AGENTS.md` use no agent-specific paths.
 - **Additive**: roles and org layers (softeng) add to the base; they do not replace it. Merging with your existing setup is always the right choice.
 - **Contribution ladder**: good practices discovered in a project can bubble up: project memory → agent global context → PR to agentics.
+
+### Two tiers: how often something is needed, not just how much
+
+A convention only needs to be copied into the adopting project if reading it live, on demand, would fail silently. Everything else stays a pointer to agentics, whether that's a local clone or a remote URL.
+
+**Needed every session, with no natural trigger of its own:** the session-start checklist, and the project's own version/sync marker. Nothing else prompts checking these, so if the check doesn't fire reliably, drift goes unnoticed. This was tested directly: a citation ("the base convention lives in X") did not reliably cause a fresh read of the current file; only an explicit instruction ("read X now, every session") did.
+
+**Needed only when actually doing that task:** writing tests, reviewing a PR, security-relevant work, writing docs. These already have a strong trigger: the agent is doing that task right now. A live dispatch pointer works fine here, which is why `CLAUDE.md` can stay lean for all of them.
+
+**The one deliberate exception:** `AGENTS.md` inlines both tiers, including the second one. It exists for agents that cannot fetch a file on demand at all: for that population nothing dispatches reliably, so the fallback pays the duplication cost instead. That's a bounded exception for a known limitation, not the default model.
+
+**Local clone versus remote URL is a separate axis.** It changes where a needed convention is fetched from, not whether it needs fetching at all. A contributor with agentics cloned locally and a new adopter working from a GitHub URL alone should both end up doing the same thing: reading tier-one content live, every session, from whichever source is actually available to them.
 
 ## Keeping up to date
 

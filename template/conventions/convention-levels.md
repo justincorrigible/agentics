@@ -17,6 +17,18 @@ If you've adopted the agentics template as your base, global should not hold a f
 **Shareable (template)**
 Structural patterns that benefit other teams: dispatch table wiring, `.dev/` layout, initialization flow, the credential file hook. Belongs in the [agentics template](https://github.com/oicr-softeng/agentics). Adopted by copying and adapting.
 
+## How much to keep locally
+
+The three levels above answer where a convention should be authored or live. This answers a different question: once a project has adopted agentics, in full or in part, does a given convention need a local copy, or can it stay a live pointer? See the root README's "Two tiers" section for the fuller motivation; this is the operational rule.
+
+**Copy in locally:** only what must fire every session, with no natural trigger of its own to prompt checking it — the session-start checklist itself, and the project's own `agentics-template-version | synced` marker (inherently local: it's state about this project, not agentics content, so there's no version of it that could live elsewhere). If this doesn't happen reliably, drift goes unnoticed, and a passive reference has already been shown not to work here (see "The reference has to be an instruction, not a citation" above).
+
+**Leave as a live pointer:** everything invoked only when actually doing that task — testing, code style, security, documentation, code review, this file, upgrading adoption. Each has its own strong trigger (the agent is doing that task right now), so a dispatch line in `CLAUDE.md` is enough; copying the content in gains nothing and adds a second copy that can drift from the first.
+
+**The `AGENTS.md` exception:** it inlines both categories, deliberately, because it's the fallback for agents that cannot fetch a file on demand at all. That's a bounded cost for a known limitation, not evidence that copying is generally the safer choice.
+
+**Local clone or remote URL, same rule either way.** Whether agentics is available as a local clone or only as a GitHub URL changes where the every-session content gets fetched from, not whether it needs fetching. A brand-new adopter working from a URL alone still needs the session-start checklist read fresh, every session, the same as a contributor with a local clone — just fetched over the network instead of from disk. Tested directly against a fixture with no local agentics clone available at all: the same imperative phrasing that works for a local path ("read `<path>` fresh") worked unchanged for a raw GitHub URL ("fetch `<url>` fresh"), first attempt, no adjustment needed.
+
 ## The propagation question
 
 Whenever you add or improve a convention: anywhere: ask three things:
