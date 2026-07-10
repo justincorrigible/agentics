@@ -35,8 +35,9 @@ See `template/conventions/convention-levels.md` § Checking for upstream updates
 2. Make the change and add a CHANGELOG entry under `## Unreleased`
 3. Before committing, run `grep -rn '~/\.claude\|Claude Code' template/` and check every hit: it needs either a `(for Claude: X; for other agents: Y)` parenthetical or a reason it's genuinely Claude-only (e.g. `.claude/settings.json`). The "Agent-neutral" principle above has drifted back into the template more than once despite being written down; the grep catches what a read-through misses.
 4. Also before committing, grep the diff for anything identifying you specifically: your OS username (`whoami`), your git identity (`git config user.name`/`user.email`), and any personal account or fork name you know is yours (e.g. `git remote -v` if you're working from a personal fork). This isn't hypothetical: it's how the check ended up written this way.
-5. Do not bump the version tag in `template/CLAUDE.md` until the previous version is committed to remote
-6. Mark `breaking: yes` in the CHANGELOG if downstream copies need a manual update
+5. If you added a new `conventions/*.md` file, it needs to be reachable from three places, not just created: a dispatch line in `template/CLAUDE.md`'s "When to read what" table, a corresponding section in `template/AGENTS.md` (inlined, not just a pointer, per its self-sufficiency requirement), and a row in `template/README.md`'s file table. A file that's real and useful but missing from any one of these is invisible to whoever needed it: this happened more than once (`security.md`'s pnpm guidance, `documentation.md`, `upgrading-adoption.md`) before it was caught
+6. Do not bump the version tag in `template/CLAUDE.md` until the previous version is committed to remote
+7. Mark `breaking: yes` in the CHANGELOG if downstream copies need a manual update
 
 ## Creating a new role file
 

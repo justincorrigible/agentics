@@ -44,6 +44,12 @@ After any meaningful unit of work: code written, bug fixed, tech-debt logged, ro
 
 When `.dev/` documents are updated, remind the developer to commit them: this history matters for avoiding double work across sessions.
 
+## Verifying conformance, not just structure
+
+Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's example shows shape; matching that shape can happen while missing a prose requirement stated right next to it — observed directly, not hypothetical: a tech-debt entry matched the field skeleton exactly while skipping the "state the fix, not just a pointer" rule written two sentences above it, in the same session that had just read it.
+
+This matters most producing several governed artifacts in one batch (initialization, a migration, a multi-file update). Before finalizing each one, re-read it once against the convention's specific prose requirement, as a discrete final step, not a background assumption carried from reading the rule earlier. If a convention's own example under-specifies a requirement stated nearby, that's a defect worth fixing, not something to route around silently.
+
 ## Session file identity
 
 Each session's log lives in its own file under `.dev/sessions/`, named `YYYY-MM-DDTHHMMSS.md`, keyed by contributor and day rather than one shared file: this is what prevents merge conflicts when several people work the same project the same day. No descriptive slug in the filename: the timestamp's only job is uniqueness.
@@ -54,13 +60,14 @@ To find your file for today: list `.dev/sessions/` for today's date prefix, then
 
 ```
 [short description of the issue]
+fix: [what the fix actually is, in one sentence, even if the full detail lives elsewhere: a roadmap item, a design doc, a linked issue. Pointing elsewhere for depth is fine; a pointer with no inline substance is not]
 standalone: yes | no
 context: [roadmap item reference or brief note: required when standalone: no]
 ```
 
 `standalone: yes`: can be picked up freely.
 
-Separate the issue from the fix, even in this minimal form: a description with no recommended direction means whoever picks it up next re-derives the same analysis. At scale (dozens of entries across a large codebase), consider a richer per-entry structure instead — File / Severity / Kind / Issue / Fix / Standalone — for triage and scanability. This is a genuine tradeoff, not a strict upgrade: it costs more friction to log each entry, which loses more than it gains for a short list. Pick based on the actual list's size.
+Separate the issue from the fix, even in this minimal form: a description with no recommended direction means whoever picks it up next re-derives the same analysis. The `fix:` field exists so this isn't optional-by-omission. Redirecting to where the full fix is tracked is valid, especially for something already scoped as its own roadmap item; what's not valid is a bare reference with nothing about the fix itself said here. At scale (dozens of entries across a large codebase), consider a richer per-entry structure instead — File / Severity / Kind / Issue / Fix / Standalone — for triage and scanability. This is a genuine tradeoff, not a strict upgrade: it costs more friction to log each entry, which loses more than it gains for a short list. Pick based on the actual list's size.
 `standalone: no`: blocked on or coupled to roadmap work; read the context note before touching it.
 
 ## Testing
@@ -111,6 +118,12 @@ Before examining how a PR is written, establish whether the proposed change is t
 
 A comment that redirects work to the right layer is often the most useful review a PR can receive.
 
+## Documentation
+
+Two layers, for projects that publish docs externally: `/docs` for what a consumer needs to install, configure, and use the project (published externally); `.dev/docs` for internal design rationale and implementation guides (repo-only, not published). Keep the full explanation in one location and cross-link from the other: duplication drifts. Links from `/docs` to `.dev/docs` must use the full GitHub URL, not a relative path (the published docs site has no access to `.dev/`); the reverse direction can use relative paths.
+
+**Writing for a cold reader:** documentation written during or right after a live design discussion inherits that discussion's dense, backward-referencing register, which works for whoever was in the room and against anyone reading cold, the actual audience for most documentation. One idea per sentence. State the conclusion first. Never reference "the earlier version" or "as discussed" without restating what it said. Give worked examples their own block. Minimize forced cross-reference chains. Applies to design docs, tech-debt entries, roadmap items; does not apply to `.dev/sessions/` logs, which are correctly terse for an already-oriented reader. See `conventions/documentation.md` for the full rules and a worked before/after example.
+
 ## Structured logging
 
 Emit logs as structured key-value pairs or JSON objects, not interpolated strings. Include a consistent set of fields: timestamp, severity, event type, actor identity where known, resource identifier, outcome. Do not log secrets, credentials, or PII in log values.
@@ -123,7 +136,9 @@ Set up structured logging before writing application logic: it is not optional p
 
 Be aware of the current OWASP Top 10 (verify the current edition at https://owasp.org/www-project-top-ten/). Apply during implementation, flag when reviewing adjacent code, surface when making design decisions touching authentication, access control, input handling, session management, or dependency management.
 
-For security-relevant work, read `conventions/security-guidelines.md`: it maps each OWASP category to concrete patterns and code review triggers. Your agent may also have a global copy of these guidelines in its personal context directory (for Claude: `~/.claude/security-guidelines.md`).
+For security-relevant work, read `conventions/security.md` (credentials/secrets policy, Node.js/pnpm supply-chain hardening, the quick threat model below) and `conventions/security-guidelines.md` (full OWASP patterns and code review triggers). Your agent may also have a global copy of the guidelines in its personal context directory (for Claude: `~/.claude/security-guidelines.md`).
+
+**pnpm supply chain (A08):** pnpm v10+ blocks package install scripts by default; keep it that way. Set `scarf-js-opt-out=true` in `.npmrc`. Only add entries to `pnpm-workspace.yaml`'s `allowBuilds` for packages you've actually reviewed; never allow `@scarf/scarf`. See `conventions/security.md` for the full Dockerfile and config guidance.
 
 **Quick threat model (A06):** before building anything with security implications, answer: what are we building? what could go wrong? what are we doing about it? Record in `.dev/sessions/`.
 
@@ -140,6 +155,10 @@ When adding or improving a convention anywhere, ask: is this at the right level?
 ## Upgrading agentics adoption
 
 If a developer asks to upgrade this project's agentics integration, or the session-start check above finds a missing/stale tag: read `conventions/upgrading-adoption.md` and follow it. It covers confirming this project is actually meant to track agentics (including the case where it shares the conventions with no textual link back to agentics at all), diagnosing what's stale against the current template, and applying fixes with per-change consent. Don't patch just the tag in isolation: session-file migration and `AGENTS.md` completeness usually need the same pass.
+
+## Deploying or debugging a service
+
+Read `.dev/docs/<service>/` if it exists before deploying or debugging a specific service: service-specific deployment notes and operational guides, one subdirectory per service (e.g. `.dev/docs/postgres/`, `.dev/docs/kafka/`), indexed at `.dev/docs/index.md`.
 
 ## Memory hygiene
 

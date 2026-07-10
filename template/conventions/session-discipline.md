@@ -36,6 +36,14 @@ Do not log conversational activity: PR reviews that produced no local changes, d
 
 When `.dev/` documents are updated, remind the developer to commit them. This history matters for avoiding double work across sessions.
 
+## Verifying conformance, not just structure
+
+Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's structural example (a field skeleton, a template block) shows shape; matching that shape can happen while missing a separate prose requirement sitting right next to it. This is a real, observed failure mode, not a hypothetical one: a tech-debt entry has been generated that matched `[description] / standalone / context` exactly, while skipping a "state the fix, not just a pointer to it" rule stated in prose two sentences above the skeleton, in the same session that had just read it.
+
+This matters most producing several governed artifacts in one batch: initialization (`CLAUDE.md`, `AGENTS.md`, tech-debt entries, memory files all at once), a migration, a multi-file update. Before finalizing each artifact, re-read it once against the convention's specific prose requirement, not just against its example shape, as a discrete final step, not a background assumption carried from having read the rule earlier. Verification happens at the point of writing each artifact, not once at the point of reading the rule at the start of the batch.
+
+If a convention's own example under-specifies a requirement stated in prose nearby, that's a defect in the convention worth fixing, not something to route around silently: flag it the same way any other convention gap gets flagged, the same way this exact gap in the tech-debt format got found and closed.
+
 ## Session file identity
 
 Each session's log lives in its own file under `.dev/sessions/`, keyed by contributor and day rather than one shared file. This is what prevents merge conflicts when several people work the same project the same day: different contributors never edit the same file.
@@ -78,6 +86,7 @@ One lean context sentence (what + why only), a blank line, then one bullet per f
 
 ```
 [short description of the issue]
+fix: [what the fix actually is, in one sentence, even if the full detail lives elsewhere: a roadmap item, a design doc, a linked issue. Pointing elsewhere for depth is fine; a pointer with no inline substance is not]
 standalone: yes | no
 context: [roadmap item reference or brief note: required when standalone: no]
 ```
@@ -85,6 +94,6 @@ context: [roadmap item reference or brief note: required when standalone: no]
 `standalone: yes`: can be picked up freely without reading other context.
 `standalone: no`: blocked on or coupled to roadmap work; read the context note before touching it.
 
-**Separate the issue from the fix, even in this minimal form.** A description without a recommended direction is exactly how debt entries go stale: whoever picks it up next re-derives the same analysis from scratch. This is worth doing regardless of project size; it's the one piece of a richer format (below) that doesn't cost extra structure to include.
+**Separate the issue from the fix, even in this minimal form.** A description without a recommended direction is exactly how debt entries go stale: whoever picks it up next re-derives the same analysis from scratch. This is worth doing regardless of project size; it's the one piece of a richer format (below) that doesn't cost extra structure to include. The `fix:` field exists precisely so this isn't optional-by-omission. Redirecting to where the full fix is tracked is valid and often correct, especially for something already scoped as its own roadmap item; what's not valid is a bare reference standing in for the field with nothing about the fix itself said here.
 
 **At scale, consider a richer structure instead:** `**File:** ... **Severity:** ... **Kind:** ... **Issue:** ... **Fix:** ... **Standalone:** ...`, one heading per entry. This is a genuine tradeoff, not a strict upgrade: it adds triage and scanability for a long-lived list with dozens of entries across a large codebase, at the cost of more friction to log each one. A project with five debt entries loses more from that friction than it gains from the structure; a project with fifty gains more than it loses. Pick based on the actual list's size, not by default.

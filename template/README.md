@@ -10,9 +10,12 @@ This directory contains template files for setting up AI agent collaboration in 
 | `AGENTS.md` | Agent-neutral version of the same instructions |
 | `CLAUDE.softeng.md` | softeng team addendum: applied conditionally on first session |
 | `conventions/convention-levels.md` | Three-level placement model (project / global / shareable) and propagation questions |
+| `conventions/upgrading-adoption.md` | On-demand procedure for bringing an already-adopted project's agentics integration current |
 | `conventions/session-discipline.md` | Session start checklist, `.dev/` write-back rules, tech-debt entry format |
 | `conventions/testing.md` | Test co-location, plan-first workflow, BDD style |
 | `conventions/code-style.md` | Comments, scope discipline, library awareness, git |
+| `conventions/code-review.md` | Pre-review gate: problem, layer, necessity, before examining implementation |
+| `conventions/documentation.md` | Two-tier docs model, cross-linking, writing for a cold reader |
 | `conventions/security.md` | OWASP awareness, credentials policy, quick threat model |
 | `conventions/security-guidelines.md` | Full OWASP-aligned patterns, failure state docs, and code review triggers |
 | `DEVELOPMENT.md` | Human developer setup and onboarding guide (placeholder) |

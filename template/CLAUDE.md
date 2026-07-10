@@ -29,7 +29,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). To ge
 - Writing code                    -> read `conventions/code-style.md`
 - Reviewing a PR or change        -> read `conventions/code-style.md`, `conventions/code-review.md`
 - Writing or updating docs        -> read `conventions/documentation.md`
-- Security-relevant work          -> read `conventions/security-guidelines.md`
+- Security-relevant work          -> read `conventions/security.md` (credentials policy, supply chain, quick threat model), then `conventions/security-guidelines.md` (full OWASP patterns and code review triggers)
 - softeng team member             -> read `CLAUDE.softeng.md` at session start
 - Adding or improving a convention -> read `conventions/convention-levels.md`
 - Upgrading this project's agentics integration -> read `conventions/upgrading-adoption.md`
