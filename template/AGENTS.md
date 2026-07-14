@@ -40,7 +40,7 @@ Update `.dev/roadmap.md` or `.dev/tech-debt.md` within the same session whenever
 
 Before writing any of these updates: marking an item done, closing a tech-debt entry, changing a status: verify against the actual current code or file state, not against a prior description or session summary. An assumption carried forward unverified is exactly how these documents drift from what they claim.
 
-After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file. Do not wait for a "session over" signal; work rarely ends cleanly. Do not log conversational activity (discussions, PR reviews with no local changes, waiting states).
+After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file. Do not wait for a "session over" signal; work rarely ends cleanly. Do not log conversational activity (discussions, PR reviews with no local changes, waiting states) — but see "Session file entry format" below for the mixed case: a review that also produced one real local change.
 
 When `.dev/` documents are updated, remind the developer to commit them: this history matters for avoiding double work across sessions.
 
@@ -63,6 +63,29 @@ To find your file for today: list `.dev/sessions/` for today's date prefix, then
 **Exception: migrating or backfilling historical entries.** Splitting an existing shared log into per-day files, or reconstructing entries for work that already happened, is different from creating a file for a session happening now: the real time genuinely isn't recoverable after the fact, and `T000000` is a legitimate placeholder there, not a bug. Don't rename a legacy file's zeroed timestamp once real times become available for new files: it wasn't wrong for what it was created to do.
 
 **Never rename an already-created file, today's own included.** This isn't limited to old migration files: a file created earlier today under the old, unfixed behavior is in the same position once created. Renaming it now to the present moment doesn't recover its actual creation time; it substitutes a different guess ("current time, best approximation") for the original one, the same anti-pattern this fix exists to stop. Fetch the real time before creating a file, never after.
+
+## Session file entry format
+
+One lean context sentence (what + why), a blank line, then one bullet per file or logical group of changes. No date header (the filename carries it), no prose paragraphs, no "Next:" line (open work belongs in `roadmap.md`). Bullet separator is `: ` (colon-space); no em dashes or space-hyphen-space, same rule as everywhere else (see `conventions/code-style.md` § Dashes).
+
+```
+[One sentence: what the work was and why.]
+
+- `path/to/file`, `path/to/other`: what changed; decision or constraint if non-obvious
+- `path/to/file`: what changed
+```
+
+**Write about effects, not style.** Describe what the code now does or enables for operators, users, or callers. Not how it was written: style choices, refactoring approach, helper names are not session-log material. "Operators now see actionable error messages" belongs; "rewrote using positive conditions and pure helpers" does not.
+
+**Bullets carry decisions or constraints only when non-obvious:** a choice between alternatives, a dependency or ordering constraint, a pattern matched for the first time. Don't annotate established conventions (alphabetical ordering, a known pattern) — that's noise, the convention is already known.
+
+**Mixed reviews: log the local effect, not the investigation.** A PR review that turns up one real local change (a tech-debt entry, a roadmap update) alongside a lot of no-op verification work isn't two categories competing for space: log the local change like any other change, drop the investigation narrative entirely. External references describing another repository's state (commit SHAs on someone else's branch, a PR number, a squash-merge history) don't belong here regardless of outcome — they document that repository's history, not this one's, and per "Name code, not people" below they often carry a username too.
+
+**A session file is immutable once its day is done.** Extend it for as long as that contributor's work continues that day. Once a new day (or a different contributor) starts, it's closed: a poorly-written entry is on the session that produced it, not something a later session revises.
+
+**Exception: a Critical Constraint violation overrides immutability.** Ordinary quality problems stay as the honest record, on principle. A Critical Constraint violation found in a closed file (most commonly an individual's name or a credential) is a different tier: fix it regardless of which day produced it, the same as scrubbing a leaked credential from an old commit rather than leaving it as "history." Immutability protects judgment calls from being quietly rewritten later; it was never meant to protect a Critical Constraint violation from correction.
+
+**Name code, not people.** Attribute work to features, modules, and systems, not individuals: "the network module", not "Jon's network module". Applies to session files, tech-debt entries, docs, any persisted content. Attribution belongs in git history (and in filenames when it matters), not in what you write.
 
 ## Tech-debt entry format
 
