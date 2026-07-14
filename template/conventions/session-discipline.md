@@ -50,12 +50,20 @@ Each session's log lives in its own file under `.dev/sessions/`, keyed by contri
 
 **Filename:** `YYYY-MM-DDTHHMMSS.md`, generated once, the first time the file is created. No descriptive slug: the timestamp's job is uniqueness, not readability. A slug forces a choice between short-and-collision-prone or long-and-unwieldy, and doesn't add anything a directory listing plus the file's own content doesn't already give you.
 
+**A session-start signal doesn't by itself mean create a file.** Greetings, "let's continue," and the other triggers in § Session-start signals tell you to run the checklist; whether that produces a new file depends on the check below. A different contributor always needs their own file (never shared), but the same contributor picking work back up later the same day extends their existing file rather than starting another one.
+
 **Finding your file for today:**
 1. List files in `.dev/sessions/` matching today's date prefix.
 2. For each match, check authorship: if it's committed, compare `git log -1 --format=%ae -- <file>` against `git config user.email`. If it's uncommitted in the working tree, it's yours by definition: no one else's uncommitted file can be present in your clone.
-3. If a match is yours, that's your session file for today: extend it. Otherwise, create a new file with the current timestamp.
+3. If a match is yours, that's your session file for today: extend it, no new file, no new timestamp. Otherwise (no match, or the only matches belong to someone else), create a new file: see "Get the actual time, don't pad with zeros" below for the timestamp.
 
-This gives at most one file per (day, contributor) pair, not one per session: picking work back up later the same day extends the same file rather than creating a new one.
+This gives at most one file per (day, contributor) pair, not one per session: multiple sessions by the same contributor on the same day land in the same file.
+
+**Get the actual time, don't pad with zeros.** Once step 3 above says a new file is actually needed: you have no innate sense of the current time of day. Your context may hand you today's date, but wall-clock time isn't something you can infer, and defaulting the unknown part to `000000` is a guess dressed up as a value, not a real timestamp. Run a shell command to get it (e.g. `date +%Y-%m-%dT%H%M%S`) before creating the file. If every file created going forward carries `T000000`, that's not several coincidentally-round timestamps, it's this step being skipped every time.
+
+**Exception: migrating or backfilling historical entries.** Splitting an existing shared log into per-day files, or otherwise reconstructing entries for work that already happened, is a different situation from creating a file for a session happening right now: the real time genuinely isn't recoverable after the fact, and `T000000` is a legitimate, deliberate placeholder there, not a bug. Don't treat a legacy file's zeroed timestamp as something to "fix" by renaming it once real times are being fetched for new files: it wasn't wrong for what it was created to do. The rule above applies to ordinary new-file creation, where the current time is always one shell call away.
+
+**Never rename an already-created file, today's own included.** This is not limited to old migration files: a file created earlier today under the old, unfixed behavior is in exactly the same position once created. Renaming it now to the present moment doesn't recover its actual creation time; it substitutes a different guess ("current time, best approximation of session start") for the original one, which is the same anti-pattern this fix exists to stop, just dressed up as a correction. A filename's job is over the instant the file is created: fetch the real time before creating a file, never after.
 
 **Known edge case:** two genuinely concurrent sessions by the same person (two terminals open at once) can still race on the same file. That's a self-conflict the same person resolves alone, not the cross-contributor conflict this convention targets, and it isn't worth a workaround.
 
