@@ -10,9 +10,13 @@
 
 <!-- TODO: list required tools and versions -->
 
+- GitHub CLI (`gh`), authenticated: any agent working in this repo uses `gh` for PRs and issues on your behalf; without it, your first GitHub-related request will stall on an auth prompt instead of just working
+
 ## Setup
 
 <!-- TODO: step-by-step local setup instructions -->
+
+1. If `gh auth status` doesn't already show you logged in, run `gh auth login` once per machine.
 
 ## Running the project
 

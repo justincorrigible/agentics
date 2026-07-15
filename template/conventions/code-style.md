@@ -23,7 +23,9 @@ const headers = auth ? { Authorization: buildBasicAuth(auth) } : {};
 
 **Pure helpers.** When a block of logic has a clear input and output (a lookup, a transformation, a format function), extract it as a named function with no side effects. This keeps orchestration code readable and the logic independently testable.
 
-Apply these three together: a function composed of pure helpers, positive conditions, and non-mutational expressions reads as a series of declarative steps rather than a sequence of instructions.
+**Derive from data, don't duplicate as a flag.** When a field's value is fully determined by other configuration already present, don't add a separate explicit discriminator (`enabled`, `type`, `mode`) for it: gate behaviour on the presence or content of the data itself. A `type: gateway | ingress | none` field that could instead be "gateway if `gateway.parentRef.name` is set, ingress if `ingress.hosts` is non-empty, neither otherwise" adds a second thing to configure and keep consistent with the first. Applies to Helm values, API schemas, and configuration objects generally: when presence unambiguously implies intent, don't require intent to be stated twice.
+
+Apply these four together: a function composed of pure helpers, positive conditions, non-mutational expressions, and data-derived rather than duplicated flags reads as a series of declarative steps rather than a sequence of instructions.
 
 ## TSDoc for exported symbols
 
@@ -89,7 +91,7 @@ Alphabetize properties within objects and mappings in config files (YAML, JSON, 
 
 Alphabetize named resource blocks in Terraform files by resource name (the second label, e.g. `"github-metrics"`, `"keycloak"`, `"lectern"`). VSO companion blocks follow their primary resource directly rather than being sorted independently.
 
-Apply when writing new config content. When editing existing files, fix ordering within the sections being touched. When inserting a new resource block, place it at its alphabetical position; not at the insertion point of the anchor used to locate the file.
+Apply when writing new config content. When editing existing files, fix ordering within the sections being touched. When inserting a new key or resource block into an existing file, place it at its alphabetical position: not at the current edit point, not at the end of the file.
 
 ## Structured logging
 

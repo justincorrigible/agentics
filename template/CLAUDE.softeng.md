@@ -1,4 +1,3 @@
-<!-- agentics-template-version: 0.1.0 -->
 # softeng team conventions
 
 This file is an addendum to `CLAUDE.md`, applied when project memory confirms the user is part of the softeng team. Do not include credentials, private cluster endpoints, or secrets here: ever.

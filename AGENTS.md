@@ -1,11 +1,11 @@
-<!-- agentics-repo-version: 0.1.0 -->
+<!-- agentics-version: see CHANGELOG.md § Released (latest entry) -->
 # Agent collaboration conventions: softeng/agentics
 
 **For AI agents:** this file is instructions your agent reads and follows; it is not documentation written for people. If you're a person looking to use or contribute to this repo, read [README.md](README.md) and [CONTRIBUTING.md](CONTRIBUTING.md) instead.
 
 This is the agentics repo itself. Its purpose is to maintain and distribute the devctx collaboration template to softeng team members and developers broadly.
 
-This file is the agent-neutral companion to `CLAUDE.md`. If you are Claude, prefer `CLAUDE.md`; otherwise use this file.
+This is the canonical source for this repo's own agent instructions, agent-neutral by design. `CLAUDE.md` exists only because Claude Code loads it automatically; it points here rather than keeping its own copy.
 
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent
@@ -29,8 +29,8 @@ When writing to project memory: keep entries concise; store no content derivable
 
 ## Repo maintenance rules
 - `template/` is the canonical deliverable; keep it accurate and in sync
-- Update `CHANGELOG.md` and the version tag in `template/CLAUDE.md` whenever any template file changes
-- CLAUDE.md at repo root mirrors this file in Claude-specific framing; keep them in sync
+- Log changes in `CHANGELOG.md` as they happen, with a `bump` field per entry. Nothing else stamps a version number: this file's own tag and `template/AGENTS.md`'s both just point at `CHANGELOG.md` § Released; releasing means moving `## Unreleased changes` entries under a new dated heading there, nothing else to update (see `CONTRIBUTING.md` § Versioning)
+- `CLAUDE.md` at repo root is a stub pointing here (Claude Code loads it automatically; this file doesn't need a Claude-specific mirror anymore, just the pointer)
 
 ## Initialization
 If no project memory exists for you in this repo yet:

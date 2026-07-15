@@ -28,8 +28,8 @@ It stores your answers in project memory and does not ask again.
 ## What gets installed
 
 ```
-CLAUDE.md                   project-specific conventions; dispatch to global context for universal rules
-AGENTS.md                   comprehensive inline reference for agents without global context
+AGENTS.md                   canonical source: project-specific content, dispatch table, universal conventions
+CLAUDE.md                   stub: Claude Code loads it automatically, it points at AGENTS.md for everything
 CLAUDE.softeng.md           softeng team addendum: applied conditionally at session start
 DEVELOPMENT.md              human developer setup and onboarding guide (fill in per project)
 .dev/
@@ -49,7 +49,7 @@ conventions/                universal code style, testing, security, session dis
                             prefer adding to ~/.claude/settings.json globally)
 ```
 
-The project `CLAUDE.md` and `AGENTS.md` should contain only project-specific content once your global context is set up. `conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are for bootstrapping agents without a comprehensive global context, or for project-specific overrides of those conventions.
+The project `AGENTS.md` should contain only project-specific content once your global context is set up; `CLAUDE.md` stays the minimal stub it started as. `conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are for bootstrapping agents without a comprehensive global context, or for project-specific overrides of those conventions.
 
 ---
 
@@ -76,7 +76,7 @@ A convention only needs to be copied into the adopting project if reading it liv
 
 **Needed only when actually doing that task:** writing tests, reviewing a PR, security-relevant work, writing docs. These already have a strong trigger: the agent is doing that task right now. A live dispatch pointer works fine here, which is why `CLAUDE.md` can stay lean for all of them.
 
-**The one deliberate exception:** `AGENTS.md` inlines both tiers, including the second one. It exists for agents that cannot fetch a file on demand at all: for that population nothing dispatches reliably, so the fallback pays the duplication cost instead. That's a bounded exception for a known limitation, not the default model.
+**Single source, not two copies:** `AGENTS.md` holds the canonical dispatch table; `CLAUDE.md` points at it rather than keeping its own. This was originally the other way around, `AGENTS.md` inlining full content on the assumption that its consumers couldn't fetch a file on demand at all. That assumption was wrong: the AGENTS.md standard's own guidance recommends the same dispatch-on-demand pattern `CLAUDE.md` already used, since real AGENTS.md consumers (Cursor, Copilot, Aider) have file-system access like any other coding agent. One dispatch table, referenced from both files, removes a class of drift rather than managing it.
 
 **Local clone versus remote URL is a separate axis.** It changes where a needed convention is fetched from, not whether it needs fetching at all. A contributor with agentics cloned locally and a new adopter working from a GitHub URL alone should both end up doing the same thing: reading tier-one content live, every session, from whichever source is actually available to them.
 
