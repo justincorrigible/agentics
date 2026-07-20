@@ -6,6 +6,49 @@ Default: write no comments. Add one only when the WHY is non-obvious: a hidden c
 
 Never explain WHAT the code does; well-named identifiers already do that. Never reference the current task, fix, or callers: those belong in the PR description and rot as the codebase evolves.
 
+## Configuration and environment isolation
+
+Module functions should never read from the environment directly (`process.env`, config files, global singletons). Configuration belongs at a dedicated config-reading seam; everything downstream receives typed parameters.
+
+This applies at two levels:
+
+**Library and package code:** never reaches `process.env` under any circumstance. Configuration is always injected by the caller as a typed argument. This keeps the library testable in isolation and free of hidden deployment coupling.
+
+**Application-layer module functions:** even within a server, individual setup or service functions (e.g. `setupKafka`, `setupAuthProvider`) should accept a typed config object rather than reading env vars inline. The env-reading belongs in a dedicated `getXConfig()` helper or a central config assembly function (e.g. `buildAppConfig()`). The setup function itself stays pure and programmable: another server importing it can construct the config object however it likes, without being forced through env vars.
+
+Concrete pattern:
+
+```ts
+// config/kafka.ts
+export type KafkaConfig = { brokers: string; clientId: string; topic: string };
+
+export const getKafkaConfig = (): KafkaConfig | undefined => {
+  const brokers = process.env.KAFKA_BROKERS;
+  if (!brokers) {
+    return undefined;
+  }
+  return { brokers, clientId: process.env.KAFKA_CLIENT_ID ?? 'app', topic: getRequiredConfig('KAFKA_TOPIC') };
+};
+
+export const setupKafka = async (config: KafkaConfig): Promise<KafkaResult> => {
+  // receives config; never reads process.env
+};
+
+// server.ts
+const kafkaConfig = getKafkaConfig();
+const kafka = kafkaConfig ? await setupKafka(kafkaConfig) : undefined;
+```
+
+The rule of thumb: if a function is `export`ed and takes work that depends on configuration, it should accept that configuration as a parameter, not discover it at runtime.
+
+## Matching existing configuration entry points
+
+Before adding new functionality that needs configuration, especially inside a library or module (a new integration client, a new feature flag, a new external dependency), locate how this project *already* resolves configuration before writing a new `process.env` read or default value. Every codebase settles on its own shape for this: it might be a single `getXConfig()` helper (see "Configuration and environment isolation" above), or a fuller layered pipeline, default constants, then env vars, then optional config-file aggregation, each layer overriding the one before it, before the merged result crosses into a library boundary. Match whatever shape already exists; don't introduce a second, parallel entry point alongside it.
+
+This is a specific case of "Searching before writing" (below) worth calling out on its own: a genuinely new feature doesn't feel like duplicating anything, so the general habit of searching for existing implementations doesn't naturally fire. The search that matters here isn't "does this feature's config already exist" (it doesn't), it's "how does this project already ingest configuration, in general" (it does, somewhere), a different question, easy to skip past when the surrounding work is a real feature addition rather than a rewrite.
+
+Concretely: adding new functionality to a library should mean extending the host application's existing config-assembly step, wherever it already builds the object passed into the library, with the new fields, not adding a second `process.env` read inside the library's new code. The library still never reads `process.env` directly, per "Configuration and environment isolation" above; the point here is the earlier step of finding where that reading already happens before assuming a new one is needed.
+
 ## Conditional logic and functional style
 
 **Positive conditions.** Write `if X` rather than `if !X`. Put the happy path in the positive branch; let the error case fall through or come after. A reader should not have to negate a condition mentally to understand what the main flow does.
@@ -25,7 +68,43 @@ const headers = auth ? { Authorization: buildBasicAuth(auth) } : {};
 
 **Derive from data, don't duplicate as a flag.** When a field's value is fully determined by other configuration already present, don't add a separate explicit discriminator (`enabled`, `type`, `mode`) for it: gate behaviour on the presence or content of the data itself. A `type: gateway | ingress | none` field that could instead be "gateway if `gateway.parentRef.name` is set, ingress if `ingress.hosts` is non-empty, neither otherwise" adds a second thing to configure and keep consistent with the first. Applies to Helm values, API schemas, and configuration objects generally: when presence unambiguously implies intent, don't require intent to be stated twice.
 
-Apply these four together: a function composed of pure helpers, positive conditions, non-mutational expressions, and data-derived rather than duplicated flags reads as a series of declarative steps rather than a sequence of instructions.
+**Always brace control-flow blocks.** Every `if`, `else`, `for`, and `while` body gets `{ }` on its own line, even for a single statement, never a brace-less one-liner (`if (x) doThing();` or `if (x) return y;` on the same line). A later change that adds a second statement to a brace-less conditional produces a diff that rewrites the line's structure along with its content; a diff against an already-braced block is purely additive, easier to review.
+
+```ts
+// avoid
+if (!user) return null;
+
+// prefer
+if (!user) {
+  return null;
+}
+```
+
+Apply these five together: a function composed of pure helpers, positive conditions, non-mutational expressions, data-derived rather than duplicated flags, and consistently braced control flow reads as a series of declarative steps rather than a sequence of instructions.
+
+## No non-null assertions
+
+Never use TypeScript's non-null assertion operator (`variable!`), even in a project whose `tsconfig.json` doesn't enable `strict` or `strictNullChecks`. The operator silences the type checker without proving the value is actually non-null: it just moves discovery of a wrong assumption from compile time to an unguarded runtime crash, with no evidence beforehand that the assumption was ever unsafe. This holds independently of the project's strictness settings: removing the assertion doesn't just appease a compiler flag that may not even be on, it forces the real runtime possibility (the value being absent) to be handled somewhere.
+
+Prefer, in order:
+- Optional chaining and nullish coalescing: `value?.prop ?? fallback`
+- A narrowing `if` or early return before use
+- A reusable type guard function, for a check used in more than one place
+
+```ts
+// avoid
+const user = users.get(id)!;
+sendEmail(user.email);
+
+// prefer
+const user = users.get(id);
+if (!user) {
+  throw new Error(`User not found: ${id}`);
+}
+sendEmail(user.email);
+```
+
+Apply to new code from the start. When touching existing `!` usages in scope, replace them; otherwise log as tech-debt rather than doing a blanket rewrite out of scope.
 
 ## TSDoc for exported symbols
 
@@ -54,6 +133,16 @@ When introducing a new dependency, always check the current version against the 
 Do not produce version strings from training data, and do not treat "already used in this repo" as implicit endorsement of currency: the existing version may itself be stale. "Consistent with existing" and "current" are separate checks; run both.
 
 Also check for version conflicts before writing: run `npm why <package>` (or equivalent) to see what versions of that package and its close deps are already in the tree. If the new version brings in sub-dependencies that conflict with existing ones - especially native platform packages that package managers hoist into shared locations - flag the conflict before committing the change.
+
+## Verifying dated or versioned external facts
+
+Training data has a cutoff, and a fact that carried an explicit version or date when you learned it may be stale by now, or may have been superseded since. This is intractable to solve in general: you cannot re-verify everything you know. It's tractable exactly when two things are both true: the fact carries an explicit, checkable version or date marker (a named standard's edition, a spec revision, a changelog), and checking it is cheap, one fetch, not a research project.
+
+When both hold and the fact is about to be actively cited or applied, not just background context, verify it against the authoritative current source first, rather than defaulting to whatever edition or version training data implies. A standing "always verify the current edition" reminder isn't enough on its own to make this fire: it's the same failure mode a passive dispatch citation has (see `convention-levels.md` § "The reference has to be an instruction, not a citation"). Tie the check to the specific moment a versioned fact is about to be used, not to remembering a general reminder.
+
+"Dependency version verification" above is one instance of this (npm package versions, checked against the registry); it's the same underlying rule, scoped to one kind of source.
+
+**Concrete trigger:** naming or applying a specific OWASP Top 10 edition or year is exactly this case, see `security.md` and `security-guidelines.md`.
 
 ## Checking in
 
@@ -84,6 +173,8 @@ When correcting existing em dashes across a file, use `sed -i '' 's/ — /: /g'`
 ## Searching before writing
 
 Before implementing something new, search the codebase for existing patterns first. Use `grep` or semantic search to find similar implementations: this keeps the codebase consistent and surfaces reusable utilities before they get duplicated.
+
+For the specific case of adding new configuration-dependent functionality, see "Matching existing configuration entry points" above: the same habit, applied to finding an existing config-resolution mechanism rather than an existing utility function.
 
 ## Property ordering
 

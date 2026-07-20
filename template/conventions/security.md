@@ -2,7 +2,7 @@
 
 ## OWASP Top 10 awareness
 
-All work should be aware of the current OWASP Top 10 for web applications. The list updates every few years: always verify the current edition at https://owasp.org/www-project-top-ten/.
+All work should be aware of the current OWASP Top 10 for web applications. Before naming or applying a specific edition or year, fetch https://owasp.org/www-project-top-ten/ and compare it against whatever edition you'd otherwise assume from training data; use whichever is actually current, don't assume the list hasn't moved since. See `code-style.md` § Verifying dated or versioned external facts for why this needs to be a check triggered at the moment of use, not a standing reminder.
 
 Apply security awareness in three ways:
 

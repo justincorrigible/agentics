@@ -27,7 +27,7 @@ This directory contains template files for setting up AI agent collaboration in 
 1. Copy `AGENTS.md` to your project root; also copy `CLAUDE.md` if you use Claude Code (it auto-loads that file specifically, but stays a stub pointing at `AGENTS.md`)
 2. Copy `CLAUDE.softeng.md` if your team uses the softeng conventions
 3. Copy `DEVELOPMENT.md` and fill in your project-specific setup steps
-4. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory
+4. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand the first time an upgrade check hits a conflict the developer wants to keep permanently (see `conventions/upgrading-adoption.md` § 2): don't create it empty upfront
 5. Copy `.claude/settings.json` to enforce the credential file blocklist (Claude Code only; skip if you have the hook in your global `~/.claude/settings.json`)
 
 **`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are bootstrapping artifacts** for agents that don't yet have a comprehensive global context. If your agent's global context already defines universal conventions (testing style, code style, security, session discipline), your role, and your team's conventions, skip copying these. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.

@@ -38,11 +38,11 @@ When `.dev/` documents are updated, remind the developer to commit them. This hi
 
 ## Verifying conformance, not just structure
 
-Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's structural example (a field skeleton, a template block) shows shape; matching that shape can happen while missing a separate prose requirement sitting right next to it. This is a real, observed failure mode, not a hypothetical one: a tech-debt entry has been generated that matched `[description] / standalone / context` exactly, while skipping a "state the fix, not just a pointer to it" rule stated in prose two sentences above the skeleton, in the same session that had just read it.
+Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's structural example (a field skeleton, a template block) shows shape; matching that shape can happen while missing a separate prose requirement sitting right next to it, a real, observed failure mode (see `CHANGELOG.md` § `verify-conformance-not-structure`).
 
 This matters most producing several governed artifacts in one batch: initialization (`CLAUDE.md`, `AGENTS.md`, tech-debt entries, memory files all at once), a migration, a multi-file update. Before finalizing each artifact, re-read it once against the convention's specific prose requirement, not just against its example shape, as a discrete final step, not a background assumption carried from having read the rule earlier. Verification happens at the point of writing each artifact, not once at the point of reading the rule at the start of the batch.
 
-If a convention's own example under-specifies a requirement stated in prose nearby, that's a defect in the convention worth fixing, not something to route around silently: flag it the same way any other convention gap gets flagged, the same way this exact gap in the tech-debt format got found and closed.
+If a convention's own example under-specifies a requirement stated in prose nearby, that's a defect in the convention worth fixing, not something to route around silently: flag it the same way any other convention gap gets flagged.
 
 ## Session file identity
 

@@ -1,18 +1,18 @@
 # Upgrading a project's agentics adoption
 
-A deliberate, on-demand procedure for bringing a project's agentics integration current. Two ways in:
+Reconciling a project's agentics integration against the current template. Two ways in:
 
 - **A developer asks directly:** "upgrade this project's agentics integration" (or similar). Run this procedure now.
-- **The automatic session-start check finds something stale or missing** (see `convention-levels.md` § Checking for upstream updates) and offers to run it, with the developer's go-ahead.
+- **The automatic session-start check finds something stale or missing** (see `convention-levels.md` § Checking for upstream updates): this procedure *is* what that check runs, not something it merely offers. It fires whenever there's a non-empty CHANGELOG diff since last sync, or no tag/synced value at all, gated by the same tiering already described there (mandatory for `agentics_contributor: yes`, opt-in via `propagation_suggestions: yes` elsewhere).
 
-Nothing in this procedure auto-commits. Prepare the diff, let the developer review it, they commit and push themselves.
+Nothing in this procedure auto-commits or applies without the developer seeing the proposal first. Prepare the diff, let the developer review it (batched where nothing conflicts, individually where something does, see § 2), they commit and push themselves.
 
 ## 0. Confirm this project is actually meant to track agentics
 
 Detection, in order:
 1. `AGENTS.md` or `CLAUDE.md` carries an `agentics-template-version` tag, in any form.
 2. Failing that, either file mentions "agentics" at all (a bare `grep -qi agentics AGENTS.md CLAUDE.md`), e.g. the "Adapted from softeng/agentics" line the template ships with.
-3. Neither is present. Don't assume either way: ask the developer directly. Some projects converge on the same conventions independently without ever referencing agentics (this has happened — a project written well after agentics existed reimplemented an almost identical session-start checklist from scratch, with zero textual link to trace it back). If the developer confirms this project should be tracked, ask where that fact should live:
+3. Neither is present. Don't assume either way: ask the developer directly. Some projects converge on the same conventions independently without ever referencing agentics: a real, tracked case (see `CHANGELOG.md` § `upgrading-adoption`). If the developer confirms this project should be tracked, ask where that fact should live:
    - **In this project's own files:** add a tag or a short mention to `CLAUDE.md`/`AGENTS.md`, same as a formal adoption. Straightforward, but it's one more file the developer has to remember exists.
    - **In the developer's `~/.claude/projects.md`** (or equivalent global registry), as an explicit "track this project against agentics" marker, without touching the project's own files at all. Lower friction if the developer manages many such projects, since it's one registry instead of N repos to remember.
    
@@ -22,6 +22,7 @@ Detection, in order:
 
 Locate the current agentics template: prefer a local clone (`Repo URL`/`Path` lookup in the developer's global context) over fetching GitHub, since local is more likely current. Check each of the following, current vs. desired, and report the diagnosis **before changing anything** — a short list of what's stale, so the developer isn't surprised by the size of the change:
 
+- **Local overrides:** read `.dev/agentics-overrides.md` if it exists (format in § 2). Any gap found below that matches a recorded permanent decision there is already resolved: don't re-report it, don't re-ask about it.
 - **Version tag:** present? Has a `synced:` value? If both are present, run the diff in `convention-levels.md` § Checking for upstream updates instead of this step. If absent (no tag, or a tag with no `synced`), there's no baseline to diff from, so don't attempt one. Instead, read agentics' `CHANGELOG.md` and surface everything currently under `## Unreleased` as a bounded, one-time catch-up — this is deliberately not a full historical walk back to this project's original adoption date (mostly agentics' own internal iteration, not necessarily relevant here), but it's also not nothing: silently baselining to `HEAD` without showing anything would swallow whatever's genuinely pending right now. Lead with any `breaking: yes` entries, same per-entry consent as the normal flow. Once reviewed, set `synced` to agentics' current `HEAD`.
 - **Does `CLAUDE.md` itself have a complete, self-contained "Starting a session" (or equivalent) checklist that predates agentics?** If so, check whether its own dispatch-to-global line (often under a "Workflow" heading) names specific topics deferred to global context. If "session discipline" isn't on that list, the project's session behavior isn't deferring to agentics at all, however well the global context is set up elsewhere — a well-tuned global dispatch cannot override a project's own explicit, narrower instructions, and shouldn't try to. This is the most likely reason an automatic upstream-update check never fires on an old project: not a bug in the check, a genuinely un-migrated file. This case needs the same treatment as thin/absent `AGENTS.md` content below, applied to `CLAUDE.md` too.
 - **Session files:** `.dev/sessions.md` (single shared file) vs `.dev/sessions/` (one file per contributor per day)? The old model needs the migration in step 2.
@@ -32,13 +33,29 @@ Locate the current agentics template: prefer a local clone (`Repo URL`/`Path` lo
 
 ## 2. Apply, with consent per change
 
+Classify each gap from § 1 before proposing anything:
+
+- **Non-conflicting:** a pure addition (the current template has a section, rule, or file the project doesn't have at all), or a mechanical structural fix where the local copy is just a stale, unmodified instance of an older template shape, nothing local was ever deliberately changed to diverge from it. Batch every non-conflicting gap into one proposed diff and ask once: a single yes/no covers the whole batch.
+- **Conflicting:** local content is a deliberate, substantive customization that diverges from the current template's current handling of the same topic (e.g. a project that intentionally kept an abridged version of a section). Ask about each of these individually, never batched, with three choices:
+  1. **Adopt upstream:** replace the local version with the current template's.
+  2. **Keep local, just this time:** leave it as-is; it stays a gap and will be asked about again next time this check runs.
+  3. **Keep local, permanently:** leave it as-is and record it in `.dev/agentics-overrides.md` so it stops being flagged.
+
+**`.dev/agentics-overrides.md` format** (created on first permanent decision, not required upfront):
+
+```
+- `<upstream topic or section, e.g. "session-discipline § Session file entry format">`: <what the local project keeps instead, and why, one sentence>. Decided <date>.
+```
+
+One entry per permanently-resolved conflict. § 1 reads this file before reporting a diagnosis and drops anything already listed here.
+
 - **Migrating `.dev/sessions.md`:** split by date. For multi-contributor history, split by date only — don't try to retroactively attribute old entries to individuals; past conflicts are already resolved. The `(day, contributor)` filename scheme (`YYYY-MM-DDTHHMMSS.md`, no slug) only needs to apply going forward. See `session-discipline.md` § Session file identity for the exact rules. This is a cutover, not an addition: once every entry has a home in `.dev/sessions/`, delete `.dev/sessions.md`. Copying content out while leaving the source in place isn't a completed migration, it's a duplicate that reintroduces the exact shared-file merge-conflict risk the new format exists to remove. Don't leave a placeholder file (e.g. `.gitkeep`) in `.dev/sessions/` once it holds real content: it existed only to make an empty directory trackable, and is noise once files exist there.
 - **Adding or repairing the tag:** `<!-- agentics-template-version: X.Y.Z | synced: <HEAD sha> -->`, using agentics' current version and commit.
 - **Bringing `AGENTS.md`'s dispatch table current:** if it's missing entries the current template has, or still has old inlined content from before agentics moved to the single-dispatch-table model, replace it with the current canonical table verbatim, don't paraphrase. If `CLAUDE.md` still keeps its own copy of the table instead of pointing at `AGENTS.md`, fix that too: one table, not two kept in sync by hand.
-- Every change here is a change to an instruction file (or the equivalent for session logs): same consent standard as any other edit to `CLAUDE.md`/`AGENTS.md`. No bulk apply-everything-then-ask.
+- Every change here is still a change to an instruction file (or the equivalent for session logs): the developer sees the proposed diff before anything is written, batched or not. What changes is how many separate decisions that takes, not whether a decision happens at all.
 
 ## 3. Record it
 
-Log the upgrade in this project's own session file (create `.dev/sessions/` now if this run is what introduces it) and remind the developer to commit and push, so other contributors pick up the change on their next pull — not automatically, and not until then.
+Log the upgrade in this project's own session file (create `.dev/sessions/` now if this run is what introduces it), noting anything newly written to `.dev/agentics-overrides.md` this run, and remind the developer to commit and push, so other contributors pick up the change on their next pull — not automatically, and not until then.
 
 This procedure reads a lot: multiple files, diffs, CHANGELOG history, back-and-forth diagnosis. None of that has ongoing value once the migration is applied, and it stays in context adding token weight to whatever comes next in the same thread. If your harness gives you no way to reset or clear your own context window, recommend the developer start a fresh chat or session for subsequent work rather than continuing in this one — the same "new thread is cheaper than accumulating" reasoning already in `session-discipline.md` § Starting a session, just more pronounced here given how much this specific procedure tends to read.
