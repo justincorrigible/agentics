@@ -182,7 +182,13 @@ Alphabetize properties within objects and mappings in config files (YAML, JSON, 
 
 Alphabetize named resource blocks in Terraform files by resource name (the second label, e.g. `"github-metrics"`, `"keycloak"`, `"lectern"`). VSO companion blocks follow their primary resource directly rather than being sorted independently.
 
-Apply when writing new config content. When editing existing files, fix ordering within the sections being touched. When inserting a new key or resource block into an existing file, place it at its alphabetical position: not at the current edit point, not at the end of the file.
+**This applies to code, not only config files.** Alphabetize the properties of an object literal, the fields of a `type`/`interface`, and the names in a destructured parameter (`{ a, b, c }: Params`), the same way and at every nesting level. A plain positional argument list is unaffected: its order comes from the function signature, not from sorting. This rule is about named fields, not every list.
+
+Apply when writing new content, config or code. When editing existing files, fix ordering within the sections being touched. When inserting a new key, resource block, or field into an existing structure, place it at its alphabetical position: not at the current edit point, not at the end.
+
+**Watch for drift across a multi-step task.** Alphabetization is easy to get right in isolation and easy to lose when a field gets bolted onto an existing object mid-task (new key appended at the end instead of inserted in place) or when the same shape gets copy-pasted across several call sites (one gets fixed, the copies don't). Before treating a multi-file change as done, sweep back over every object literal, type, and destructured parameter it touched, not just the one you were looking at when you added the field.
+
+**Optional automated enforcement:** [`eslint-plugin-perfectionist`](https://npmjs.com/package/eslint-plugin-perfectionist) has autofixable rules for exactly this (`sort-objects`, `sort-interfaces`, `sort-object-types`, among others) and can catch what manual review misses. Surfacing it here as an option per "Library awareness" above, not a requirement: check its current version against the registry before adopting, and confirm which of its rules cover destructured parameters versus plain object literals before relying on it as the sole enforcement mechanism.
 
 ## Structured logging
 

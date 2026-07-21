@@ -26,7 +26,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 - Working in a specific role      -> read `CLAUDE.roles/<role>.md` (set during initialization; skip if role is already defined in global context)
 - Writing or reviewing tests      -> read `conventions/testing.md`
 - Writing code                    -> read `conventions/code-style.md`
-- Reviewing a PR or change        -> read `conventions/code-style.md`, `conventions/code-review.md`
+- Reviewing a PR or change        -> read `conventions/code-style.md`, `conventions/code-review.md`, `conventions/review-conduct.md`
 - Writing or updating docs        -> read `conventions/documentation.md`
 - Security-relevant work          -> read `conventions/security.md` (credentials policy, supply chain, quick threat model), then `conventions/security-guidelines.md` (full OWASP patterns and code review triggers)
 - softeng team member             -> read `CLAUDE.softeng.md` at session start
