@@ -43,5 +43,5 @@ If no project memory exists for you in this project yet:
 2. Ask: "What best describes your primary work on this project?": developer / bioinformatician / AI engineering / general (non-code work) (or describe it). If the answer is already in your global context, skip this question. Otherwise read the matching file in `CLAUDE.roles/`.
 3. Ask: "Are you part of the softeng team?": if yes, apply conventions from `CLAUDE.softeng.md` on top of your role conventions. Skip if already known from global context.
 4. Ask: "Do you already have agent conventions for this project?": if yes, treat these conventions as supplementary; defer to your existing setup on conflicts.
-5. Ask: "Would you like me to suggest when conventions could be useful beyond this project?": record as `propagation_suggestions: yes | no`. Skip if already known from global context.
-Record all answers in project memory. Do not ask again.
+5. Ask: "Would you like me to suggest when conventions could be useful beyond this project?": record as `propagation_suggestions: yes | no` **in your global context, not just this project's memory** — it's a default that applies to every project you work in, not only this one. Skip if already known from global context.
+Record role, softeng-team, and existing-setup answers in project memory; record `propagation_suggestions` in global context per above. A specific project can still locally override the global default later (recorded in that project's own memory instead); when both exist, the project-level record wins for that project only. Do not ask again.
