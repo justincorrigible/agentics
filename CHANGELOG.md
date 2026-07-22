@@ -13,6 +13,10 @@ Breaking: `yes` (downstream copies require manual update) / `no` (additive or cl
 
 ## Released
 
+### 0.7.0 - 2026-07-21
+
+- `2026-07-21 | conventions | minor | no | session-entries-collapse-not-narrate`: the developer noticed session files logging tech-debt entries created and resolved within the same session, and bullets narrating a change's full back-and-forth ("did this, then changed it to this, then this") instead of just where it ended up, both bloat with no value to a future reader. Added two rules to `session-discipline.md`: tech-debt entries that never outlive the session they were found in shouldn't be logged at all, log the fix as an ordinary change instead; and corrections to a still-open session file should edit the existing bullet in place rather than appending a new one describing the correction, since the file staying open for the rest of the day is exactly what allows that. Dogfooded immediately: today's own session file had exactly this pattern (a bullet narrating two successive corrections to the same `AGENTS.md` wording), collapsed to its final state. `breaking: no`
+
 ### 0.6.1 - 2026-07-21
 
 - `2026-07-21 | repo | patch | no | succinct-wording-is-a-separate-pass`: the same bullet trimmed twice in a row (`surface-unprompted-too-narrow`, then `surface-unprompted-trim`) showed that removing duplicated incident narrative and writing genuinely tight prose are two different checks; passing the first doesn't mean the second was done. Added a design principle to `CONTRIBUTING.md`, sibling to the existing narrative-in-`CHANGELOG.md`-only one: after a convention entry states its rule and reasoning, reread it against the density of what surrounds it, and cut anything that restates a point already made or spells out what a shorter phrase already conveys. `breaking: no`
