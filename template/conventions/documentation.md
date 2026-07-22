@@ -49,6 +49,8 @@ Which location is primary depends on the intended audience:
 | Startup sequence, internal call graph, implementation rationale | `.dev/docs` | `/docs` → `.dev/docs` |
 | A feature with observable behaviour and non-trivial internals | Split: surface in `/docs`, depth in `.dev/docs` | both cross-link |
 
+**The same principle, across repos:** when another repo or team asks how to migrate onto or adopt a package you maintain, point them at that package's own docs or README directly rather than writing a bespoke explanation. Its docs are the canonical source, kept in sync with the package itself; a one-off explanation given elsewhere is a second copy that goes stale the moment the package changes without a matching update to what was said.
+
 ## Linking from `/docs` to `.dev/docs`
 
 Any link from a `/docs` page to a `.dev/docs` file must use the full GitHub repository URL, not a relative path:

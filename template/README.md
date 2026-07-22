@@ -1,6 +1,6 @@
 # Agent collaboration template
 
-This directory contains template files for setting up AI agent collaboration. `AGENTS.md` and `CLAUDE.md` are meant to be copied into your project root and adapted; everything else here, `conventions/`, `CLAUDE.roles/`, `CLAUDE.softeng.md`, `global-context/`, is global-guideline material, read live from agentics or used once to bootstrap your agent's own global context, and never belongs copied into a project (see "How to adopt" below).
+This directory contains template files for setting up AI agent collaboration. `AGENTS.md` and `CLAUDE.md` are meant to be copied into your project root and adapted; everything else here, `conventions/`, `CLAUDE.roles/`, `CLAUDE.softeng.md`, `CLAUDE.overture.md`, `global-context/`, is global-guideline material, read live from agentics or used once to bootstrap your agent's own global context, and never belongs copied into a project (see "How to adopt" below).
 
 ## Files
 
@@ -9,6 +9,7 @@ This directory contains template files for setting up AI agent collaboration. `A
 | `AGENTS.md`                          | Canonical source, agent-neutral: conventions, dispatch table, project-specific content all live here                                                                         |
 | `CLAUDE.md`                          | Minimal stub: exists only because Claude Code loads it automatically, points at `AGENTS.md`                                                                                  |
 | `CLAUDE.softeng.md`                  | softeng team addendum: applied conditionally on first session                                                                                                                |
+| `CLAUDE.overture.md`                 | Overture product-family addendum: applied conditionally on first session                                                                                                     |
 | `conventions/convention-levels.md`   | Three-level placement model (project / global / shareable) and propagation questions                                                                                         |
 | `conventions/upgrading-adoption.md`  | On-demand procedure for bringing an already-adopted project's agentics integration current                                                                                   |
 | `conventions/session-discipline.md`  | Session start checklist, `.dev/` write-back rules, tech-debt entry format                                                                                                    |
@@ -29,9 +30,9 @@ This directory contains template files for setting up AI agent collaboration. `A
 2. Copy `DEVELOPMENT.md` and fill in your project-specific setup steps
 3. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand the first time an upgrade check hits a conflict the developer wants to keep permanently (see `conventions/upgrading-adoption.md` § 2): don't create it empty upfront
 4. Copy `.claude/settings.json` to enforce the credential file blocklist (Claude Code only; skip if you have the hook in your global `~/.claude/settings.json`)
-5. If your agent's global context doesn't yet define your role or your team's conventions (e.g. softeng), bootstrap it once from `CLAUDE.roles/<role>.md` and `CLAUDE.softeng.md`, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent). This is a one-time action on your global context, not a per-project step
+5. If your agent's global context doesn't yet define your role, your team's conventions (e.g. softeng), or your product family's (e.g. Overture), bootstrap it once from `CLAUDE.roles/<role>.md`, `CLAUDE.softeng.md`, and/or `CLAUDE.overture.md`, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent). This is a one-time action on your global context, not a per-project step
 
-**`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are global-guideline material: they never belong copied into a project, under any circumstance.** See `conventions/convention-levels.md` § How much to keep locally for the full rule and why. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.
+**`conventions/`, `CLAUDE.roles/`, `CLAUDE.softeng.md`, and `CLAUDE.overture.md` are global-guideline material: they never belong copied into a project, under any circumstance.** See `conventions/convention-levels.md` § How much to keep locally for the full rule and why. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.
 
 ## Keeping up to date
 

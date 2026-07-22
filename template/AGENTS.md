@@ -32,6 +32,7 @@ Every path below is a live pointer into agentics or your own global context, nev
 - Writing or updating docs        -> read `conventions/documentation.md`
 - Security-relevant work          -> read `conventions/security.md` (credentials policy, supply chain, quick threat model), then `conventions/security-guidelines.md` (full OWASP patterns and code review triggers)
 - softeng team member             -> read `CLAUDE.softeng.md` at session start
+- Overture project                -> read `CLAUDE.overture.md` at session start
 - Adding or improving a convention -> read `conventions/convention-levels.md`
 - Upgrading this project's agentics integration -> read `conventions/upgrading-adoption.md`
 - Deploying or debugging a service -> read `.dev/docs/<service>/` if it exists
@@ -44,6 +45,7 @@ If no project memory exists for you in this project yet:
 1. Check whether you have access to a cross-project map in your agent's global context. If yes, read it for cross-project relationships. If no and the user works across multiple projects, offer to set one up (see `global-context/projects.md` in the agentics template for the recommended format).
 2. Ask: "What best describes your primary work on this project?": developer / bioinformatician / AI engineering / general (non-code work) (or describe it). If the answer is already in your global context, skip this question. Otherwise read the matching file in `CLAUDE.roles/`.
 3. Ask: "Are you part of the softeng team?": if yes, apply conventions from `CLAUDE.softeng.md` on top of your role conventions. Skip if already known from global context.
-4. Ask: "Do you already have agent conventions for this project?": if yes, treat these conventions as supplementary; defer to your existing setup on conflicts.
-5. Ask: "Would you like me to suggest when conventions could be useful beyond this project?": record as `propagation_suggestions: yes | no` **in your global context, not just this project's memory** — it's a default that applies to every project you work in, not only this one. Skip if already known from global context.
-Record role, softeng-team, and existing-setup answers in project memory; record `propagation_suggestions` in global context per above. A specific project can still locally override the global default later (recorded in that project's own memory instead); when both exist, the project-level record wins for that project only. Do not ask again.
+4. Ask: "Is this an Overture project?": if yes, apply conventions from `CLAUDE.overture.md` on top of your role conventions. Skip if already known from global context.
+5. Ask: "Do you already have agent conventions for this project?": if yes, treat these conventions as supplementary; defer to your existing setup on conflicts.
+6. Ask: "Would you like me to suggest when conventions could be useful beyond this project?": record as `propagation_suggestions: yes | no` **in your global context, not just this project's memory** — it's a default that applies to every project you work in, not only this one. Skip if already known from global context.
+Record role, softeng-team, Overture-project, and existing-setup answers in project memory; record `propagation_suggestions` in global context per above. A specific project can still locally override the global default later (recorded in that project's own memory instead); when both exist, the project-level record wins for that project only. Do not ask again.

@@ -134,6 +134,8 @@ Do not produce version strings from training data, and do not treat "already use
 
 Also check for version conflicts before writing: run `npm why <package>` (or equivalent) to see what versions of that package and its close deps are already in the tree. If the new version brings in sub-dependencies that conflict with existing ones - especially native platform packages that package managers hoist into shared locations - flag the conflict before committing the change.
 
+**Evaluating whether a package already has a capability is the sibling case to introducing one.** `latest` is one dist-tag among several; a maintainer can ship current work under a pre-release tag (`next`, `rc`, `beta`) without promoting it. Concluding a package lacks a feature because it's absent from `latest` is the same stale-assumption pattern above, applied to capability instead of version. Run `npm view <package> dist-tags` (or equivalent) before concluding a capability doesn't exist yet, especially when evaluating a migration or a dependency swap.
+
 ## Verifying dated or versioned external facts
 
 Training data has a cutoff, and a fact that carried an explicit version or date when you learned it may be stale by now, or may have been superseded since. This is intractable to solve in general: you cannot re-verify everything you know. It's tractable exactly when two things are both true: the fact carries an explicit, checkable version or date marker (a named standard's edition, a spec revision, a changelog), and checking it is cheap, one fetch, not a research project.
