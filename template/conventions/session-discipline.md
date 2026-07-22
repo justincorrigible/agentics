@@ -30,6 +30,8 @@ Update `.dev/roadmap.md` or `.dev/tech-debt.md` within the same session whenever
 
 Before writing any of these updates: marking an item done, closing a tech-debt entry, changing a status: verify against the actual current code or file state, not against a prior description or session summary. An assumption carried forward unverified is exactly how these documents drift from what they claim.
 
+**Re-check before committing, not just at session start.** "Don't log an entry that never outlives the session" (see Tech-debt entry format below) only catches the case where the fix lands before the entry is written. A long session leaves room for the reverse: an entry gets logged, then that same session goes on to fix the very thing it describes, with no forced moment to circle back and remove it. Before committing any change that touches `.dev/tech-debt.md` or `.dev/roadmap.md`, or commits code covered by an entry added earlier in the same session, re-verify every entry added since the session began against current code state, and reread each one against "Say it once" below. Waiting for the next session's staleness pass is too late for either check: by then a stale or bloated entry may already be committed as if it were fine.
+
 After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file (see "Session file identity" below). Do not wait for an explicit "session over" signal: work rarely ends cleanly, and the update will be missed if it depends on one.
 
 Do not log conversational activity: PR reviews that produced no local changes, discussions, waiting states. These are not session-log material. A real example of what this looks like when it slips through: "Asked whether other projects' agents would actually see today's changes: no, not yet, since nothing here is committed or pushed." A question, an answer, no decision and no local change, zero value to a future reader, exactly the shape to catch before it's written, not after. See "Session file entry format" below for the mixed case: a review that also produced one real local change.
@@ -37,6 +39,10 @@ Do not log conversational activity: PR reviews that produced no local changes, d
 When `.dev/` documents are updated, remind the developer to commit them. This history matters for avoiding double work across sessions.
 
 **Concrete content, not process or events.** `.dev/roadmap.md` and `.dev/tech-debt.md` hold the substance: a decision, a design topic, a known issue and its fix. They are not a record of who raised something, in which PR, or when a discussion happened; that's process, and it belongs in PR or issue history, not here, the same reasoning "write about effects, not style" applies to session files. A "message format design" entry states the open question and the options, not who tagged whom. This is also where an individual's name most often sneaks in (see "Name code, not people" below): stripping the process narrative removes the attribution risk with it, not as a separate pass.
+
+## Say it once, at the density it deserves
+
+The same fact stated twice in different forms costs the same as stating it wrong, not incorrect, just taking up two or three times its own space: a caveat given in prose, then repeated as a bullet; a blocking condition explained, then given its own bolded status label ("trigger condition, not a start-now item") restating the same explanation a second way; a standing convention cited by name locally instead of just applied. Applies equally to `.dev/roadmap.md`, `.dev/tech-debt.md`, and session file entries: an entry that's grown a sub-section explaining its own nature, sitting beside entries that are two or three lines each, is the signal to fold that condition back into the entry's own fact, not evidence this one earned extra structure. Trusting this to happen at the moment of writing is the same fragile shape as any other unenforced judgment call: it's caught for real at the pre-commit re-check above, the same checkpoint that catches stale entries. Same discipline as `CONTRIBUTING.md`'s `succinct-wording-is-a-separate-pass`, applied here to any persisted `.dev/` content rather than just convention prose.
 
 ## Verifying conformance, not just structure
 
@@ -109,6 +115,8 @@ context: [roadmap item reference or brief note: required when standalone: no]
 
 `standalone: yes`: can be picked up freely without reading other context.
 `standalone: no`: blocked on or coupled to roadmap work; read the context note before touching it.
+
+A blocking condition, a caveat, or context on why an entry isn't actionable yet belongs once, inside `context` or `fix` above: not restated under its own bolded status heading or a trailing bullet list. See "Say it once, at the density it deserves" above.
 
 **Don't log an entry that never outlives the session.** Tech-debt entries exist to carry a still-open issue into future sessions. If an issue is found and fixed before the same session's file closes, it never reaches that state: fixing it is ordinary work, not debt, so log the fix itself as a normal session-file change and skip `tech-debt.md` entirely. Adding an entry only to remove it again within the same file produces a "created, then resolved" bullet that documents the entry's own lifecycle instead of any effect a reader would care about, the same process-not-substance shape "Concrete content, not process or events" above already excludes.
 
