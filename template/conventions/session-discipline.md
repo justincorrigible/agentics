@@ -32,7 +32,7 @@ Before writing any of these updates: marking an item done, closing a tech-debt e
 
 After any meaningful unit of work: code written, bug fixed, tech-debt logged, roadmap updated, docs changed: add or extend the dated entry in your session file (see "Session file identity" below). Do not wait for an explicit "session over" signal: work rarely ends cleanly, and the update will be missed if it depends on one.
 
-Do not log conversational activity: PR reviews that produced no local changes, discussions, waiting states. These are not session-log material. See "Session file entry format" below for the mixed case: a review that also produced one real local change.
+Do not log conversational activity: PR reviews that produced no local changes, discussions, waiting states. These are not session-log material. A real example of what this looks like when it slips through: "Asked whether other projects' agents would actually see today's changes: no, not yet, since nothing here is committed or pushed." A question, an answer, no decision and no local change, zero value to a future reader, exactly the shape to catch before it's written, not after. See "Session file entry format" below for the mixed case: a review that also produced one real local change.
 
 When `.dev/` documents are updated, remind the developer to commit them. This history matters for avoiding double work across sessions.
 
