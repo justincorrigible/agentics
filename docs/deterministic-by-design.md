@@ -1,0 +1,27 @@
+# Deterministic by design
+
+Dual audience: contributors maintaining agentics, and anyone building a similar agent-instruction system elsewhere. Both readings are intentional.
+
+An agent following a written instruction is not the same act as a compiler executing code. A rule that's true, well-written, and correctly understood can still not fire, because "the agent should do X" is a probabilistic claim, not a guarantee: it holds most of the time, then doesn't, for reasons that don't repeat cleanly enough to call a pattern. That's not a bug in any one instruction. It's what "possible" means when the thing doing the reasoning is a probabilistic process instead of a deterministic one: the same input can produce a different outcome on a different run, and you don't find out which one you got until you check.
+
+Every incident logged in this repo's `CHANGELOG.md` under a `conventions` or `repo` category is an instance of this: a rule existed, was arguably clear, and still didn't fire at the moment it needed to. The fix each time looked like "write the rule more clearly." That helps, but it doesn't change what kind of thing is enforcing it.
+
+What did we learn? **"stop trusting 'memory' for the parts that don't need judgment, and make the parts that do need judgment impossible to quietly skip"**
+
+## The actual lever: reduce what depends on being remembered
+
+Sort every rule you're tempted to add into one of three buckets, and treat each differently.
+
+**1. Purely mechanical, no judgment required.** A pattern that either exists in a file or doesn't; a count that either matches or doesn't; a name that either appears in a diff or doesn't. Nothing about deciding whether it's a problem requires understanding intent. These should never be "remember to check this", they should be a script, wired into something that runs whether or not anyone remembers it exists (a pre-commit hook, CI, whatever your equivalent is). Documenting a mechanical check as a step in a checklist is strictly worse than automating it: it costs the same to write down, and still depends on memory to execute. `testing/scripts/check-consistency.sh` plus `.githooks/pre-commit` in this repo is this bucket, fully converted.
+
+**2. Requires judgment, but has a clear trigger.** "Does this change actually solve the stated problem" can't be mechanized, it needs understanding. But _when_ to ask it is knowable: at review time, every time, no exceptions. The failure mode here isn't "the rule is wrong", it's "the rule lost to something that felt like a good enough reason to skip it this once": the change looked small, it was already discussed, confidence was high. The fix is naming the override explicitly: state that this check is not conditional on how the change feels, and name the specific rationalizations that don't count as an exception. `agentics_contributor`'s mandatory upstream-check tier needed exactly this (`CHANGELOG.md` § `contributor-check-explicit-override`): "run this every session" lost to a project's own complete-looking checklist until it was rephrased as "this runs _in addition to_ that checklist, even when it looks complete." A plain instruction reads as a frequency; an override has to read as a precedence.
+
+**3. Structural: the ambiguity itself is avoidable, not just catchable.** Some failure classes don't need a check after the fact, because the pattern that causes them can be disallowed outright. A relative path with no stated base directory reads correctly from wherever it was written and incorrectly from everywhere else; that's not a rule to remember to apply, it's a shape of writing to stop producing, the same way you'd ban a footgun API instead of writing a linter for every way to misuse it. This repo's `global-guideline-material-never-in-project` incident (a dispatch table's bare relative paths, ambiguous the moment they were copied into a different project) was this bucket. The fix wasn't "review paths more carefully", it was stating explicitly, once, that this class of content is always a live pointer, never a local path, and checking for the regression of that one sentence going missing, not for every way a bad path could be written.
+
+## What this doesn't solve
+
+Bucket 1 gets to something close to actually deterministic: either the script runs and blocks, or it doesn't exist yet. Bucket 3 gets close too, once the structural fix is in place, the ambiguity can't recur in that specific shape. Bucket 2 does not get there. An override phrased correctly reduces how often it's skipped; it does not make skipping impossible, because applying it still runs through the same probabilistic reasoning as everything else. Don't oversell it as "solved" when what actually happened is "the failure rate dropped."
+
+## Applying this to your own system
+
+For each existing rule: would a person or agent following it perfectly, every time, actually need to exercise judgment, or are you just hoping they remember to run a check that has one right answer? If the latter, that's bucket 1, and it should already be a script wired into something that runs automatically, not a line in a document. If a rule keeps getting silently skipped despite being clearly written, check whether it's actually bucket 2 dressed up as a plain instruction, missing the explicit override it needs. And if the same class of mistake keeps recurring in slightly different shapes no matter how the rule is reworded, ask whether the underlying pattern should be disallowed structurally instead of caught after the fact, bucket 3, not bucket 2.

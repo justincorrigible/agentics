@@ -1,6 +1,6 @@
 # Agent collaboration template
 
-This directory contains template files for setting up AI agent collaboration in your project. Copy the files you need into your project root and adapt them.
+This directory contains template files for setting up AI agent collaboration. `AGENTS.md` and `CLAUDE.md` are meant to be copied into your project root and adapted; everything else here, `conventions/`, `CLAUDE.roles/`, `CLAUDE.softeng.md`, `global-context/`, is global-guideline material, read live from agentics or used once to bootstrap your agent's own global context, and never belongs copied into a project (see "How to adopt" below).
 
 ## Files
 
@@ -26,12 +26,12 @@ This directory contains template files for setting up AI agent collaboration in 
 ## How to adopt
 
 1. Copy `AGENTS.md` to your project root; also copy `CLAUDE.md` if you use Claude Code (it auto-loads that file specifically, but stays a stub pointing at `AGENTS.md`)
-2. Copy `CLAUDE.softeng.md` if your team uses the softeng conventions
-3. Copy `DEVELOPMENT.md` and fill in your project-specific setup steps
-4. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand the first time an upgrade check hits a conflict the developer wants to keep permanently (see `conventions/upgrading-adoption.md` § 2): don't create it empty upfront
-5. Copy `.claude/settings.json` to enforce the credential file blocklist (Claude Code only; skip if you have the hook in your global `~/.claude/settings.json`)
+2. Copy `DEVELOPMENT.md` and fill in your project-specific setup steps
+3. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand the first time an upgrade check hits a conflict the developer wants to keep permanently (see `conventions/upgrading-adoption.md` § 2): don't create it empty upfront
+4. Copy `.claude/settings.json` to enforce the credential file blocklist (Claude Code only; skip if you have the hook in your global `~/.claude/settings.json`)
+5. If your agent's global context doesn't yet define your role or your team's conventions (e.g. softeng), bootstrap it once from `CLAUDE.roles/<role>.md` and `CLAUDE.softeng.md`, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent). This is a one-time action on your global context, not a per-project step
 
-**`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are bootstrapping artifacts** for agents that don't yet have a comprehensive global context. If your agent's global context already defines universal conventions (testing style, code style, security, session discipline), your role, and your team's conventions, skip copying these. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.
+**`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are global-guideline material: they never belong copied into a project, under any circumstance.** See `conventions/convention-levels.md` § How much to keep locally for the full rule and why. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.
 
 ## Keeping up to date
 
@@ -39,7 +39,7 @@ Your freshly-copied `AGENTS.md` carries a pointer, not a number (`<!-- agentics-
 
 ## Already have an existing setup?
 
-If you already have a `CLAUDE.md`, `AGENTS.md`, or other agent instruction file, don't replace it: merge instead. Add the dispatch table and initialization block to your existing agent-neutral file (or create `AGENTS.md` if you don't have one), and copy only the `conventions/` content that your project does not already cover. Softeng conventions are designed to supplement existing practices, not override them.
+If you already have a `CLAUDE.md`, `AGENTS.md`, or other agent instruction file, don't replace it: merge instead. Add the dispatch table and initialization block to your existing agent-neutral file (or create `AGENTS.md` if you don't have one); its `conventions/*.md` dispatch lines point at agentics itself, not a local copy, regardless of what your existing setup already covers. Softeng conventions are designed to supplement existing practices, not override them, and belong in your global context, not this project, same as any other adoption.
 
 ## Contributing back
 

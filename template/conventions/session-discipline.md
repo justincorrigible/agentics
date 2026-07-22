@@ -36,6 +36,8 @@ Do not log conversational activity: PR reviews that produced no local changes, d
 
 When `.dev/` documents are updated, remind the developer to commit them. This history matters for avoiding double work across sessions.
 
+**Concrete content, not process or events.** `.dev/roadmap.md` and `.dev/tech-debt.md` hold the substance: a decision, a design topic, a known issue and its fix. They are not a record of who raised something, in which PR, or when a discussion happened; that's process, and it belongs in PR or issue history, not here, the same reasoning "write about effects, not style" applies to session files. A "message format design" entry states the open question and the options, not who tagged whom. This is also where an individual's name most often sneaks in (see "Name code, not people" below): stripping the process narrative removes the attribution risk with it, not as a separate pass.
+
 ## Verifying conformance, not just structure
 
 Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's structural example (a field skeleton, a template block) shows shape; matching that shape can happen while missing a separate prose requirement sitting right next to it, a real, observed failure mode (see `CHANGELOG.md` § `verify-conformance-not-structure`).
@@ -107,5 +109,7 @@ context: [roadmap item reference or brief note: required when standalone: no]
 `standalone: no`: blocked on or coupled to roadmap work; read the context note before touching it.
 
 **Separate the issue from the fix, even in this minimal form.** A description without a recommended direction is exactly how debt entries go stale: whoever picks it up next re-derives the same analysis from scratch. This is worth doing regardless of project size; it's the one piece of a richer format (below) that doesn't cost extra structure to include. The `fix:` field exists precisely so this isn't optional-by-omission. Redirecting to where the full fix is tracked is valid and often correct, especially for something already scoped as its own roadmap item; what's not valid is a bare reference standing in for the field with nothing about the fix itself said here.
+
+**Don't restate this format inside a project's own `tech-debt.md`.** A comment explaining the skeleton, or noting why older entries don't have a separate `fix:` line, duplicates what this section already defines and drifts from it the moment either copy changes. If a project's file needs a reminder, reference `conventions/session-discipline.md` § Tech-debt entry format by name; don't restate the format inline.
 
 **At scale, consider a richer structure instead:** `**File:** ... **Severity:** ... **Kind:** ... **Issue:** ... **Fix:** ... **Standalone:** ...`, one heading per entry. This is a genuine tradeoff, not a strict upgrade: it adds triage and scanability for a long-lived list with dozens of entries across a large codebase, at the cost of more friction to log each one. A project with five debt entries loses more from that friction than it gains from the structure; a project with fifty gains more than it loses. Pick based on the actual list's size, not by default.

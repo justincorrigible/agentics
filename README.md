@@ -30,7 +30,6 @@ It stores your answers in project memory and does not ask again.
 ```
 AGENTS.md                   canonical source: project-specific content, dispatch table, universal conventions
 CLAUDE.md                   stub: Claude Code loads it automatically, it points at AGENTS.md for everything
-CLAUDE.softeng.md           softeng team addendum: applied conditionally at session start
 DEVELOPMENT.md              human developer setup and onboarding guide (fill in per project)
 .dev/
   roadmap.md                planned work across features and phases
@@ -38,18 +37,9 @@ DEVELOPMENT.md              human developer setup and onboarding guide (fill in 
   sessions/                 one file per contributor per day, dated log of decisions and open threads
 ```
 
-**Optional bootstrapping files** (skip if already covered by your agent's global context):
+`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are never copied into a project, under any circumstance: they're global-guideline material, not project content (see "Two tiers" below and `conventions/convention-levels.md` § How much to keep locally for the full rule). If your agent's global context doesn't yet define your role or your team's conventions, bootstrap it from those files directly, once, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent), not a per-project step.
 
-```
-CLAUDE.roles/               role-specific conventions (skip if role is defined globally)
-CLAUDE.softeng.md           softeng team conventions (skip if already in global context)
-conventions/                universal code style, testing, security, session discipline
-                            (skip if your agent's global context defines these)
-.claude/settings.json       credential file protection hook (Claude only;
-                            prefer adding to ~/.claude/settings.json globally)
-```
-
-The project `AGENTS.md` should contain only project-specific content once your global context is set up; `CLAUDE.md` stays the minimal stub it started as. `conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are for bootstrapping agents without a comprehensive global context, or for project-specific overrides of those conventions.
+`.claude/settings.json` (Claude Code's credential-file protection hook) can be copied per project, or added to your global `~/.claude/settings.json` once instead.
 
 ---
 
@@ -82,10 +72,12 @@ A convention only needs to be copied into the adopting project if reading it liv
 
 ## Keeping up to date
 
-On adoption, extend the version tag in the adopting project's `CLAUDE.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/convention-levels.md` § Checking for upstream updates) instead of requiring a manual CHANGELOG comparison.
+On adoption, extend the version tag in the adopting project's `AGENTS.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. `CLAUDE.md` carries no tag at all: it's a stub pointing at `AGENTS.md` for everything, including this. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/convention-levels.md` § Checking for upstream updates) instead of requiring a manual CHANGELOG comparison.
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to propose changes and how to create new role files.
 
 If you discover a convention in your project that could benefit other teams, open a PR. Your agent will flag likely candidates as they surface.
+
+Building something similar for your own team? [`docs/deterministic-by-design.md`](docs/deterministic-by-design.md) is the design philosophy behind how this repo tries to make its own conventions reliable: which parts should be a mechanical check wired into something that always runs, which parts need an explicit override instead of a plain instruction, and which parts should be made structurally impossible rather than caught after the fact.

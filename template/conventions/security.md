@@ -12,7 +12,7 @@ Apply security awareness in three ways:
 
 ## Detailed guidelines
 
-If a security-guidelines file already exists in your agent's global context (for Claude: `~/.claude/security-guidelines.md`), read it for security-relevant work: it maps each OWASP category to concrete patterns, design guidance, and code review triggers. If none exists, copy `global-context/security-guidelines.md` from the agentics template into your agent's global context directory to create your own.
+If a security-guidelines file already exists in your agent's global context (for Claude: `~/.claude/security-guidelines.md`), read it for security-relevant work: it maps each OWASP category to concrete patterns, design guidance, and code review triggers. If none exists, copy agentics' `template/global-context/security-guidelines.md` into your agent's global context directory to create your own (a synced copy of this repo's `conventions/security-guidelines.md`; see that file's header).
 
 ## Credentials and secrets
 
@@ -48,8 +48,4 @@ Only approve packages you have reviewed. Treat a new entry in `allowBuilds` the 
 
 ## Quick threat model (A06: Insecure Design)
 
-Before implementing a feature with security implications, answer three questions and record in `.dev/sessions/`:
-
-1. **What are we building?** (one sentence)
-2. **What could go wrong?** (consider: unauthorized access, injection, resource exhaustion, data exposure, supply chain)
-3. **What are we doing about it?** (specific design decisions)
+Before implementing a feature with security implications, answer three questions and record the result: see `security-guidelines.md` § Quick threat model for the full version (the questions, a worked "what could go wrong" checklist, and the rationale).

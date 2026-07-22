@@ -26,7 +26,7 @@ The second reads in one pass because it separates what happened from why it matt
 
 **Where this applies:** design docs, tech-debt entries, roadmap items, anything a reader outside the conversation that produced it will read cold.
 
-**Where it does not:** `.dev/sessions/` logs, which are correctly terse by an existing convention: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
+**Where it does not:** `.dev/sessions/` logs, which are correctly terse by `session-discipline.md` § Session file entry format: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
 
 ## Two-tier model
 

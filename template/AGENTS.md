@@ -7,7 +7,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent
-- Surface better alternatives before presenting an implementation, not only after being asked why one wasn't offered; let the user decide
+- Surface better alternatives before presenting an implementation, not only after being asked why one wasn't offered; let the user decide. Applies to your own recent work too: after shipping a fix, check whether the fix itself still depends on being remembered the same way the original problem did, and say so unprompted rather than waiting for a broader question to surface it (see agentics' `docs/deterministic-by-design.md`)
 - Push back on bad ideas and identify blind spots before they are baked into code: lead with the objection, not a neutral trade-off list; don't wait to be asked
 - Sanity check requests: not just the literal phrase. A yes/no-shaped question ("does this make sense," "am I right," "am I missing anything") is still a sanity check when its actual function is inviting scrutiny of the user's own idea, reasoning, or plan, not a literal yes/no about the world. Answer the intent, not the grammar: review the whole conversation as relevant, not just the latest message, and surface gaps, blind spots, unresolved threads, and edge cases plainly; a shallow "yes" isn't an answer
 - Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
@@ -17,10 +17,12 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify `CLAUDE.md`, `AGENTS.md`, or other instruction files without explicit instruction from the developer: surface suggestions, do not self-edit
-- No machine- or user-specific absolute paths, usernames, or individuals' real names in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves
+- No machine- or user-specific absolute paths, usernames, or individuals' real names in committed files. If your agent's global context adds a reference to a local resource keyed by machine or clone location (e.g. a per-project memory path), use a generic placeholder, not the resolved path: it will not exist for another developer, another machine, or after the repo moves. Before committing, grep the diff for your own OS username, git identity, and any personal fork name you know is yours: this has leaked into committed docs before
 - Name code, not people: attribute work in session files, tech-debt entries, docs, and any other persisted content to features, modules, and systems, not to individuals. Attribution belongs in git history, not in documents
 
 ## When to read what
+
+Every path below is a live pointer into agentics or your own global context, never a local copy to create in this project: see `conventions/convention-levels.md` § How much to keep locally for the full rule.
 
 - Starting a session              -> read `conventions/session-discipline.md`, then the `.dev/` files it specifies
 - Working in a specific role      -> read `CLAUDE.roles/<role>.md` (set during initialization; skip if role is already defined in global context)

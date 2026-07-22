@@ -9,8 +9,8 @@ This is the canonical source for this repo's own agent instructions, agent-neutr
 
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent
-- Surface better alternatives as options; let the user decide
-- Push back on bad ideas and identify blind spots before they are baked in
+- Surface better alternatives before presenting an implementation, not only after being asked why one wasn't offered; let the user decide. Applies to your own recent work too: after shipping a fix, check whether the fix itself still depends on being remembered the same way the original problem did, and say so unprompted rather than waiting for a broader question to surface it (see `docs/deterministic-by-design.md`)
+- Push back on bad ideas and identify blind spots before they are baked in: lead with the objection, not a neutral trade-off list; don't wait to be asked
 - Sanity check requests: not just the literal phrase. A yes/no-shaped question ("does this make sense," "am I right," "am I missing anything") is still a sanity check when its actual function is inviting scrutiny of the user's own idea, reasoning, or plan, not a literal yes/no about the world. Answer the intent, not the grammar: review the whole conversation as relevant, not just the latest message, and surface gaps, blind spots, unresolved threads, and edge cases plainly; a shallow "yes" isn't an answer
 - Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
 - Flag scope-adjacent issues verbally, then document them in `.dev/tech-debt.md`
@@ -18,11 +18,17 @@ This is the canonical source for this repo's own agent instructions, agent-neutr
 ## Critical constraints
 - No credentials, secrets, or private URLs in any file in this repo: ever
 - This repo is the upstream source for other teams; keep content general and publicly safe
+- Do not modify `CLAUDE.md`, `AGENTS.md`, or other instruction files without explicit instruction from the developer: surface suggestions, do not self-edit
 - No personal identifying details: no local usernames, real names of individual contributors, machine-specific absolute paths, or personal account/fork handles anywhere in this repo. Use generic placeholders instead: "the developer," "the repo's lead developer," "a local clone." Before committing, grep the diff for your own OS username, git identity, and any personal fork name you know is yours: this has leaked into committed docs before
+- Name code, not people: attribute work in `.dev/sessions/`, `.dev/tech-debt.md`, and any other persisted content to features, modules, and systems, not to individuals (see `template/conventions/session-discipline.md` § "Name code, not people": the same rule applies to this repo's own `.dev/` content)
 
 ## When to read what
+
+Every `conventions/*.md` path below is this repo's own local copy, since this file governs agentics itself. Adopting projects copying this table verbatim (per `conventions/upgrading-adoption.md`) must not treat these as local paths to create: see that file's "bootstrap artifacts" diagnosis item.
+
 - Starting a session → read `.dev/roadmap.md`, `.dev/tech-debt.md`, `.dev/sessions/`
 - Reviewing or editing template files → read `template/CLAUDE.md` first to understand what we are maintaining
+- Proposing a change to the dispatch table, or a procedure whose output gets copied verbatim elsewhere → read `testing/README.md` before considering it done
 - Adding to project memory → check: could this be global? Could it be a template improvement?
 
 ## Memory and contribution hygiene
@@ -30,6 +36,7 @@ When writing to project memory: keep entries concise; store no content derivable
 
 ## Repo maintenance rules
 - `template/` is the canonical deliverable; keep it accurate and in sync
+- **Agentics is adopter zero of its own template.** Whenever `template/AGENTS.md` or `template/CLAUDE.md` changes, run `conventions/upgrading-adoption.md`'s diagnosis against this repo's own `AGENTS.md`/`CLAUDE.md` before considering the change done, treating `template/` as the upstream source: no clone-vs-URL lookup needed, it's already sitting in this repo, and § 0's detection step is trivially "yes." This is a standing self-check, not a one-time reconciliation: see `CHANGELOG.md` § `full-repo-duplication-audit` for what happens without it
 - Log changes in `CHANGELOG.md` as they happen, with a `bump` field per entry. Nothing else stamps a version number: this file's own tag and `template/AGENTS.md`'s both just point at `CHANGELOG.md` § Released; releasing means moving `## Unreleased changes` entries under a new dated heading there, triggered by an explicit publish request (direct or indirect phrasing) rather than a fixed cadence. Publishing is the one case where committing in this repo is authorized, narrowly, for any contributor: see `CONTRIBUTING.md` § Versioning for the trigger phrases and the exception's exact scope
 - `CLAUDE.md` at repo root is a stub pointing here (Claude Code loads it automatically; this file doesn't need a Claude-specific mirror anymore, just the pointer)
 

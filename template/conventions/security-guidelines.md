@@ -4,6 +4,8 @@
 
 These guidelines are derived from the team's working review of OWASP Top 10:2025 (items 1-7 reviewed; 8-10 supplemented from OWASP directly). They are a working document: update as new items are reviewed and as patterns are validated in practice.
 
+**This is the canonical copy.** `template/global-context/security-guidelines.md` is a portable bootstrap copy of this exact content, meant to be copied to `~/.claude/` (or equivalent) once, for an agent whose global context doesn't yet have it; it can't be a live pointer back here since it needs to stand alone once copied out. When this file changes, update that copy to match in the same change; they're expected to be identical.
+
 ---
 
 ## Quick threat model: A06: Insecure Design

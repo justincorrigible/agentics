@@ -1,6 +1,6 @@
 # Security Guidelines: OWASP Top 10:2025
 
-> Always verify the current edition at https://owasp.org/www-project-top-ten/: the list updates every few years.
+> This document is keyed to the 2025 edition. Before relying on the category numbers or names below in security-relevant work, fetch https://owasp.org/www-project-top-ten/ and confirm 2025 is still current; if a newer edition exists, treat this document as needing a re-map, not as authoritative on its own.
 
 These guidelines are derived from the team's working review of OWASP Top 10:2025 (items 1-7 reviewed; 8-10 supplemented from OWASP directly). They are a working document: update as new items are reviewed and as patterns are validated in practice.
 
