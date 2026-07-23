@@ -7,6 +7,14 @@ Place this file in your agent's global context directory (for Claude: `~/.claude
 
 ---
 
+## Agentic projects
+
+Projects known to have adopted agentics (a project that adopts it becomes "agentic"): list them by name only, e.g. `org/project-a`, `org/project-b`.
+
+Update this list only when a project adopts or drops agentics entirely, not on every version sync: the version each one is currently synced to already lives canonically in that project's own `AGENTS.md` tag, restating it here would just go stale the next time any one of them syncs.
+
+---
+
 ## Projects
 
 ### [project-name]

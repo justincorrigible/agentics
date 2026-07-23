@@ -64,6 +64,22 @@ if (auth) headers['Authorization'] = buildBasicAuth(auth);
 const headers = auth ? { Authorization: buildBasicAuth(auth) } : {};
 ```
 
+The same principle applies to loops, not just object construction. A `while`/`for` loop that reassigns a local across iterations to accumulate a result is still a mutating statement; recursion (or `reduce`/`map`/`find` where the shape fits) is the expression-producing equivalent:
+
+```ts
+// avoid
+const findRoot = (dir: string): string => {
+  let current = dir;
+  while (!isRoot(current)) {
+    current = parentOf(current);
+  }
+  return current;
+};
+
+// prefer
+const findRoot = (dir: string): string => (isRoot(dir) ? dir : findRoot(parentOf(dir)));
+```
+
 **Pure helpers.** When a block of logic has a clear input and output (a lookup, a transformation, a format function), extract it as a named function with no side effects. This keeps orchestration code readable and the logic independently testable.
 
 **Derive from data, don't duplicate as a flag.** When a field's value is fully determined by other configuration already present, don't add a separate explicit discriminator (`enabled`, `type`, `mode`) for it: gate behaviour on the presence or content of the data itself. A `type: gateway | ingress | none` field that could instead be "gateway if `gateway.parentRef.name` is set, ingress if `ingress.hosts` is non-empty, neither otherwise" adds a second thing to configure and keep consistent with the first. Applies to Helm values, API schemas, and configuration objects generally: when presence unambiguously implies intent, don't require intent to be stated twice.
@@ -186,6 +202,8 @@ Alphabetize named resource blocks in Terraform files by resource name (the secon
 
 **This applies to code, not only config files.** Alphabetize the properties of an object literal, the fields of a `type`/`interface`, and the names in a destructured parameter (`{ a, b, c }: Params`), the same way and at every nesting level. A plain positional argument list is unaffected: its order comes from the function signature, not from sorting. This rule is about named fields, not every list.
 
+**And to markdown reference documents with named per-item sections**, not just code or config: a project map's `### project-name` headings, a glossary's terms, anything enumerating discrete named entries. Same reasoning as config keys: scanning for whether an entry already exists, and knowing where a new one belongs, both get harder without it. A prose document that isn't enumerating named items (a narrative walkthrough, an ordered set of steps) isn't affected: this is about named-entry lists, not every heading in existence.
+
 Apply when writing new content, config or code. When editing existing files, fix ordering within the sections being touched. When inserting a new key, resource block, or field into an existing structure, place it at its alphabetical position: not at the current edit point, not at the end.
 
 **Watch for drift across a multi-step task.** Alphabetization is easy to get right in isolation and easy to lose when a field gets bolted onto an existing object mid-task (new key appended at the end instead of inserted in place) or when the same shape gets copy-pasted across several call sites (one gets fixed, the copies don't). Before treating a multi-file change as done, sweep back over every object literal, type, and destructured parameter it touched, not just the one you were looking at when you added the field.
@@ -209,5 +227,7 @@ Set up structured logging before writing application logic, the same way you set
 Never commit without explicit user instruction: the user handles all git work themselves.
 
 Never stage changes (`git add`) without being explicitly asked to, either: staging is the user's call, same as committing. Making an edit does not stage it: changes sit in the working tree, unstaged, until staged deliberately. When reporting on changes made, state their actual git state plainly rather than just "the changes are there": a user who expects staging and finds none wastes real time looking for something that was never where they expected it.
+
+**No AI-tool attribution in commits or PRs.** Do not add "Co-Authored-By," "Generated with," or similar trailers naming an AI tool or vendor to commit messages, PR descriptions, or PR comments, regardless of which agent is doing the work. Unprompted attribution reads as this project endorsing a specific commercial product; that's not something to do on any vendor's behalf, paid or not.
 
 [Team placeholder: adjust this default if your team has a different commit or staging discipline.]

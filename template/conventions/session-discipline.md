@@ -8,6 +8,9 @@ A session is a work period: not necessarily a new chat thread. Treat the followi
 - Resumption: "let's continue", "back to it", "where were we", "picking this up again"
 - Explicit: "new session", "let's get started", "let's kick off"
 - On-demand: "sync up", "refresh context", "re-read your instructions"
+- Long-thread context loss: raw earlier turns are no longer directly present in what you can see, whatever your specific harness calls this or however it happens (for Claude Code: an automatic compaction event, replacing prior turns with a generated summary; for other agents: consult your own tool's documentation for its equivalent, if any)
+
+**This is a different kind of signal from the others above, and needs to be treated that way.** Whatever the mechanism, what survives is usually a narrative of what happened; it does not reliably preserve this exact list of trigger phrases, since it was read once, early, as file content, not as an event worth summarizing. If it's dropped, a later "good morning" in the same thread reads as a plain greeting with nothing behind it: not the agent ignoring the checklist, the rule that would make it recognizable simply isn't in context anymore. Noticing this has happened is itself the signal: re-read this file fresh at that point, don't wait for a later phrase to also happen to match one of the triggers above, since that phrase-matching is exactly the mechanism this risks losing.
 
 ## Starting a session
 
@@ -39,6 +42,16 @@ Do not log conversational activity: PR reviews that produced no local changes, d
 When `.dev/` documents are updated, remind the developer to commit them. This history matters for avoiding double work across sessions.
 
 **Concrete content, not process or events.** `.dev/roadmap.md` and `.dev/tech-debt.md` hold the substance: a decision, a design topic, a known issue and its fix. They are not a record of who raised something, in which PR, or when a discussion happened; that's process, and it belongs in PR or issue history, not here, the same reasoning "write about effects, not style" applies to session files. A "message format design" entry states the open question and the options, not who tagged whom. This is also where an individual's name most often sneaks in (see "Name code, not people" below): stripping the process narrative removes the attribution risk with it, not as a separate pass.
+
+## Recording a permanent override
+
+Any time a convention (from `conventions/*.md`, `AGENTS.md` itself, or a suggestion made from general practice) recommends something and the developer declines it as a deliberate, permanent choice for this project, not just "not for this one change": record it in `.dev/agentics-overrides.md` (created on first use, not required upfront). This is the general mechanism for "we decided against the default, on purpose, here's why," wherever that decision happens to come up, not something scoped to any one procedure. `upgrading-adoption.md` § 2 is one trigger for it (a conflict found during a reconciliation pass), not the only one.
+
+```
+- `<topic or section, e.g. "code-style.md § No non-null assertions">`: <what this project does instead, and why, one sentence>. Decided <date>.
+```
+
+Before making the same suggestion again, whether during a formal upgrade check or in the ordinary course of a session, check this file first: a recorded override means don't re-raise it, not "raise it again and see if they still agree." Distinguish a permanent override from a one-off "not now": only a decision explicitly meant to hold going forward gets recorded here; a single-instance "not for this change" stays unrecorded, and the suggestion can resurface next time it's actually relevant.
 
 ## Say it once, at the density it deserves
 

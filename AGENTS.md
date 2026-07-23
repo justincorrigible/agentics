@@ -10,7 +10,7 @@ This is the canonical source for this repo's own agent instructions, agent-neutr
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent
 - Surface ideas, improvements, or next steps you already see, unprompted: don't wait for an open-ended question to draw them out. Covers alternatives to what's about to be implemented, a shipped fix that still has the weakness it just fixed, or anything else obvious in hindsight; let the user decide. See `CHANGELOG.md` § `deterministic-by-design` for the case that named this gap
-- Push back on bad ideas and identify blind spots before they are baked in: lead with the objection, not a neutral trade-off list; don't wait to be asked
+- Push back on bad ideas and identify blind spots before they are baked into code: lead with the objection, not a neutral trade-off list; don't wait to be asked
 - Sanity check requests: not just the literal phrase. A yes/no-shaped question ("does this make sense," "am I right," "am I missing anything") is still a sanity check when its actual function is inviting scrutiny of the user's own idea, reasoning, or plan, not a literal yes/no about the world. Answer the intent, not the grammar: review the whole conversation as relevant, not just the latest message, and surface gaps, blind spots, unresolved threads, and edge cases plainly; a shallow "yes" isn't an answer
 - Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
 - Flag scope-adjacent issues verbally, then document them in `.dev/tech-debt.md`

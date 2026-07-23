@@ -44,15 +44,7 @@ Classify each gap from § 1 before proposing anything:
 - **Conflicting:** local content is a deliberate, substantive customization that diverges from the current template's current handling of the same topic (e.g. a project that intentionally kept an abridged version of a section). Ask about each of these individually, never batched, with three choices:
   1. **Adopt upstream:** replace the local version with the current template's.
   2. **Keep local, just this time:** leave it as-is; it stays a gap and will be asked about again next time this check runs.
-  3. **Keep local, permanently:** leave it as-is and record it in `.dev/agentics-overrides.md` so it stops being flagged.
-
-**`.dev/agentics-overrides.md` format** (created on first permanent decision, not required upfront):
-
-```
-- `<upstream topic or section, e.g. "session-discipline § Session file entry format">`: <what the local project keeps instead, and why, one sentence>. Decided <date>.
-```
-
-One entry per permanently-resolved conflict. § 1 reads this file before reporting a diagnosis and drops anything already listed here.
+  3. **Keep local, permanently:** leave it as-is and record it in `.dev/agentics-overrides.md` (format and general purpose in `session-discipline.md` § Recording a permanent override; this procedure is one trigger for it, not the only one) so it stops being flagged. § 1 reads this file before reporting a diagnosis and drops anything already listed here.
 
 - **Migrating `.dev/sessions.md`:** split by date. For multi-contributor history, split by date only — don't try to retroactively attribute old entries to individuals; past conflicts are already resolved. The `(day, contributor)` filename scheme (`YYYY-MM-DDTHHMMSS.md`, no slug) only needs to apply going forward. See `session-discipline.md` § Session file identity for the exact rules. This is a cutover, not an addition: once every entry has a home in `.dev/sessions/`, delete `.dev/sessions.md`. Copying content out while leaving the source in place isn't a completed migration, it's a duplicate that reintroduces the exact shared-file merge-conflict risk the new format exists to remove. Don't leave a placeholder file (e.g. `.gitkeep`) in `.dev/sessions/` once it holds real content: it existed only to make an empty directory trackable, and is noise once files exist there.
 - **Asking any new initialization question found unanswered in § 1:** non-conflicting (there's nothing local to override, just a question with no recorded answer yet); ask it in the same batch pass rather than treating it as its own special case. Record the answer in project memory (or global context, if that's where the question says it belongs) the same as during initial setup.
@@ -67,3 +59,11 @@ One entry per permanently-resolved conflict. § 1 reads this file before reporti
 Log the upgrade in this project's own session file (create `.dev/sessions/` now if this run is what introduces it), noting anything newly written to `.dev/agentics-overrides.md` this run, and remind the developer to commit and push, so other contributors pick up the change on their next pull — not automatically, and not until then.
 
 This procedure reads a lot: multiple files, diffs, CHANGELOG history, back-and-forth diagnosis. None of that has ongoing value once the migration is applied, and it stays in context adding token weight to whatever comes next in the same thread. If your harness gives you no way to reset or clear your own context window, recommend the developer start a fresh chat or session for subsequent work rather than continuing in this one — the same "new thread is cheaper than accumulating" reasoning already in `session-discipline.md` § Starting a session, just more pronounced here given how much this specific procedure tends to read.
+
+## Troubleshooting an unresolvable `synced` SHA
+
+Occasionally the SHA in a project's `synced:` tag doesn't exist in agentics' history at all, not just "no new commits since": the diff command errors (unknown revision, bad object) rather than returning empty. This is a different situation from a missing `synced` value: there was a valid baseline once, it just isn't reachable anymore.
+
+Most likely cause: agentics rewrote its own history (a rebase, a squash, a scrub of something that shouldn't have been committed), changing every commit's hash from that point forward. Since agentics is sole-maintained and local is authoritative, this is a legitimate, if infrequent, event, not corruption. Less likely: a shallow or incomplete local clone missing older history that does still exist upstream; try `git fetch --unshallow` before concluding the SHA is genuinely gone.
+
+Once confirmed unresolvable: treat it exactly like "No tag, or a tag with no `synced` value" above, not like "nothing changed." Run the full procedure in § 1 directly, then set `synced` to agentics' current `HEAD` once reviewed, the same as that path already does.
