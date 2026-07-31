@@ -17,11 +17,12 @@ A session is a work period: not necessarily a new chat thread. Treat the followi
 On a session-start signal, run this sequence before touching any code:
 
 1. `git log --oneline -1 -- CLAUDE.md AGENTS.md .claude/settings.json`: check whether instruction or configuration files changed since your last session file. Re-read only the files that changed. If `settings.json` changed unexpectedly, read it immediately and verify it contains only the expected hooks before proceeding (see `docs/agent-security.md`). When you re-read a changed file, say: "I've re-read [file]: the prior version in this thread is superseded."
-2. Read `.dev/roadmap.md`: check the current focus and any `[in progress]` items. If your global context defines one or more global roadmaps, also read the one relevant to the current project - not all of them. For example: read `roadmap-work.md` for professional projects, `roadmap-personal.md` for personal ones. See `global-context/roadmap.md` for the convention.
-3. Read `.dev/tech-debt.md`: note any `standalone: yes` entries relevant to today's work
-4. Read the most recent 1-2 files in `.dev/sessions/` for context on recent work and open threads. ISO-formatted filenames sort chronologically, so `ls .dev/sessions | sort | tail -2` finds them without an index file.
-5. If your global context has `propagation_suggestions: yes`, or you're an agentics contributor (`agentics_contributor: yes` in your global context) without `agentics_upstream_check: no` set for this project or globally, check whether this project has adopted agentics at all (a tag, or just a mention of agentics in `AGENTS.md`/`CLAUDE.md`) and, if so, check for upstream updates: see `conventions/convention-levels.md` § Checking for upstream updates. A missing or incomplete tag doesn't mean skip it: it means this project needs the tag added, which that section covers. For contributors, this is mandatory and recurs every session for an unresolved gap — don't let it quietly stop repeating just because it went unanswered before.
-6. Determine your session file for today: see "Session file identity" below.
+2. `git status --porcelain`: check for uncommitted changes this session didn't make. If anything is unattributed, see "Unattributed working-tree changes" below before treating it as settled context.
+3. Read `.dev/roadmap.md`: check the current focus and any `[in progress]` items. If your global context defines one or more global roadmaps, read only the one relevant to the current project, not all of them. For example: read `roadmap-work.md` for professional projects, `roadmap-personal.md` for personal ones. See `global-context/roadmap.md` for the convention.
+4. Read `.dev/tech-debt.md`: note any `standalone: yes` entries relevant to today's work
+5. Read the most recent 1-2 files in `.dev/sessions/` for context on recent work and open threads. ISO-formatted filenames sort chronologically, so `ls .dev/sessions | sort | tail -2` finds them without an index file.
+6. If your global context has `propagation_suggestions: yes`, or you're an agentics contributor (`agentics_contributor: yes` in your global context) without `agentics_upstream_check: no` set for this project or globally, check whether this project has adopted agentics at all (a tag, or just a mention of agentics in `AGENTS.md`/`CLAUDE.md`) and, if so, check for upstream updates: see `conventions/convention-levels.md` § Checking for upstream updates. A missing or incomplete tag doesn't mean skip it: it means this project needs the tag added, which that section covers. For contributors, this is mandatory and recurs every session for an unresolved gap: it doesn't quietly stop repeating just because it went unanswered before.
+7. Determine your session file for today: see "Session file identity" below.
 
 **On context efficiency:** re-reading a file mid-thread adds it to context: it does not replace the prior version. Both consume tokens. To stay efficient: only re-read files that actually changed (step 1 tells you which), and explicitly mark the old version superseded. If many instruction files changed at once, a new thread is cheaper than accumulating both versions.
 
@@ -57,13 +58,50 @@ Before making the same suggestion again, whether during a formal upgrade check o
 
 The same fact stated twice in different forms costs the same as stating it wrong, not incorrect, just taking up two or three times its own space: a caveat given in prose, then repeated as a bullet; a blocking condition explained, then given its own bolded status label ("trigger condition, not a start-now item") restating the same explanation a second way; a standing convention cited by name locally instead of just applied. Applies equally to `.dev/roadmap.md`, `.dev/tech-debt.md`, and session file entries: an entry that's grown a sub-section explaining its own nature, sitting beside entries that are two or three lines each, is the signal to fold that condition back into the entry's own fact, not evidence this one earned extra structure. Trusting this to happen at the moment of writing is the same fragile shape as any other unenforced judgment call: it's caught for real at the pre-commit re-check above, the same checkpoint that catches stale entries. Same discipline as `CONTRIBUTING.md`'s `succinct-wording-is-a-separate-pass`, applied here to any persisted `.dev/` content rather than just convention prose.
 
+## Git
+
+Never commit without explicit user instruction: the user handles all git work themselves.
+
+Never stage changes (`git add`) without being explicitly asked to, either: staging is the user's call, same as committing. Making an edit does not stage it: changes sit in the working tree, unstaged, until staged deliberately. When reporting on changes made, state their actual git state plainly rather than just "the changes are there": a user who expects staging and finds none wastes real time looking for something that was never where they expected it.
+
+**Say this in a reply, not into a persisted file.** A session log entry, roadmap item, or any other file that narrates its own current staging or commit state ("everything above is unstaged; nothing has been committed") goes stale the moment anything gets staged, and the file itself never gets corrected after the fact. `git status` already answers this live, for free, at any point someone reads the file later; restating it in prose only adds a claim that can end up false. See "Session file entry format" below for what this looks like as a real instance.
+
+**No AI-tool attribution in commits or PRs.** Do not add "Co-Authored-By," "Generated with," or similar trailers naming an AI tool or vendor to commit messages, PR descriptions, or PR comments, regardless of which agent is doing the work. Unprompted attribution reads as this project endorsing a specific commercial product; that's not something to do on any vendor's behalf, paid or not. **This overrides your own default commit-message template**, not just other projects' conventions: many agents, including Claude Code, are configured by default to append exactly this kind of trailer automatically. Having read this rule earlier in the session doesn't mean it's actually checked against the message at the moment of writing it: that's a separate, later act. Verify the commit message against this rule specifically as a discrete step when constructing it.
+
+[Team placeholder: adjust this default if your team has a different commit or staging discipline.]
+
+## Unattributed working-tree changes
+
+A shared local clone can pick up uncommitted changes this session didn't make: a different, concurrent session working the same repo, another tool, a teammate's local edit. Their presence in the working tree isn't evidence they're correct, safe, or already reviewed, only that a `git status`/`git diff` will show them.
+
+Notice this at session start (see "Starting a session" above) and any other time it comes up, most commonly the developer pointing out that a file changed unexpectedly. Either way, treat unattributed content the same way any unverified claim gets treated (see `review-conduct.md` § "Ground truth over claims"): validate it before trusting it, or before telling the developer it's fine.
+
+**What "validate" means here, concretely:** read the actual diff, not just its own description of itself. Check it against the same bars any of your own work would need to clear: technical correctness, the project's Critical Constraints (no credentials, no personal information), format and cross-reference consistency with existing conventions, and whether it duplicates or conflicts with something already present. In this repo specifically, also check whether each substantive addition has a matching `CHANGELOG.md` entry per `CONTRIBUTING.md`'s own contribution steps: unattributed content bypassed the ordinary process by definition, so a missing entry isn't a one-off oversight to fix quietly, it's a sign the addition itself may not have been reviewed the way this repo's own rules assume it was. Report the specific checks made and what each found, not just a verdict.
+
+**A validation step, not an automatic revert.** Content that passes validation can be kept. Whether to keep it, revert it, or hold it for their own review is the developer's call, informed by what you found, not decided by the fact that it arrived through an unreviewed channel.
+
 ## Verifying conformance, not just structure
 
 Reading a convention and holding it as an active constraint while generating content several steps later in the same turn are not the same act. A convention's structural example (a field skeleton, a template block) shows shape; matching that shape can happen while missing a separate prose requirement sitting right next to it, a real, observed failure mode (see `CHANGELOG.md` § `verify-conformance-not-structure`).
 
 This matters most producing several governed artifacts in one batch: initialization (`CLAUDE.md`, `AGENTS.md`, tech-debt entries, memory files all at once), a migration, a multi-file update. Before finalizing each artifact, re-read it once against the convention's specific prose requirement, not just against its example shape, as a discrete final step, not a background assumption carried from having read the rule earlier. Verification happens at the point of writing each artifact, not once at the point of reading the rule at the start of the batch.
 
+**Not limited to internal governed artifacts.** Anything about to leave your control and become visible to someone else, a PR comment, a commit message, a Slack message, a published doc, an artifact, needs the same discrete check, not just the files named above. A rule stated as universal and absolute doesn't get easier to hold against a strong competing default just because it's read once, early, alongside dozens of other conventions in the same global file. The no-dashes rule is a real, observed instance of this: it stays technically in context the whole session, but its practical salience at the moment of drafting one specific piece of externally-visible text fades across a long, multi-topic thread, the same way session-start signals fade after a compaction event. Run the check as a discrete, mechanical-where-possible pass immediately before the content leaves your control: the same `grep -c` backstop "Bulk text replacements" already requires for cleaning up existing files applies just as well to fresh content about to go out.
+
 If a convention's own example under-specifies a requirement stated in prose nearby, that's a defect in the convention worth fixing, not something to route around silently: flag it the same way any other convention gap gets flagged.
+
+## Refinement passes: not just once at the end
+
+`documentation.md`'s cold-reader and "rewrite freely until committed" rules, and "Say it once" above, are easy to apply to whatever's being written in the exact moment of writing it, and easy to never revisit afterward. A long session accumulates uncommitted prose across several files (session log, roadmap, tech-debt, conventions, CHANGELOG) faster than any single moment of writing catches. Left to one pass at the very end, the accumulated draft only gets checked once, too late to be worth much and too large to review well in one sweep.
+
+Run this refinement pass, re-reading the session's own uncommitted changes against those rules, at three points, not one:
+- **Semiregularly during a long session:** after a natural cluster of related edits lands, before moving to a different, unrelated part of the work. Not after every single edit: that's too fine-grained to be worth the interruption.
+- **Before committing anything:** every file about to be staged gets this pass. This runs alongside "Re-check before committing" above, which re-verifies `.dev/tech-debt.md` and `.dev/roadmap.md` entries for staleness. Same checkpoint, applied here to prose quality across all touched files, not just those two.
+- **Before ending a session:** the last thing done before signing off for the day, not something skipped because the underlying work itself is done. A correct fix described in noisy, self-narrating prose is an unfinished session, not a finished one with rough edges.
+
+No dedicated tool is required: reading `git diff` (or the equivalent for a new, untracked file) against each uncommitted file and checking the changed passages against the rules above is enough.
+
+**These same checkpoints also enforce `definition-of-done.md`'s lessons-learned criterion.** That criterion is checked live, at the moment a non-obvious decision is made, but each refinement pass is the backstop: ask whether anything recognized as a lesson since the last pass has actually been persisted where it belongs yet, not just noticed and left for later.
 
 ## Session file identity
 
@@ -92,7 +130,7 @@ No index file is needed to browse chronologically: ISO-formatted filenames alrea
 
 ## Session file entry format
 
-One lean context sentence (what + why only), a blank line, then one bullet per file or logical group of changes. No date header inside the file: the filename already carries it. No prose paragraphs. No "Next:" line: open work belongs in `roadmap.md`. The separator in bullets is `: ` (colon-space). Do not use em dashes (`—`) or a space-hyphen-space (` - `) as a connector; both are the same anti-pattern in different characters. See code-style.md § Dashes for the full list and the absolute rule (no conversational-chat exemption).
+One lean context sentence (what + why only), a blank line, then one bullet per file or logical group of changes. No date header inside the file: the filename already carries it. No prose paragraphs. No "Next:" line: open work belongs in `roadmap.md`. The separator in bullets is `: ` (colon-space). Do not use em dashes (`—`) or a space-hyphen-space (` - `) as a connector; both are the same anti-pattern in different characters. See `writing-style.md` § Dashes for the full list and the absolute rule (no conversational-chat exemption).
 
 ```
 [One sentence: what the work was and why.]
@@ -105,17 +143,23 @@ One lean context sentence (what + why only), a blank line, then one bullet per f
 
 **Write about effects, not style.** Describe what the code now does or enables - the practical outcome for operators, users, or callers. Do not describe how the code was written: style choices, refactoring approach, helper names, and implementation details are not session log material. "Operators now see actionable error messages" belongs; "rewrote using positive conditions and pure helpers" does not.
 
+**Don't narrate the file's own commit state either.** A real example of what this looks like when it slips through: "Everything above is unstaged in the working tree; nothing has been committed." True when written, but it's restating something `git status` already answers for free, and it stops being true the instant anything gets staged, leaving the file asserting a false fact with no mechanism to correct it. See "Git" above: that's a reply to give the developer in conversation, not a fact to persist inside the log itself.
+
 **What to include in bullets:** decisions or constraints only when non-obvious: a choice between alternatives, a dependency or ordering constraint, a pattern being matched for the first time. Don't annotate established conventions (alphabetical ordering, matching a known pattern, etc.): the convention is already known and the annotation is noise.
 
 **Mixed reviews: log the local effect, not the investigation.** A PR review or investigation that turns up one real local change (a tech-debt entry, a roadmap update) alongside a lot of no-op verification work isn't two categories competing for space: log the local change the same way any other change is logged, and drop the investigation narrative entirely, the same way "do not log conversational activity" above already drops a review that produced no local change at all. External references that describe another repository's state (commit SHAs on someone else's branch, a PR number, a squash-merge history) don't belong here regardless of outcome: they document that repository's history, not this one's, and per "Name code, not people" below, they often carry a username along with them too.
 
-**Collapse iteration to outcome, don't narrate the path.** Work inside a still-open session file can get corrected, trimmed, or reversed more than once before the day closes; when that happens, edit the existing bullet to reflect where things ended up, don't append a new bullet describing the correction on top of the old one. A future reader needs the destination, not the sequence of wrong turns that reached it: "trimmed the wording to lead with the general principle" is true now; "reworded, found still too narrow, reworded again, found too verbose, trimmed again" is the process that produced that, and reads as the same kind of noise "do not log conversational activity" already excludes. This is exactly what the file staying open for the rest of the day is for (see immutability below): correcting a bullet in place is ordinary editing of an open file, not a rewrite of a closed one.
+**Collapse iteration to outcome, don't narrate the path.** `documentation.md` § "Rewrite freely until committed" states the general rule this applies: overwrite a stale note in place, don't append a correction on top of it. Applied here: work inside a still-open session file can get corrected, trimmed, or reversed more than once before the day closes, and the file stays open for exactly that reason (see immutability below): correcting a bullet in place is ordinary editing of an open file, not a rewrite of a closed one.
+
+The failure isn't ignorance of the rule. It's mistaking "already written" for "already committed." A bullet sitting in an uncommitted, still-open file is a draft, not settled history, right up until the day itself closes it, and treating it as fixed the moment it's typed is what produces a chain of "renamed to Y", then "renamed Y to Z", then "renamed Z to A": that chain documents the note's own edit history, not the code, and reads as the same kind of noise "do not log conversational activity" already excludes. A future reader needs only "A".
 
 **A session file is immutable once its day is done.** It may be extended for as long as that contributor's work continues on that day. Once a new day (or a different contributor) starts, that file is closed: if it was written poorly, that's on the session that produced it. Revise a file before the day's work ends, not in a later session.
 
 **Exception: a Critical Constraint violation overrides immutability.** An ordinary quality problem (rambling prose, an unnecessary narrative, a missing detail) stays as the honest record of the mistake, on principle. A violation of one of this project's Critical Constraints found inside a closed file, most commonly an individual's name or a credential, is a different tier of problem: fix it in place regardless of which day produced it, the same way you'd scrub a leaked credential out of an old commit rather than leave it because "that commit is history." Immutability protects against a later session quietly rewriting an earlier one's judgment calls; it was never meant to protect a Critical Constraint violation from being corrected.
 
 **Name code, not people.** Attribute work to features, modules, and systems, not to individuals: "the network module", not "Jon's network module". This applies to session files, tech-debt entries, docs, and any other persisted content. Attribution belongs in git history (and, per "Session file identity" above, in filenames when it matters), not in what you write.
+
+**A third party's name can't be mechanically caught the way your own can.** A pre-commit consistency check, where one exists, can grep for your own OS username or git identity, since those are known in advance. It has no way to know whose name might get typed while narrating an incident someone else reported to you, since that name isn't known until you write it. This is exactly the moment a name slips in naturally, retelling what someone else did or said, so catching it is on you at the point of writing, not something a script backstops.
 
 ## Tech-debt entry format
 
@@ -138,3 +182,35 @@ A blocking condition, a caveat, or context on why an entry isn't actionable yet 
 **Don't restate this format inside a project's own `tech-debt.md`.** A comment explaining the skeleton, or noting why older entries don't have a separate `fix:` line, duplicates what this section already defines and drifts from it the moment either copy changes. If a project's file needs a reminder, reference `conventions/session-discipline.md` § Tech-debt entry format by name; don't restate the format inline.
 
 **At scale, consider a richer structure instead:** `**File:** ... **Severity:** ... **Kind:** ... **Issue:** ... **Fix:** ... **Standalone:** ...`, one heading per entry. This is a genuine tradeoff, not a strict upgrade: it adds triage and scanability for a long-lived list with dozens of entries across a large codebase, at the cost of more friction to log each one. A project with five debt entries loses more from that friction than it gains from the structure; a project with fifty gains more than it loses. Pick based on the actual list's size, not by default.
+
+## Troubleshooting: agent won't load, or its memory doesn't follow a project, after a rename or multi-root adoption
+
+Reorganizing project folders, a rename, a move, or combining several repos under a shared parent, can trigger two genuinely different failures. Check which one you actually have before assuming a fix for one resolves the other.
+
+### Failure mode 1: the editor fails to load at all (blank screen, no error)
+
+Confirmed as the actual blocker in a real incident: a multi-root workspace configuration still references a folder's old path. If your editor's workspace configuration (for VSCode: a `.code-workspace` file, or its own remembered folder list) includes a folder that's since been renamed or moved, the editor can fail to resolve the whole workspace, not just that one folder, silently rather than with a clear error. That takes down any extension running inside it, an agent extension included, along with it. **Fix:** re-add the moved folder at its new path in the workspace configuration.
+
+### Failure mode 2: the editor loads fine, but an agent's memory doesn't follow the repo you expect
+
+The underlying property, not specific to any one incident: if your agent keys session or memory identity to a single resolved absolute directory path (for Claude Code: under `~/.claude/projects/`, in a directory named after the path with every slash replaced by a hyphen) rather than to "the repo" as a concept, that identity can end up wrong in two different ways depending on how the project is opened:
+
+- **Single-folder window:** resolves directly from the opened folder's path. A rename that collapses a hyphenated name into a nested path, or the reverse, can collide byte-for-byte with a different project's old encoded key: a hyphen in a name and a slash between folders turn into the same character once encoded.
+
+  ```
+  sajter/ohcrn-infra  ->  -Users-...-sajter-ohcrn-infra
+  sajter/ohcrn/infra  ->  -Users-...-sajter-ohcrn-infra
+  ```
+
+  Reopening the project at its new location then silently resolves to the old project's memory instead of creating a fresh one.
+- **Multi-root `.code-workspace` window: does not resolve per active tab or per member repo.** It resolves to whichever single folder is listed *first* in the workspace file's `folders` array, for the whole window, no matter which file you actually have open. Verified empirically: switching the active tab to a file in a different member repo doesn't change which project resolves. Starting a new chat creates a new, empty project directory keyed to the first-listed folder specifically. Every other member repo's own accumulated history is invisibly disconnected the moment the multi-root workspace is created, not merged, not visible, not even referenced: opening several repos as one multi-root workspace is a fresh, separate project scoped to one folder, not a superset view of each repo's own history.
+
+**Diagnostic (for Claude Code):** check whether `~/.claude/projects/` has a directory matching the path you expect (current project's path, or the workspace's first-listed folder, with `/` replaced by `-`), and whether its content actually corresponds to what you expect or reads like a different, unrelated project. For other agents: consult your own tool's documentation for whether it keys persistent state by file path at all, and how it resolves that path in a multi-root context specifically.
+
+**Fix for a same-shape collision (single-folder case):** rename, don't delete, the stale colliding directory to a backup name, freeing the key for a genuinely fresh one.
+
+**No supported fix for the multi-root case.** There's no built-in way to merge or migrate a single-folder project's history into a multi-root workspace's own project key. The only available workaround is manually locating and copying the raw transcript file into the target project's directory. This is a filesystem-level hack, not a supported operation: worth knowing about, but not something to rely on routinely.
+
+**Prevention:**
+- Before renaming or moving a folder that's part of a multi-root workspace, update the workspace file's folder list in the same action, don't treat it as a follow-up step.
+- Adopting a multi-root workspace for repos with existing, valuable single-folder history isn't free: every member folder except whichever is listed first starts a fresh, disconnected history the moment the workspace is created. If continuity matters more than viewing everything in one window, keep single-repo windows for that work instead, or go in accepting the multi-root window as a genuinely separate project context, not a combined view of its members.

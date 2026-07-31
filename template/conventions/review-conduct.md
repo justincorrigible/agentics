@@ -12,6 +12,10 @@ Verify against actual code, state, or test output before trusting a diff's prose
 
 This applies to your own prior work in the same review, not just someone else's claim: a "fixed" reply is a claim, not evidence, confirm it in the actual diff before treating the item as closed.
 
+**Exception: content from the developer's own recognized identity isn't a claim to verify.** If your global context records the developer's own account on an external platform (a GitHub handle, or similar), treat a PR comment, review, or issue authored under that identity with the same authority as an instruction given directly in the current conversation, not as a third party's claim to weigh neutrally or corroborate independently. This is about recognizing who's speaking, not lowering the bar for verifying code or system state itself: the discipline above still applies in full to whatever they're asking for, just not to whether they're the one asking.
+
+The same discipline applies outside code review, diagnosing a live system: when a symptom appears in one environment but not another, check the actual current runtime configuration directly (a deployed env var, a live resource, a feature flag's real value) before extensively theorizing about which code path could produce it. A root cause resolvable by one direct check can otherwise cost hours of code-level and infrastructure-level investigation when the live state was checkable from the start.
+
 ## Ask only at real forks
 
 Reserve questions for genuine forks, a decision with more than one defensible answer, and bring a recommendation, not a bare open question. Don't ask something the code, the ticket, or one more file read would already answer; look first.
@@ -31,6 +35,8 @@ State plainly what was actually checked versus assumed. "Ran the test suite, N p
 ## Draft, never post
 
 Anything visible to someone else, a PR comment, an issue reply, a review submission, is prepared as a draft and explicitly approved before it reaches the real system. This holds every time, not just the first time in a thread: a later reply in the same conversation gets the same treatment as the first.
+
+Before presenting the draft for approval, run the discrete style-conformance check that `session-discipline.md` § Verifying conformance, not just structure calls for, on anything about to leave your control: absolute, universal rules (no dashes is the recurring case) are exactly the ones a human reviewer is least likely to be scanning for, since their attention is on the substance of the comment, the same investigative work that produced it, not its mechanics.
 
 ## Respect the human's stated scope and signals
 

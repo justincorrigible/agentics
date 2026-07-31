@@ -43,3 +43,19 @@ suite('getNetworkPassthroughHeaders', () => {
 
 - New tests: BDD style from the start
 - Existing tests: rename and restructure when touching them in scope; large-scale rewrites belong in tech-debt
+
+## Rebuild `file:`-linked workspace dependencies before testing across a package boundary
+
+A package referenced via `"file:../other-package"` resolves through that package's built output (`dist/`, per its `package.json`'s `main`/`exports`), not its live source. Editing that dependency's source and testing a consumer without rebuilding it first silently exercises stale compiled output. No error, no warning, just wrong behaviour.
+
+Unit tests that import from a package's own source, via internal path aliases, within the same package, never cross this boundary and cannot catch it. Only a test that imports the dependency the way a real consumer does, by package name, through its resolved entry point, will.
+
+**Before trusting a "changed the dependency, tests still pass" result:** rebuild the dependency first, or write at least one test that exercises the real cross-package resolution path rather than importing from source.
+
+## Prefer bare test-runner invocation over a shell-glob pattern in `test` scripts
+
+`"test": "tsx --test ./src/**/*.test.ts"` (or the `node --test` equivalent) depends on the invoking shell expanding `**` recursively. `npm run <script>` executes through a non-interactive `sh`, which does not support globstar the way an interactive bash/zsh session does.
+
+Under plain `sh`, `**` behaves like a single `*` for one path segment: it silently matches only files at that exact depth, skipping everything shallower or deeper. No error, no warning. The only symptom is a lower-than-expected test or suite count, easy to miss unless someone happens to be watching for it.
+
+**Fix:** use a bare `"test": "tsx --test"` (or `"node --test"`) with no path argument. The test runner's own recursive discovery isn't subject to the shell's globbing behaviour and finds every test file regardless of nesting depth.

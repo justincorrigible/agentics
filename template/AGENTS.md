@@ -7,9 +7,11 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent
+- Check in before non-trivial decisions: it gives the user a chance to catch design misalignments early, before code exists or a document is rewritten, not only before writing code. Don't over-ask on mechanical steps, but do ask on direction
 - Surface ideas, improvements, or next steps you already see, unprompted: don't wait for an open-ended question to draw them out. Covers alternatives to what's about to be implemented, a shipped fix that still has the weakness it just fixed, or anything else obvious in hindsight; let the user decide. See agentics' `CHANGELOG.md` § `deterministic-by-design` for the case that named this gap
 - Push back on bad ideas and identify blind spots before they are baked into code: lead with the objection, not a neutral trade-off list; don't wait to be asked
 - Sanity check requests: not just the literal phrase. A yes/no-shaped question ("does this make sense," "am I right," "am I missing anything") is still a sanity check when its actual function is inviting scrutiny of the user's own idea, reasoning, or plan, not a literal yes/no about the world. Answer the intent, not the grammar: review the whole conversation as relevant, not just the latest message, and surface gaps, blind spots, unresolved threads, and edge cases plainly; a shallow "yes" isn't an answer
+- Default review or audit posture: assume there's something real to find, not that the artifact is fine until proven otherwise, the same reason a neutral "does this look okay" or "is this done?" invites confirming over searching. This is a search stance, not a quota: a manufactured nitpick, technically true but inconsequential, just to have something to report, is worse than finding nothing; surface a finding only if it concretely matters. See `conventions/review-conduct.md` for PR/ticket-review specifics, `conventions/definition-of-done.md` for the completion-checklist specifics, and your own memory for any standing self-audit trigger you maintain
 - Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
 - Flag scope-adjacent issues verbally, then document them in `.dev/tech-debt.md`
 
@@ -24,7 +26,7 @@ Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics). This 
 
 Every path below is a live pointer into agentics or your own global context, never a local copy to create in this project: see `conventions/convention-levels.md` § How much to keep locally for the full rule.
 
-- Starting a session              -> read `conventions/session-discipline.md`, then the `.dev/` files it specifies
+- Starting a session              -> read `conventions/session-discipline.md` (also covers git/commit rules), then the `.dev/` files it specifies, and `conventions/writing-style.md` (applies to any output, dev or not, so it's read unconditionally rather than gated behind "Writing code" below)
 - Working in a specific role      -> read `CLAUDE.roles/<role>.md` (set during initialization; skip if role is already defined in global context)
 - Writing or reviewing tests      -> read `conventions/testing.md`
 - Writing code                    -> read `conventions/code-style.md`
@@ -36,6 +38,7 @@ Every path below is a live pointer into agentics or your own global context, nev
 - Adding or improving a convention -> read `conventions/convention-levels.md`
 - Upgrading this project's agentics integration -> read `conventions/upgrading-adoption.md`
 - Deploying or debugging a service -> read `.dev/docs/<service>/` if it exists
+- Finishing a task, or asked "is this done?" -> read `conventions/definition-of-done.md`
 
 ## Memory and contribution hygiene
 When writing to project memory: keep entries concise; store no content derivable from code or files. If an insight could apply to all your projects, offer to promote it to your agent's global context. If a convention could benefit other teams, flag it as a potential PR to the agentics repo.

@@ -41,9 +41,11 @@ for f in template/conventions/*.md; do
 done
 [ "$ORPHAN_FAIL" -eq 0 ] && echo "  ok"
 
-# 3. Personal info in the diff (staged + unstaged changes only).
+# 3. Personal info in the diff (staged + unstaged changes, plus untracked new files:
+#    a session file is untracked from creation until first staged, and is exactly
+#    where a name is most likely to leak, so it can't be skipped here).
 section "Personal info in changed files"
-CHANGED=$(git diff --name-only HEAD 2>/dev/null; git diff --cached --name-only 2>/dev/null)
+CHANGED=$(git diff --name-only HEAD 2>/dev/null; git diff --cached --name-only 2>/dev/null; git ls-files --others --exclude-standard 2>/dev/null)
 CHANGED=$(printf '%s\n' "$CHANGED" | sort -u | grep -v '^$' || true)
 WHOAMI="$(whoami 2>/dev/null || true)"
 GIT_NAME="$(git config user.name 2>/dev/null || true)"
@@ -64,27 +66,53 @@ if [ -n "$CHANGED" ]; then
 fi
 [ "$PERSONAL_FAIL" -eq 0 ] && echo "  ok (checked $(printf '%s\n' "$CHANGED" | grep -c . || echo 0) changed file(s))"
 
-# 4. Root vs template AGENTS.md: rough bullet-count heads-up for sections known to drift.
-section "Root/template AGENTS.md section drift (heads-up only)"
-count_section() {
+# 4. Root vs template AGENTS.md. These two sections get different treatment on purpose, confirmed
+#    by actually running this check against real content. "Interaction parameters" is meant to be
+#    near-identical: general collaboration principles apply the same way to agentics-the-repo as
+#    to any adopter. It gets a real content diff, since a bullet-count match can still hide real
+#    wording drift. That happened once: "baked in" vs "baked into code", same count, different
+#    text. The one known intentional difference there is template's CHANGELOG pointer: it says
+#    "agentics' CHANGELOG.md" since it's copied elsewhere, while root's doesn't need the prefix
+#    since it's the same repo. That difference is normalized away before comparing. "Critical
+#    constraints" is meant to genuinely diverge. Root's is repo-specific: agentics has no library
+#    code to isolate from the environment, but does need "we're the upstream source, keep this
+#    public-safe." Template's is generic-adopter: it needs the environment-isolation rule a real
+#    project's library code needs. A strict diff there would just be permanent, unfixable noise,
+#    so it keeps the looser bullet-count heads-up: still worth reading both side by side on a
+#    mismatch, not asserting they match.
+section "Root/template AGENTS.md section drift"
+extract_section() {
   # $1 = file, $2 = heading
   awk -v h="$2" '
     $0 ~ "^## "h"$" { found=1; next }
     found && /^## / { exit }
-    found && /^- / { n++ }
-    END { print n+0 }
+    found { print }
   ' "$1"
 }
-for heading in "Interaction parameters" "Critical constraints"; do
-  root_n=$(count_section AGENTS.md "$heading")
-  tmpl_n=$(count_section template/AGENTS.md "$heading")
-  if [ "$root_n" != "$tmpl_n" ]; then
-    echo "  FLAG: \"$heading\" has $root_n bullet(s) in root AGENTS.md, $tmpl_n in template/AGENTS.md: read both side by side"
-    FAIL=1
-  else
-    echo "  ok: \"$heading\" ($root_n bullets each)"
-  fi
-done
+count_bullets() {
+  printf '%s\n' "$1" | grep -c '^- '
+}
+
+root_txt="$(extract_section AGENTS.md "Interaction parameters")"
+tmpl_txt="$(extract_section template/AGENTS.md "Interaction parameters")"
+tmpl_txt="${tmpl_txt//agentics\' /}"
+drift="$(diff <(printf '%s\n' "$root_txt") <(printf '%s\n' "$tmpl_txt") || true)"
+if [ -n "$drift" ]; then
+  echo "  FLAG: \"Interaction parameters\" content differs beyond the known agentics'-CHANGELOG-pointer difference:"
+  printf '%s\n' "$drift" | sed 's/^/    /'
+  FAIL=1
+else
+  echo "  ok: \"Interaction parameters\" content matches"
+fi
+
+root_n=$(count_bullets "$(extract_section AGENTS.md "Critical constraints")")
+tmpl_n=$(count_bullets "$(extract_section template/AGENTS.md "Critical constraints")")
+if [ "$root_n" != "$tmpl_n" ]; then
+  echo "  FLAG: \"Critical constraints\" has $root_n bullet(s) in root AGENTS.md, $tmpl_n in template/AGENTS.md: read both side by side (content is expected to diverge here, repo-specific vs. generic-adopter; a count mismatch is still worth a look)"
+  FAIL=1
+else
+  echo "  ok: \"Critical constraints\" ($root_n bullets each; content expected to diverge here, not compared)"
+fi
 
 # 5. Bare-relative-path safeguard: the disambiguating sentence in template/AGENTS.md's dispatch
 #    table (conventions/*.md paths are live pointers, not local copies) is exactly what closed the
@@ -98,6 +126,51 @@ if printf '%s\n' "$dispatch_table" | grep -qi "live pointer"; then
 else
   echo "  FLAG: template/AGENTS.md's \"When to read what\" no longer states its conventions/*.md paths are live pointers, not local copies. This is the exact ambiguity behind CHANGELOG.md § global-guideline-material-never-in-project; restore the disambiguating note before shipping"
   FAIL=1
+fi
+
+# 6. Near-duplicate testing/regression-checklist.md entries (heads-up only, not a hard fail: this
+#    is a heuristic, word-overlap check, not a semantic one). Two concurrent sessions once added
+#    two separate entries for the same non-mutational loop-example incident. This catches that
+#    shape without needing to know in advance what the next duplicate will be about.
+section "Near-duplicate regression-checklist entries (heads-up only)"
+if command -v python3 >/dev/null 2>&1; then
+  python3 - "$REPO_ROOT/testing/regression-checklist.md" <<'PYEOF'
+import re, sys
+
+path = sys.argv[1]
+text = open(path).read()
+entries = re.findall(r'^### (\S+)\n(.*?)(?=\n### |\Z)', text, re.S | re.M)
+
+STOP = {
+    "this", "that", "with", "from", "have", "been", "were", "which", "their",
+    "would", "could", "should", "about", "there", "these", "those", "being",
+    "into", "than", "when", "then", "some", "each", "over", "only", "same",
+    "does", "doesn", "aren", "cannot", "exist", "existing", "before", "after",
+}
+
+def words(s):
+    ws = re.findall(r"[a-z]{4,}", s.lower())
+    return {w for w in ws if w not in STOP}
+
+flagged = False
+for i in range(len(entries)):
+    slug_a, body_a = entries[i]
+    wa = words(body_a)
+    for j in range(i + 1, len(entries)):
+        slug_b, body_b = entries[j]
+        wb = words(body_b)
+        if not wa or not wb:
+            continue
+        overlap = len(wa & wb) / min(len(wa), len(wb))
+        if overlap > 0.55:
+            print(f"  FLAG: '{slug_a}' and '{slug_b}' share {overlap:.0%} of their distinctive words: read both, they may be the same incident")
+            flagged = True
+
+if not flagged:
+    print("  ok")
+PYEOF
+else
+  echo "  skipped (python3 not found)"
 fi
 
 echo

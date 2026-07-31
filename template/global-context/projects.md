@@ -3,7 +3,7 @@
 Global index of known projects, memory locations, and key cross-project relationships.
 Place this file in your agent's global context directory (for Claude: `~/.claude/projects.md`; for other agents: consult your agent's docs). Update it when a new project is set up or when paths change.
 
-**Repo URL vs local Path:** when a task references a project's GitHub URL (a doc link, a PR target, "check the latest conventions"), prefer reading the local `Path` over fetching the URL: it's faster and may be ahead of origin (uncommitted or unpushed work). Verify freshness first with `git log @{u}..` in that directory, since local can also be behind origin if someone else pushed. If you're the sole maintainer of a given repo, note that as an exception and skip the freshness check for it.
+**Repo URL vs local Path:** when a task references a project's GitHub URL (a doc link, a PR target, "check the latest conventions"), prefer reading the local `Path` over fetching the URL: it's faster and may be ahead of origin (uncommitted or unpushed work). Verify freshness first, and verify the right thing: confirm the local clone's configured remote(s) actually include the canonical URL recorded above (`git remote -v`) before trusting `git log @{u}..` in that directory. `@{u}` only reports how far local is behind whatever it happens to track, not whether that's the right remote at all. A clone pointed at a stale personal fork or an unintended mirror can report "0 behind" while still being badly out of date relative to the canonical source. Don't skip this check for a repo you believe you're the sole maintainer of: that belief can silently stop being true the moment a new contributor joins, and the check itself costs only one cheap `git fetch`.
 
 ---
 

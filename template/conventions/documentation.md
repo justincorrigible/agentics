@@ -28,6 +28,28 @@ The second reads in one pass because it separates what happened from why it matt
 
 **Where it does not:** `.dev/sessions/` logs, which are correctly terse by `session-discipline.md` § Session file entry format: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
 
+## Rewrite freely until committed
+
+Uncommitted content, in any file, is a draft: rewrite it in place as understanding changes, don't layer a new note on top documenting the change from the old one. This applies to README updates, `/docs` and `.dev/docs` pages, tech-debt entries, roadmap items, and CHANGELOG's `## Unreleased` section.
+
+The failure has two depths, not one. A chain of `X → Y`, `Y → Z`, `Z → A` notes is the shallow version: it documents the note's own edit history instead of stating `A` once. The deeper version survives even without chaining: a single, unchained note still mentioning `X` is noise if `X` never existed in any committed or shipped state, since no reader could ever encounter it. A document whose job is describing current design or a current bug (a roadmap rationale, a tech-debt issue, a convention) gains nothing from "this field used to be called `reason`" when nothing ever shipped under that name.
+
+**The test:** would the sentence stay true and useful to someone who only ever sees the current, merged state? If not, and the earlier value never shipped, cut the reference entirely, not just the chained instances of it.
+
+**Example:**
+> Draft note: "renamed the handler to `processRequest`."
+> The same still-uncommitted work renames it again, to `handleIncoming`, before anything ships.
+>
+> Correct: "the handler is `handleIncoming`."
+> Wrong, chained: "further renamed `processRequest` to `handleIncoming`."
+> Wrong, still noise even unchained: "renamed the handler from `processRequest` to `handleIncoming`." Nothing ever shipped as `processRequest`, so a reader gains nothing from being told it once existed.
+
+Once content is committed, git history is the record of how it got there. Before that point, the file's job is to state the current fact, not preserve a draft's own revision log.
+
+**Exception: a document whose entire job is recording change.** A CHANGELOG entry, a migration guide, a PR description: there, "renamed X to Y" is the point, not noise, since the "before" state is something a reader or their deployed instance may actually have been running against. This exception is narrow: artifacts whose stated purpose is documenting a transition for someone on the other side of it, not roadmap items, tech-debt entries, or convention prose describing current design.
+
+**Exception: session files close earlier, at day's end, not at commit.** `session-discipline.md` § "Collapse iteration to outcome" applies this same principle to `.dev/sessions/` entries, but with a stricter boundary than "uncommitted": a session file is meant to be an honest same-day account, so it stays open only while that day's work continues, even if it happens to remain uncommitted for days afterward (nothing requires committing same-day). See that section for the full reasoning. This is a narrower exception, not a looser instance, of the rule above.
+
 ## Two-tier model
 
 Projects that publish docs externally use two distinct documentation layers:
