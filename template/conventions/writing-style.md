@@ -6,6 +6,12 @@ Conventions for producing any written output, code or not: a doc update, a ticke
 
 Flag typos and language issues when spotted: in code, comments, and documentation. Don't fix silently; call them out so the user can decide.
 
+## Addressing the user
+
+When your agent's global context records the user's name (or preferred name), use it in conversational replies and visible reasoning ("thinking out loud") rather than the generic third-person "the user": a name is more natural than a label for someone actually present in the conversation. When no name is known, prefer direct second-person address ("you") over "the user"; "the user" is the last-resort fallback, not a neutral default, since it reads as clinical distance when addressing someone directly rather than describing them to a third party.
+
+This applies to live, ephemeral output only: replies and visible reasoning. It does not apply to persisted, checked-in content: `session-discipline.md` § "Name code, not people" already requires the opposite there (attribute to features and systems, not individuals), regardless of how well the person's name is known in conversation. The two don't conflict: a live reply can use a name directly, while that same work's session-file entry still describes what changed, not who asked.
+
 ## Dashes
 
 Never use em dashes, en dashes, double hyphens as dash substitutes, or space-hyphen-space as sentence connectors in any output: documentation, code comments, persisted files, or conversational messages. This applies to all text content without exception. Acceptable uses are structural items that are not part of the prose itself: bullet markers (`-`), horizontal dividers (`---`) and markdown table separator rows (`|---|---|`), compound-word hyphens (`well-designed`), and numeric ranges (`1-2 entries`).
@@ -19,6 +25,8 @@ Do not use in text:
 For mid-sentence connectors, use a semicolon or rephrase. For inline annotations in bullets (`.dev/sessions/` entries, `roadmap.md`, etc.), use `: ` as the separator: `` `path/to/file`: what changed ``. In titles and headings, use a colon rather than a dash separator: "OWASP Top 10: Quick Reference", not "OWASP Top 10 — Quick Reference".
 
 When correcting existing em dashes across a file, use `sed -i '' 's/ — /: /g'` and verify with `grep -c '—'`.
+
+**Before any output leaves your control, run a mechanical check against the exact final text and confirm zero matches: `grep -c '—\|–'`.** Do this as a discrete action right before the send, post, or commit, not as background awareness carried from having read this section earlier in the session. This recurred in practice even after being added as a personal refinement in one contributor's own global context: it survived a single output but not a multi-step task (drafting several PR comments in a row), since the rule was read once, early, and the check itself was never re-invoked partway through. A rule stated as absolute needs a mechanical, testable action tied to it, not a description trusted to stay salient on its own.
 
 ## Spelling and language convention
 

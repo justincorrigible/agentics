@@ -6,6 +6,23 @@ This is AI-native documentation applied to a whole codebase, not just a docs sit
 
 This template goes further, though: its conventions also shape how the agent reasons and collaborates, not just what it can parse, a critical aspect other similar tools don't cover. In essence, an agent following it "questions" ideas instead of simply executing them blindly, whenever possible surfaces better alternatives, and checks that a proposed approach actually serves the stated goal before committing to one.
 
+## The illusion of context
+
+When people say an agent "understands the codebase," they rarely mean it read every file. They mean something narrower, and far more fragile.
+
+It read the right file, at the right moment, before that moment passed.
+It remembered why the last attempt at this was rejected.
+It knew which rule was mechanical, and which one still needed judgment.
+
+None of that came from reading more. It came from someone having already written it down, in a place built to be read again.
+
+That's not understanding. It's not memorization either.
+
+**It's context that survived past the session that created it.**
+Agentics doesn't teach an agent to understand your system: it gives your team a place to put what it already knows, so the next session doesn't have to earn it again and again.
+
+---
+
 ## Quick start
 
 If this repo is accessible to your agent, say:

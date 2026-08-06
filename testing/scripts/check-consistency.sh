@@ -128,7 +128,26 @@ else
   FAIL=1
 fi
 
-# 6. Near-duplicate testing/regression-checklist.md entries (heads-up only, not a hard fail: this
+# 6. No AI-tool attribution in commit messages: session-discipline.md explicitly overrides an
+#    agent's own default commit template for this. Checks commits not yet pushed to the configured
+#    upstream (or just HEAD if no upstream is tracked), since a pushed commit is history to fix
+#    separately, not something this pre-commit-style check can catch usefully.
+section "No AI-tool attribution in commit messages"
+upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
+if [ -n "$upstream" ]; then
+  attr_hits=$(git log --format='%H %s%n%b' "$upstream"..HEAD 2>/dev/null | grep -niE 'co-authored-by|generated (with|by) claude|written by claude' || true)
+else
+  attr_hits=$(git log --format='%H %s%n%b' -1 2>/dev/null | grep -niE 'co-authored-by|generated (with|by) claude|written by claude' || true)
+fi
+if [ -n "$attr_hits" ]; then
+  echo "  FLAG: commit message(s) contain AI-tool attribution, remove before pushing:"
+  echo "$attr_hits" | sed 's/^/    /'
+  FAIL=1
+else
+  echo "  ok"
+fi
+
+# 7. Near-duplicate testing/regression-checklist.md entries (heads-up only, not a hard fail: this
 #    is a heuristic, word-overlap check, not a semantic one). Two concurrent sessions once added
 #    two separate entries for the same non-mutational loop-example incident. This catches that
 #    shape without needing to know in advance what the next duplicate will be about.
