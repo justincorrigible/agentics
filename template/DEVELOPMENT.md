@@ -33,6 +33,14 @@ The `.dev/` directory contains living documents maintained alongside the codebas
 - `.dev/roadmap.md`: planned features and architectural direction; read at session start
 - `.dev/tech-debt.md`: known issues, scope-adjacent problems, and deferred work
 - `.dev/sessions/`: one file per contributor per day (`YYYY-MM-DDTHHMMSS.md`), brief log of what changed and why
-- `.dev/docs/`: service-specific deployment notes and operational guides; indexed at `.dev/docs/index.md`; one subdirectory per service (e.g. `.dev/docs/postgres/`, `.dev/docs/kafka/`)
+- `.dev/docs/`: service-specific deployment notes and operational guides; one subdirectory per service (e.g. `.dev/docs/postgres/`, `.dev/docs/kafka/`), each organized however this project already does that
+- `.dev/docs/atlas/` (the atlas): agent-generated reference material, roadmap depth if this project has opted into the roadmap split, lessons-learned write-ups; indexed at `.dev/docs/atlas/index.md`, kept separate from the service folders above so neither needs to conform to the other's shape
 
 Read the `.dev/` files at the start of each session before beginning work. Read the relevant `docs/<service>/` guide before deploying or debugging a specific service. Update these at the end of any session that produces meaningful output.
+
+## Troubleshooting
+
+Common environment-specific gotchas, full detail lives in `conventions/session-discipline.md`:
+
+- **Your agent doesn't see a file you're actively editing.** It reads the filesystem directly and can't see unsaved editor content: save the file first, or paste it directly into the conversation instead. See § "Troubleshooting: agent doesn't see a file you're actively editing."
+- **Your agent's memory doesn't follow a project after a rename or a multi-root workspace setup.** Two different failure modes, each with its own fix. See § "Troubleshooting: agent won't load, or its memory doesn't follow a project."

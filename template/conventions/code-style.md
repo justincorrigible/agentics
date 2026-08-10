@@ -53,7 +53,7 @@ Concretely: adding new functionality to a library should mean extending the host
 
 **Positive conditions.** Write `if X` rather than `if !X`. Put the happy path in the positive branch; let the error case fall through or come after. A reader should not have to negate a condition mentally to understand what the main flow does.
 
-**Non-mutational.** Prefer expressions that produce new values over statements that mutate existing containers. Use ternaries and object spread instead of initialising an object and conditionally filling it:
+**Non-mutational.** Default to `const`; treat every `let` as a question to answer, not a neutral second option. If a binding needs to be reassigned, find out why before accepting it: either it fits one of the two patterns below and should be rewritten as an expression, or it's a real, narrow exception, like the async cancellation signal further down, not a default reached for out of habit. Prefer expressions that produce new values over statements that mutate existing containers. Use ternaries and object spread instead of initialising an object and conditionally filling it:
 
 ```ts
 // avoid
@@ -81,6 +81,8 @@ const findRoot = (dir: string): string => (isRoot(dir) ? dir : findRoot(parentOf
 ```
 
 **What this targets: accumulation as a substitute for computation, not every mutable binding.** Both examples above build a value through iteration or conditional steps that a pure expression could instead produce directly; that's the property the rule is actually about, not "no `let` ever gets reassigned." A mutable signal recording whether an event already happened across an async boundary, a cancellation flag set once inside a cleanup function or effect teardown, isn't accumulating a value at all: there's no expression that could produce "did this get cancelled before the request resolved" ahead of time. This is a real exception, not a loophole, but a narrow one: only reach for it once the underlying dependency's actual cancellation support has been checked and genuinely found absent, the same capability-verification discipline "Dependency version verification" below already requires before concluding a package lacks a feature. If a cancellation primitive exists (an `AbortSignal`, a cancellation token), use it instead of a flag.
+
+**Optional automated enforcement:** ESLint's `prefer-const` rule catches the mechanical half of this, a `let` that's never actually reassigned, but it is not part of `eslint:recommended` and needs enabling explicitly (`"prefer-const": "error"`). It can't judge the harder half, whether a genuinely-reassigned `let` is accumulation-as-computation or a legitimate exception, that's still the judgment call this section describes. Per "Library awareness" below, surfacing it as an option, not a requirement: some projects may already run a stricter style-guide config (Airbnb and similar) that includes it.
 
 **Pure helpers.** When a block of logic has a clear input and output (a lookup, a transformation, a format function), extract it as a named function with no side effects. This keeps orchestration code readable and the logic independently testable.
 

@@ -59,6 +59,20 @@ Projects that publish docs externally use two distinct documentation layers:
 
 Neither layer is optional for projects with external users. Docs that only exist in `.dev/docs` are invisible to operators and integrators; docs that belong in `.dev/docs` but land in `/docs` bloat the consumer-facing surface and dilute clarity.
 
+`.dev/docs` itself is often already populated by a project before any of these conventions arrive, service folders a human contributor set up and organizes their own way. None of what follows applies to that pre-existing content, or requires reorganizing it: see "The atlas" immediately below for the one subfolder these conventions actually govern.
+
+## The atlas: `.dev/docs/atlas/`, indexed and cross-linked
+
+Agent-generated reference material (a lessons-learned write-up, a roadmap entry's relocated depth) accumulates unpredictably over time in a way pre-existing per-service docs don't: nothing guarantees it lands anywhere navigable on its own. Give it its own subfolder, `.dev/docs/atlas/`, rather than mixing it into whatever a project already has directly under `.dev/docs`: this keeps existing human-curated service docs completely untouched, no retroactive index or cross-linking requirement gets imposed on content that predates this and was never meant to carry it.
+
+Maintain `.dev/docs/atlas/index.md`: one line per topic, name and a one-sentence description, the same shape `MEMORY.md` already uses for project memory. Create it the moment the first atlas topic file is added, and update it the moment any later one is, not batched for later; don't leave "do I need one yet" as a judgment call.
+
+Within an atlas topic file, link to a genuinely related one with a normal relative markdown link (`[roadmap: nesting config](../roadmap/nesting-config.md)`), not a special syntax: unlike project memory, `.dev/docs` files live in the same repo at stable paths, so an ordinary link already works and stays clickable in the repo browser and on GitHub. Link liberally when a real relationship exists; don't force a link where there isn't one just to make the corpus look more connected than it is.
+
+**Live-investigation output needs a draft step before it reaches the atlas, not a direct write.** A number just pulled from a live server, a specific example not yet checked for whether it's actually representative, still-unverified findings from an active investigation: writing these straight into `.dev/docs/atlas/` risks committing half-settled, over-specific material to a permanent artifact. Confirmed directly: a depth count and a schema's specific field names both went straight into permanent atlas content before being verified, each needing a multi-file surgical correction once the investigation actually settled and proved the first version wrong. Stage genuinely unverified investigation output as a draft in project memory space instead (`<project-memory-dir>/drafts/*.md`; never indexed in `MEMORY.md`, so it's never auto-loaded into context), then promote it, verified and appropriately genericized, into the atlas once the investigation is settled, replacing the draft rather than leaving both. This is for output still being actively verified, not routine writing: an already-confirmed fact goes directly into the atlas as normal, no staging needed.
+
+**Roadmap depth lives here too, not just service docs.** `.dev/docs/roadmap/<topic>.md` is where a roadmap entry's deeper reasoning, alternatives considered, or history goes once it needs more than a sentence or two, the same pointer-versus-substance split `definition-of-done.md`'s lessons-learned criterion already applies to memory versus `.dev/docs`, now applied to `roadmap.md` itself. See `session-discipline.md` § Keeping `.dev/` current for when this split is actually in effect for a given project: it's opt-in, not a default.
+
 ## Cross-linking, not duplication
 
 When a topic needs both a consumer-facing summary and internal depth, keep the full explanation in one location and cross-link from the other. Duplication creates drift: two descriptions of the same behaviour will disagree.
