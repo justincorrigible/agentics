@@ -159,6 +159,13 @@ One lean context sentence (what + why only), a blank line, then one bullet per f
 
 **Write about effects, not style.** Describe what the code now does or enables - the practical outcome for operators, users, or callers. Do not describe how the code was written: style choices, refactoring approach, helper names, and implementation details are not session log material. "Operators now see actionable error messages" belongs; "rewrote using positive conditions and pure helpers" does not.
 
+**Describe the system, not the struggle to find it.** A negative result worth keeping ("X doesn't work because Y") is a fact about the system; the process of getting there, what was tried, what failed, how long it took, isn't. Collapse the second into the first:
+
+Not: "Spent a while trying to get token refresh working, kept hitting a wall, eventually realized the session state was being reset."
+Instead: "Token refresh was resetting session state; fixed to preserve it across refresh."
+
+Same fact, no narrative. Applies to `.dev/tech-debt.md` and `.dev/roadmap.md` too: a known issue is a property of the code, not a chapter in anyone's debugging story.
+
 **Don't narrate the file's own commit state either.** A real example of what this looks like when it slips through: "Everything above is unstaged in the working tree; nothing has been committed." True when written, but it's restating something `git status` already answers for free, and it stops being true the instant anything gets staged, leaving the file asserting a false fact with no mechanism to correct it. See "Git" above: that's a reply to give the developer in conversation, not a fact to persist inside the log itself.
 
 **What to include in bullets:** decisions or constraints only when non-obvious: a choice between alternatives, a dependency or ordering constraint, a pattern being matched for the first time. Don't annotate established conventions (alphabetical ordering, matching a known pattern, etc.): the convention is already known and the annotation is noise.

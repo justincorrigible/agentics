@@ -15,6 +15,7 @@ Every item below has to actually be checked, not assumed clean because it was pr
 5. **Lessons learned persisted where they belong**: see below, defined here rather than pointed elsewhere, since it's new
 6. **`CHANGELOG.md`'s `## Unreleased` discipline**, if the project keeps one
 7. **A final refinement pass** over both the docs and the changes themselves, per `session-discipline.md`'s "Refinement passes: not just once at the end." This is the last gate, not a separate check bolted on afterward: it's what actually catches whether 1 through 6 were done well, not just done
+8. **Reproducibility**: nothing required to make this work exists only on this machine, invisibly. If reaching "it works" needed an environment-specific accommodation, a symlink, an installed package, a local config value, it's not done until that's either generalized into the fix itself (detect the runtime, read a config value, see `code-style.md`'s "Platform portability") or captured somewhere a teammate could reproduce it (a setup script, a README line, a Makefile target). Cross-platform divergence is a common instance of this, not a separate case: a fix that only works because the machine it was written on happens to differ from a teammate's (a different OS's default paths, for one concrete example) is the same gap as any other undocumented local accommodation
 
 ## Project-specific annexes
 

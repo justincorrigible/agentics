@@ -355,6 +355,26 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Correct now:** `AGENTS.md` § Repo maintenance rules runs the same simplification pass at each natural completion point within a session, not only right before a release; the publish-time pass is a backstop confirming it already happened, not the sole trigger.
 **Re-verify:** finish a batch of convention-file edits mid-session, well before any publish trigger fires; confirm the session re-reads the touched bullets for accretion bloat rather than deferring that check to whenever a release eventually happens.
 
+### undisclosed-machine-state-change
+**Used to break:** an agent created a symlink on a developer's own machine to work around a platform-specific path mismatch, without disclosing it; the developer didn't know it happened, and the resulting fix, being machine-specific, wasn't reproducible when a teammate applied the same change elsewhere.
+**Correct now:** `AGENTS.md`'s "Check in before non-trivial decisions" (root and template) names the developer's own machine and OS-level state explicitly, not just global config files, as requiring the same check-in as any other lasting footprint outside the current project. `definition-of-done.md`'s checklist adds reproducibility as its own item: a fix isn't done if it only works because of an undocumented, machine-specific accommodation, cross-platform divergence named as a common instance. `code-style.md` § "Platform portability" covers the proactive fix: detect the runtime or make it configurable, don't hardcode what one machine happens to need.
+**Re-verify:** a task requires an environment-specific workaround to get something running (a path mismatch, a missing local dependency, a platform default); confirm the response discloses the change explicitly before making it, and either generalizes the fix or documents the accommodation somewhere reproducible, rather than silently patching the machine and moving on.
+
+### struggle-narrative-vs-system-fact
+**Used to break:** a session log or tech-debt entry describing a negative result narrated the process of finding it (what was tried, what failed, how long it took) rather than stating the fact itself, collapsing density but also reading as an account of one person's difficulty rather than a property of the system.
+**Correct now:** `session-discipline.md` distinguishes a negative result worth keeping ("X doesn't work because Y", a system fact) from the struggle to reach it (a personal account, strip it), with a before/after example modeling the transformation directly.
+**Re-verify:** write a session-log or tech-debt entry for a negative result reached only after several failed attempts; confirm the entry states the final fact about the system, with no trace of what was tried and failed along the way.
+
+### global-tag-version-tracking
+**Used to break:** a developer's own global agentics bootstrap had no version tag at all; an upstream-check run in a specific project checked only that project's `synced` tag, with nothing tracking whether the developer's own global context had drifted behind, or worse, behind a project it had itself informed.
+**Correct now:** `global-context/personal-preferences.md` carries its own version tag, stamped on bootstrap; `convention-levels.md` § Checking for upstream updates runs the same diff-and-diagnose procedure against it independently, and treats a project's tag being ahead of the global one as an anomaly to fix immediately, not just note.
+**Re-verify:** with a global tag stamped behind current `HEAD`, work in a project whose own `synced` tag is further along; confirm the session brings the global tag current in the same sitting, rather than only fixing the project or silently leaving the global tag behind it.
+
+### upstream-check-empty-diff-not-personal-catchup
+**Used to break:** a project's synced marker already matched agentics' current `HEAD` (advanced by a different, concurrently active session in the same project), so a second session's own upstream check found an empty diff and stopped, silently, having never itself seen what the marker's advancement was supposed to reflect.
+**Correct now:** `convention-levels.md` § Checking for upstream updates states that an empty diff means the project's files need no further changes, not that this session has personally seen the current content; on a session's own first check this conversation, it skims the current content once regardless. `upgrading-adoption.md`'s "update your agentics" trigger runs unconditionally for the same reason, an explicit ask always verifies for real.
+**Re-verify:** in a project with more than one concurrently active session, have one session run and complete the upstream-check procedure (advancing `synced`), then have a second, previously-uninvolved session run its own session-start check; confirm it doesn't silently stop on the now-current marker, and that an explicit "update your agentics" to it forces a full check regardless.
+
 
 
 

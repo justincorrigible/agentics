@@ -6,6 +6,10 @@ Default: write no comments. Add one only when the WHY is non-obvious: a hidden c
 
 Never explain WHAT the code does; well-named identifiers already do that. Never reference the current task, fix, or callers: those belong in the PR description and rot as the codebase evolves.
 
+## Platform portability
+
+When a fix depends on something that differs by platform, a socket path, a line ending, a case-sensitive filesystem, an installed binary's default location, default to detecting the runtime or making it configurable, not hardcoding the value observed on whichever machine wrote the fix. This applies most sharply to modifying the machine itself rather than the code: a symlink or local file created so one specific machine's environment matches what the code expects is not a fix, it's a machine-specific accommodation that breaks the moment anyone else runs the same code on a different setup. Change the code to accept what the platform actually provides instead.
+
 ## Configuration and environment isolation
 
 Module functions should never read from the environment directly (`process.env`, config files, global singletons). Configuration belongs at a dedicated config-reading seam; everything downstream receives typed parameters.
