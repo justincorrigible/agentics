@@ -3,7 +3,7 @@
 
 Adapted from [softeng/agentics](https://github.com/oicr-softeng/agentics), for a developer's own global agent context: applies across every project, not copied into any one of them (see `conventions/convention-levels.md` § How much to keep locally). If a specific project has its own `AGENTS.md`, that project's own Interaction parameters and Critical constraints take precedence for work there; this file covers everywhere else, including projects with no agentics setup of their own at all.
 
-This file's own version tag stamps the developer's *global* agentics sync point, generally expected to be at or ahead of any individual project's, since refreshing it is cheap and personal, no team coordination needed. See `conventions/convention-levels.md` § Checking for upstream updates for how this tag gets checked and kept current.
+This file's own version tag stamps the developer's *global* agentics sync point, generally expected to be at or ahead of any individual project's, since refreshing it is cheap and personal, no team coordination needed. See `conventions/upstream-check.md` for how this tag gets checked and kept current.
 
 ## Interaction parameters
 - Ask clarifying questions before making large assumptions about intent

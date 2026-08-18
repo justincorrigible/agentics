@@ -1,10 +1,10 @@
 # softeng team conventions
 
-This file is an addendum to `CLAUDE.md`, applied when project memory confirms the user is part of the softeng team. Do not include credentials, private cluster endpoints, or secrets here: ever.
+This file is an addendum to `AGENTS.md`/`CLAUDE.md`, applied when project memory confirms the user is part of the softeng team. Do not include credentials, private cluster endpoints, or secrets here: ever.
 
 ## How this file is used
 
-The initialization block in `CLAUDE.md` records team membership in project memory on the first session. Subsequent sessions read the flag and load this file at session start.
+The initialization block in `AGENTS.md` records team membership in project memory on the first session. Subsequent sessions read the flag and load this file at session start.
 
 ---
 
@@ -63,6 +63,8 @@ Each environment has exactly two Terraform roots: `stateless/` and `stateful/`. 
 - **Stateless:** everything else, including Helm releases, TF provider-based service configuration (e.g. `mrparkers/keycloak` realm config), and management-plane resources that call external APIs
 
 When a new tool requires a Terraform provider (e.g. the Keycloak admin provider), add it as a second provider in the stateless root alongside `hashicorp/helm`. Use `depends_on` to sequence it after the service it configures.
+
+**Ordering within a Terraform file.** `conventions/writing-style.md` § Property ordering covers named entries generally; the softeng-specific reading is that named resource blocks are alphabetized by resource name, meaning the second label rather than the type, and that a VSO companion block follows its primary resource directly instead of being sorted independently. That exception exists because the companion is meaningless apart from the resource it serves, so keeping the pair adjacent beats a strict global sort.
 
 ### CI and deployment
 

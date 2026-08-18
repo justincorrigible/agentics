@@ -6,6 +6,8 @@ AI agents are categorically more vulnerable than human developers to certain att
 
 This document covers the threat landscape relevant to agentics users, the session-start integrity checks agents should run, and an honest account of what cannot be caught automatically.
 
+**Companion, for the developer:** `security-for-developers.md` covers the developer's own half, what to verify yourself rather than take on an agent's report, which agent claims are unreliable and how to check them cheaply, the trust boundaries only a person can hold, and what to do once something has gone wrong.
+
 ---
 
 ## The core vulnerability

@@ -23,9 +23,9 @@ Write no comments by default...
 
 Exercises the "AGENTS.md completeness" and "does CLAUDE.md/AGENTS.md agree" diagnosis items; the correct outcome is collapsing to the current dispatch table, verbatim, with any real project-specific content (a "Project notes" section, an extension-point note) preserved, not dropped.
 
-**3. Tag present, no `synced` value.** An `AGENTS.md` with `<!-- agentics-template-version: 0.3.0 -->` and nothing else. Exercises the bounded first-encounter catch-up branch in `convention-levels.md` § Checking for upstream updates; the correct outcome is surfacing current `## Unreleased` entries once, then baselining `synced` to `HEAD`, not a full historical walk back to 0.1.0.
+**3. Tag present, no `synced` value.** An `AGENTS.md` with `<!-- agentics-template-version: 0.3.0 -->` and nothing else. Exercises the bounded first-encounter catch-up branch in `upstream-check.md`; the correct outcome is surfacing current `## Unreleased` entries once, then baselining `synced` to `HEAD`, not a full historical walk back to 0.1.0.
 
-**4. Steady state, mature adopter.** A current dispatch-table `AGENTS.md` with `<!-- agentics-template-version: X.Y.Z | synced: <some older sha> -->`, a stub `CLAUDE.md`, and no `conventions/`, `CLAUDE.roles/`, or `CLAUDE.softeng.md` locally (representing a contributor whose global context already covers all of it). This is the exact shape that broke: the correct outcome of a dry run here is that none of those three ever get proposed, not even as a batched "non-conflicting" fix.
+**4. Steady state, mature adopter.** A current dispatch-table `AGENTS.md` with `<!-- agentics-template-version: X.Y.Z | synced: <some older sha> -->`, a stub `CLAUDE.md`, and no `conventions/`, `AGENTS.roles/`, or `AGENTS.softeng.md` locally (representing a contributor whose global context already covers all of it). This is the exact shape that broke: the correct outcome of a dry run here is that none of those three ever get proposed, not even as a batched "non-conflicting" fix.
 
 ## Running one
 

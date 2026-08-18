@@ -12,3 +12,6 @@
 
 # OS-generated
 Thumbs.db
+
+# Agent-local settings: machine-specific paths and usernames, never committed
+**/.claude/settings.local.json

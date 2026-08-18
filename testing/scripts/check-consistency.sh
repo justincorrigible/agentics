@@ -96,9 +96,13 @@ count_bullets() {
 root_txt="$(extract_section AGENTS.md "Interaction parameters")"
 tmpl_txt="$(extract_section template/AGENTS.md "Interaction parameters")"
 tmpl_txt="${tmpl_txt//agentics\' /}"
+# Second known-and-expected difference: convention paths are bare in the template (they resolve
+# against agentics' template/ directory from an adopting project) and prefixed in root (this repo
+# holds the files under template/). Normalize so only real content drift is reported.
+root_txt="${root_txt//template\/conventions\//conventions/}"
 drift="$(diff <(printf '%s\n' "$root_txt") <(printf '%s\n' "$tmpl_txt") || true)"
 if [ -n "$drift" ]; then
-  echo "  FLAG: \"Interaction parameters\" content differs beyond the known agentics'-CHANGELOG-pointer difference:"
+  echo "  FLAG: \"Interaction parameters\" content differs beyond the known path-prefix and agentics'-CHANGELOG-pointer differences:"
   printf '%s\n' "$drift" | sed 's/^/    /'
   FAIL=1
 else
@@ -188,6 +192,57 @@ for i in range(len(entries)):
 if not flagged:
     print("  ok")
 PYEOF
+else
+  echo "  skipped (python3 not found)"
+fi
+
+echo
+echo "== Credential hook actually fires (payload contract, not just patterns) =="
+if command -v python3 >/dev/null 2>&1; then
+  hook_cmd=$(python3 -c "
+import json,sys
+try:
+    d=json.load(open('template/.claude/settings.json'))
+    print(d['hooks']['PreToolUse'][0]['hooks'][0]['command'])
+except Exception as e:
+    sys.exit(1)
+" 2>/dev/null)
+  if [ -z "$hook_cmd" ]; then
+    echo "  FLAG: could not extract the PreToolUse hook command from template/.claude/settings.json"
+    FAIL=1
+  else
+    decide() { printf '%s' "$1" | eval "$hook_cmd" 2>/dev/null | python3 -c "
+import json,sys
+try:
+    print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])
+except Exception:
+    print('ERROR')
+" 2>/dev/null; }
+    hook_bad=0
+    # Each payload uses the key shape a real tool sends, so a key-name regression is caught.
+    for probe in \
+      'deny:{"tool_input":{"file_path":"/h/p/.env"}}' \
+      'deny:{"tool_input":{"file_path":"/h/.ssh/id_rsa"}}' \
+      'deny:{"tool_input":{"notebook_path":"/h/p/.env"}}' \
+      'deny:{"tool_input":{"command":"cat /h/p/.env"}}' \
+      'allow:{"tool_input":{"file_path":"/h/p/README.md"}}' \
+      'allow:{"tool_input":{}}'; do
+      want=${probe%%:*}
+      payload=${probe#*:}
+      got=$(decide "$payload")
+      if [ "$got" != "$want" ]; then
+        echo "  FLAG: expected $want, got $got for $payload"
+        hook_bad=1
+      fi
+    done
+    if [ "$hook_bad" -eq 0 ]; then
+      echo "  ok"
+    else
+      echo "  The hook does not behave as documented. A hook that returns allow is indistinguishable"
+      echo "  from no hook at all: see CHANGELOG.md § credential-hook-never-fired."
+      FAIL=1
+    fi
+  fi
 else
   echo "  skipped (python3 not found)"
 fi

@@ -6,6 +6,14 @@ Default: write no comments. Add one only when the WHY is non-obvious: a hidden c
 
 Never explain WHAT the code does; well-named identifiers already do that. Never reference the current task, fix, or callers: those belong in the PR description and rot as the codebase evolves.
 
+## Naming conventions
+
+**No `Type` suffix on type names, no `I` prefix on interfaces.** Name the concept, not the declaration keyword: `ThemeContext`, not `ThemeContextType`; `Logger`, not `ILogger`. A consumer never sees whether something was declared with `type` or `interface`, and the two are interchangeable enough in practice that the name shouldn't imply otherwise.
+
+**Full-word, descriptive identifiers, never a single letter or an unexplained abbreviation.** Applies broadly: any variable, parameter, or import alias, including a package's own conventional short alias (`fc` for `fast-check`, `z` for `zod`), not just the obviously terse ones. A package-level convention being common doesn't make an abbreviation self-explanatory to someone who doesn't already know that package.
+
+**Exception: idioms embedded in the language or framework itself, not a single package's own convention.** A loop counter (`i`, `j` in a simple bounded loop) or Express middleware's own signature (`req`, `res`, `next`) are established vocabulary shared across virtually every codebase in that language or framework, not an abbreviation anyone chose for brevity. That's a narrower exception than a package's own short alias: reach for it only when the idiom is genuinely universal to the language or framework, not merely common within one library's own docs or examples.
+
 ## Platform portability
 
 When a fix depends on something that differs by platform, a socket path, a line ending, a case-sensitive filesystem, an installed binary's default location, default to detecting the runtime or making it configurable, not hardcoding the value observed on whichever machine wrote the fix. This applies most sharply to modifying the machine itself rather than the code: a symlink or local file created so one specific machine's environment matches what the code expects is not a fix, it's a machine-specific accommodation that breaks the moment anyone else runs the same code on a different setup. Change the code to accept what the platform actually provides instead.
@@ -130,6 +138,10 @@ sendEmail(user.email);
 
 Apply to new code from the start. When touching existing `!` usages in scope, replace them; otherwise log as tech-debt rather than doing a blanket rewrite out of scope.
 
+## Explicit return types
+
+Declare return types explicitly on named or declared functions. Anonymous functions passed as arguments (a callback, a `.map`/`.filter` predicate) may omit them: the surrounding context already constrains the type, and annotating every inline lambda adds noise without adding safety.
+
 ## TSDoc for exported symbols
 
 All functions, types, and interfaces exported from a module require a brief TSDoc comment. One or two sentences is enough: state the contract or a non-obvious behaviour, not what the name already says. For types with multiple fields, add inline `/** */` member comments on the non-obvious ones.
@@ -172,11 +184,15 @@ When both hold and the fact is about to be actively cited or applied, not just b
 
 **Concrete trigger:** naming or applying a specific OWASP Top 10 edition or year is exactly this case, see `security.md` and `security-guidelines.md`.
 
+**Applies to your own tooling, not just external dependencies.** A documented feature or capability of your own harness that seems unavailable in the current environment is the same kind of versioned fact: check whether the harness itself needs an update, or whether the capability is gated behind a version, before concluding it's an architectural limitation. Confirmed directly: cross-session messaging was diagnosed as unavailable in a given environment, reasoning from a plausible but unverified theory about the hosting architecture, when a pending client update was the simpler, correct explanation and hadn't been checked first.
+
 ## Searching before writing
 
 Before implementing something new, search the codebase for existing patterns first. Use `grep` or semantic search to find similar implementations: this keeps the codebase consistent and surfaces reusable utilities before they get duplicated.
 
 For the specific case of adding new configuration-dependent functionality, see "Matching existing configuration entry points" above: the same habit, applied to finding an existing config-resolution mechanism rather than an existing utility function.
+
+**The same habit applies to debugging, not just writing new code.** When stuck on a problem that a system's other, similar parts may have already solved, a working sibling instance (another service in the same cluster, another module handling the same class of input, another environment with the same constraint) is ground truth, faster and more reliable than re-deriving the answer from first principles. Look for one before diagnosing in isolation.
 
 ## Structured logging
 
@@ -189,3 +205,5 @@ Apply from the start of any feature involving:
 - Errors, failures, or unexpected states at system boundaries
 
 Set up structured logging before writing application logic, the same way you set up a test runner before writing tests. It is not optional plumbing.
+
+**Baseline justification: OWASP A09 (Security Logging and Alerting Failures)**, see `security-guidelines.md` § A09. The value extends past security, though: structured logs are machine-queryable and are the foundation for any audit trail, not just a security control.

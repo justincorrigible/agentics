@@ -18,9 +18,9 @@ If a security-guidelines file already exists in your agent's global context (for
 
 No credentials, secrets, API keys, tokens, or private URLs in any file committed to version control: ever. This includes comments, test fixtures, and example configurations. Use environment variables or a secrets manager; document the variable names but never their values.
 
-## Node.js / pnpm: supply chain (A08)
+## Node.js / pnpm: supply chain (A03)
 
-pnpm v10+ blocks package install scripts by default. This is a deliberate A08 control: a compromised package cannot run arbitrary code during `pnpm install` unless explicitly approved.
+pnpm v10+ blocks package install scripts by default. This is a deliberate A03 control: a compromised package cannot run arbitrary code during `pnpm install` unless explicitly approved.
 
 **Always configure these for any pnpm project:**
 

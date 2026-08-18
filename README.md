@@ -39,7 +39,7 @@ This doesn't duplicate step 1 from scratch: it adds persistent project memory (`
 
 It stores your answers in project memory (or your global context, for the propagation-suggestions default) and does not ask again.
 
-**Once it's done, verify independently, don't just trust the summary.** Run `git status` yourself: you should see exactly `AGENTS.md`, `CLAUDE.md`, `DEVELOPMENT.md`, and `.dev/` as new. If `conventions/`, `CLAUDE.roles/`, or `CLAUDE.softeng.md` show up too, that's a bug, they're global-guideline material and should never be copied into a project (see "What gets installed" below); remove them and re-read `conventions/convention-levels.md` § How much to keep locally. Once it looks right, `git add` and commit those specific files yourself.
+**Once it's done, verify independently, don't just trust the summary.** Run `git status` yourself: you should see exactly `AGENTS.md`, `CLAUDE.md`, `DEVELOPMENT.md`, and `.dev/` as new. If `conventions/`, `AGENTS.roles/`, or `AGENTS.softeng.md` show up too, that's a bug, they're global-guideline material and should never be copied into a project (see "What gets installed" below); remove them and re-read `conventions/convention-levels.md` § How much to keep locally. Once it looks right, `git add` and commit those specific files yourself.
 
 **One thing worth setting expectations on:** this doesn't change what your agent can do the moment you run it. It's a place for your team to put what it's already learned, so the next session doesn't start from zero. The difference shows up over several sessions of actual use, not on first install; judging it by whether it feels different immediately is the wrong test.
 
@@ -63,7 +63,7 @@ What this actually looks like in practice, a real entry from this repo's own `te
 
 That's it: a fact about the system, the same kind of line any mature codebase already keeps in an issues list or a TODO, just structured for an agent to read reliably too.
 
-`conventions/`, `CLAUDE.roles/`, and `CLAUDE.softeng.md` are never copied into a project, under any circumstance: they're global-guideline material, not project content (see "Two tiers" below and `conventions/convention-levels.md` § How much to keep locally for the full rule). If your agent's global context doesn't yet define your role or your team's conventions, bootstrap it from those files directly, once, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent), not a per-project step.
+`conventions/`, `AGENTS.roles/`, and `AGENTS.softeng.md` are never copied into a project, under any circumstance: they're global-guideline material, not project content (see "Two tiers" below and `conventions/convention-levels.md` § How much to keep locally for the full rule). If your agent's global context doesn't yet define your role or your team's conventions, bootstrap it from those files directly, once, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent), not a per-project step.
 
 `.claude/settings.json` (Claude Code's credential-file protection hook) can be copied per project, or added to your global `~/.claude/settings.json` once instead.
 
@@ -98,7 +98,7 @@ This template goes further, though: its conventions also shape how the agent rea
 
 ## Design
 
-- **Dispatch, not dump**: `CLAUDE.md` stays lean; convention detail lives in separate files loaded only when relevant. See "Two tiers" below for what decides which conventions get copied in versus left as a live pointer.
+- **Dispatch, not dump**: `AGENTS.md` stays lean; convention detail lives in separate files loaded only when relevant. See "Two tiers" below for what decides which conventions get copied in versus left as a live pointer.
 - **Agent-neutral**: the template works with Claude, Codex, Copilot, and others. Role files, convention files, and `AGENTS.md` use no agent-specific paths.
 - **Additive**: roles and org layers (softeng) add to the base; they do not replace it. Merging with your existing setup is always the right choice.
 - **Contribution ladder**: good practices discovered in a project can bubble up: project memory → agent global context → PR to agentics.
@@ -109,7 +109,7 @@ A convention only needs to be copied into the adopting project if reading it liv
 
 **Needed every session, with no natural trigger of its own:** the session-start checklist, and the project's own version/sync marker. Nothing else prompts checking these, so if the check doesn't fire reliably, drift goes unnoticed. This was tested directly: a citation ("the base convention lives in X") did not reliably cause a fresh read of the current file; only an explicit instruction ("read X now, every session") did.
 
-**Needed only when actually doing that task:** writing tests, reviewing a PR, security-relevant work, writing docs. These already have a strong trigger: the agent is doing that task right now. A live dispatch pointer works fine here, which is why `CLAUDE.md` can stay lean for all of them.
+**Needed only when actually doing that task:** writing tests, reviewing a PR, security-relevant work, writing docs. These already have a strong trigger: the agent is doing that task right now. A live dispatch pointer works fine here, which is why `AGENTS.md` can stay lean for all of them.
 
 **Single source, not two copies:** `AGENTS.md` holds the canonical dispatch table; `CLAUDE.md` points at it rather than keeping its own. This was originally the other way around, `AGENTS.md` inlining full content on the assumption that its consumers couldn't fetch a file on demand at all. That assumption was wrong: the AGENTS.md standard's own guidance recommends the same dispatch-on-demand pattern `CLAUDE.md` already used, since real AGENTS.md consumers (Cursor, Copilot, Aider) have file-system access like any other coding agent. One dispatch table, referenced from both files, removes a class of drift rather than managing it.
 
@@ -117,7 +117,16 @@ A convention only needs to be copied into the adopting project if reading it liv
 
 ## Keeping up to date
 
-On adoption, extend the version tag in the adopting project's `AGENTS.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. `CLAUDE.md` carries no tag at all: it's a stub pointing at `AGENTS.md` for everything, including this. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/convention-levels.md` § Checking for upstream updates) instead of requiring a manual CHANGELOG comparison.
+On adoption, extend the version tag in the adopting project's `AGENTS.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. `CLAUDE.md` carries no tag at all: it's a stub pointing at `AGENTS.md` for everything, including this. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/upstream-check.md`) instead of requiring a manual CHANGELOG comparison.
+
+## Security
+
+Running an agent with real access to your repos has a threat model of its own, separate from the application security your code already needs.
+
+- [`docs/security-for-developers.md`](docs/security-for-developers.md): **written for you, not your agent.** What to verify yourself rather than take on your agent's report, which agent claims are unreliable and how to check each cheaply, the trust boundaries only a person can hold (pull request text is attacker-controlled, a peer session's message is not your approval, your global context is loaded everywhere and usually not version controlled), and what to do once something has gone wrong. Start here.
+- [`docs/agent-security.md`](docs/agent-security.md): the threat model itself, the attack vectors, the session-start integrity check agents run, and an honest account of what cannot be caught automatically. Dual audience.
+
+The template ships a credential-file blocklist hook, but it is a speed bump on the routine accident rather than a boundary, and it is specific to Claude Code. `security-for-developers.md` states its limits plainly and gives you a short command to confirm it is actually live, which is worth running: this repo shipped that hook in a state where it silently allowed everything, and the lesson generalizes past the one bug.
 
 ## Contributing
 

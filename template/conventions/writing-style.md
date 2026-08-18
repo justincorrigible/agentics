@@ -36,8 +36,6 @@ When correcting existing em dashes across a file, use `sed -i '' 's/ — /: /g'`
 
 Alphabetize properties within objects and mappings in config files (YAML, JSON, etc.) at all nesting levels: scalars and block properties interleaved together, not split by type. This prevents silent duplicate key overwrites and makes additions easier to place consistently.
 
-Alphabetize named resource blocks in Terraform files by resource name (the second label, e.g. `"github-metrics"`, `"keycloak"`, `"lectern"`). VSO companion blocks follow their primary resource directly rather than being sorted independently.
-
 **This applies to code, not only config files.** Alphabetize the properties of an object literal, the fields of a `type`/`interface`, and the names in a destructured parameter (`{ a, b, c }: Params`), the same way and at every nesting level. A plain positional argument list is unaffected: its order comes from the function signature, not from sorting. This rule is about named fields, not every list.
 
 **Exception: key order that's semantically meaningful.** Doesn't apply where the order itself is part of the meaning: a reducer's accumulator, an enum-like object whose entries represent an intentional sequence (pipeline steps, ordered states). Alphabetizing there would destroy something deliberate, not leave an arbitrary order unsorted. This is about named fields with no inherent order of their own, not every object.

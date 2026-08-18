@@ -4,9 +4,9 @@ This repo distributes the devctx collaboration template. Changes here propagate 
 
 ## Design principles
 
-- **Dispatch over inline**: `CLAUDE.md` stays lean (~30 lines); convention detail lives in separate files loaded on demand. Full reasoning: `README.md` § Two tiers
+- **Dispatch over inline**: `AGENTS.md` stays lean; convention detail lives in separate files loaded on demand. Full reasoning: `README.md` § Two tiers
 - **Agent-neutral**: template files must not reference Claude-specific paths (`~/.claude/`); use "your agent's global context directory" with a parenthetical for Claude users where needed
-- **`AGENTS.md` is the single source; other agent-specific files are stubs, not copies:** `CLAUDE.md` (root and `template/`) holds nothing but a pointer to `AGENTS.md`, because Claude Code loads it automatically and something has to exist for that purpose. If this repo ever adds another agent-specific file (a Cursor rules file, `.github/copilot-instructions.md`), give it the same treatment: a stub pointing at `AGENTS.md`, never a second copy of content. This wasn't the original design: `AGENTS.md` used to inline everything on a false premise (see `CHANGELOG.md`'s `agents-md-single-dispatch-table` entry), and before that, both files carried independent copies that drifted repeatedly: a missing section, a missing bullet, a version-tag rule naming only one file's tag. If you're ever tempted to add real content to `CLAUDE.md` beyond a pointer, that's the regression to watch for
+- **`AGENTS.md` is the single source; other agent-specific files are stubs, not copies, or not needed at all:** `CLAUDE.md` (root and `template/`) holds nothing but a pointer to `AGENTS.md`, because Claude Code loads it automatically and something has to exist for that purpose. GitHub Copilot needs even less: its coding agent, CLI, and VS Code's Copilot Chat (enabled by default) all read `AGENTS.md` directly, no `.github/copilot-instructions.md` required at all, not even a stub, see `conventions/upgrading-adoption.md`'s Copilot-specific bullet for what to do about a project that already has one. If this repo ever adds guidance for another agent-specific file that genuinely needs its own (a Cursor rules file, say), give it the stub treatment: pointing at `AGENTS.md`, never a second copy of content. This wasn't the original design: `AGENTS.md` used to inline everything on a false premise (see `CHANGELOG.md`'s `agents-md-single-dispatch-table` entry), and before that, both files carried independent copies that drifted repeatedly: a missing section, a missing bullet, a version-tag rule naming only one file's tag. If you're ever tempted to add real content to `CLAUDE.md` beyond a pointer, that's the regression to watch for
 - **No credentials**: see `AGENTS.md` § Critical constraints, the authoritative statement
 - **No personal identifying details**: see `AGENTS.md` § Critical constraints for the rule itself. It's read by people with no context for who you are or what machine you use, this session's history included: a personal GitHub username and a contributor's first name both made it into committed docs before being caught
 - **Additive, not prescriptive**: role and org files add or modify the base; they do not replace it
@@ -30,9 +30,9 @@ This enables three behaviours without needing to opt in per session or per proje
 - The agentics repo is always named as an explicit candidate, alongside the project and global levels
 - The upstream-update check becomes mandatory, not opt-in, in every project you work in, regardless of that project's own `propagation_suggestions` setting, and keeps recurring every session for an unresolved gap rather than surfacing it once and going quiet. This is deliberately more insistent than the standard opt-in tier: contributing to agentics implies keeping the ecosystem you're helping build actually current is part of the job. It stops only on an explicit "stop for this project" (recorded in that project's memory) or "stop for all projects" (recorded in your global context), never inferred from silence: someone who'd rather turn this off entirely than deal with it is signalling something about how invested they actually are in contributing, which is fine, but it's their call to make explicitly.
 
-Your agent will ask about this on the first session in this repo (initialization block in `CLAUDE.md`), and should record the answer in your global context, not (only) this repo's project memory. You can also set it manually in your global context at any time.
+Your agent will ask about this on the first session in this repo (initialization block in `AGENTS.md`), and should record the answer in your global context, not (only) this repo's project memory. You can also set it manually in your global context at any time.
 
-See `template/conventions/convention-levels.md` § Checking for upstream updates for what this looks like in practice.
+See `template/conventions/upstream-check.md` for what this looks like in practice.
 
 ## Proposing changes
 
@@ -49,7 +49,7 @@ See `template/conventions/convention-levels.md` § Checking for upstream updates
 
 Semver, with major reserved: agentics stays at `0.y.z` until productization is explicitly authorized; major only moves once that's decided.
 
-**`CHANGELOG.md` is the only place a version number lives.** Under `## Released`, each dated entry (`### 0.2.0 - 2026-07-15`) is a past version; the first one is the current one. Nothing else stamps a copy of this number: `AGENTS.md`'s own tag is a pointer (`<!-- agentics-version: see CHANGELOG.md § Released (latest entry) -->`), not a value, and `CLAUDE.md` carries no tag at all, since it's already a stub pointing at `AGENTS.md` for everything. `template/AGENTS.md` carries the same kind of pointer while it sits inside this repo (`agentics-template-version: see CHANGELOG.md § Released (latest entry)`); it only becomes an actual stamped number at the moment a project adopts it, since a copied file can no longer dynamically reference this repo's `CHANGELOG.md` once it's living somewhere else. See `template/README.md` § How to adopt for that step, and `template/conventions/convention-levels.md` § Checking for upstream updates for how an adopter's stamped tag gets compared against this file afterward.
+**`CHANGELOG.md` is the only place a version number lives.** Under `## Released`, each dated entry (`### 0.2.0 - 2026-07-15`) is a past version; the first one is the current one. Nothing else stamps a copy of this number: `AGENTS.md`'s own tag is a pointer (`<!-- agentics-version: see CHANGELOG.md § Released (latest entry) -->`), not a value, and `CLAUDE.md` carries no tag at all, since it's already a stub pointing at `AGENTS.md` for everything. `template/AGENTS.md` carries the same kind of pointer while it sits inside this repo (`agentics-template-version: see CHANGELOG.md § Released (latest entry)`); it only becomes an actual stamped number at the moment a project adopts it, since a copied file can no longer dynamically reference this repo's `CHANGELOG.md` once it's living somewhere else. See `template/README.md` § How to adopt for that step, and `template/conventions/upstream-check.md` for how an adopter's stamped tag gets compared against this file afterward.
 
 **Every CHANGELOG entry carries a `bump` field**: `date | category | bump | breaking? | description`.
 - `bump: patch`: fixes, clarifies, backfills, or propagates something already intended elsewhere in agentics. Nothing new is introduced.
@@ -70,18 +70,18 @@ Semver, with major reserved: agentics stays at `0.y.z` until productization is e
 
 ## Creating a new role file
 
-Role files live in `template/CLAUDE.roles/`. Each one describes what to add, modify, or de-emphasize relative to the base template for a specific type of user.
+Role files live in `template/AGENTS.roles/`. Each one describes what to add, modify, or de-emphasize relative to the base template for a specific type of user.
 
 ### Steps
 
-1. Create `template/CLAUDE.roles/<role>.md` using this structure:
+1. Create `template/AGENTS.roles/<role>.md` using this structure:
 
    ```markdown
    # <Role name>
 
    [Who this is: 1-2 sentences, plain language, no jargon]
 
-   [Optionally: Builds on: CLAUDE.roles/general.md: read that first.]
+   [Optionally: Builds on: AGENTS.roles/general.md: read that first.]
 
    ## [Relevant section]
    [What the base template adds or changes for this role]
@@ -94,7 +94,7 @@ Role files live in `template/CLAUDE.roles/`. Each one describes what to add, mod
 
 3. Add a CHANGELOG entry:
    ```
-   date | template | no | role-<name>: add CLAUDE.roles/<name>.md: <one-line description>
+   date | template | no | role-<name>: add AGENTS.roles/<name>.md: <one-line description>
    ```
 
 ### What goes in a role file
@@ -108,7 +108,7 @@ Role files live in `template/CLAUDE.roles/`. Each one describes what to add, mod
 ### What stays out of role files
 
 - Credentials, secrets, private URLs: never, in any file
-- Org-specific content: goes in the org layer (e.g., `CLAUDE.softeng.md`)
+- Org-specific content: goes in the org layer (e.g., `AGENTS.softeng.md`)
 - Project-specific content: goes in the project's own `CLAUDE.md` / `AGENTS.md`
 - Claude-specific paths (`~/.claude/`): role files are agent-neutral
 
@@ -117,7 +117,7 @@ Role files live in `template/CLAUDE.roles/`. Each one describes what to add, mod
 `general.md` is for users who may not work with files, code, or software projects at all. It is the foundation for non-developer specialist profiles. If you are creating a role for a non-developer audience: admin, ops, clinical, legal: start from it:
 
 ```
-Builds on: CLAUDE.roles/general.md: read that first.
+Builds on: AGENTS.roles/general.md: read that first.
 ```
 
 Then add only what is specific to that audience.
@@ -126,7 +126,7 @@ Then add only what is specific to that audience.
 
 | File | Audience | Foundation for |
 |---|---|---|
-| `dev.md` | Software developers |: (base template is the dev default) |
+| `dev.md` | Software developers | (base template is the dev default) |
 | `general.md` | Any user; non-technical task assistance | Admin, ops, clinical, and similar |
-| `bio.md` | Bioinformaticians |: |
-| `ai-eng.md` | AI/ML engineers building AI systems |: |
+| `bio.md` | Bioinformaticians | |
+| `ai-eng.md` | AI/ML engineers building AI systems | |

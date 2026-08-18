@@ -59,3 +59,7 @@ Unit tests that import from a package's own source, via internal path aliases, w
 Under plain `sh`, `**` behaves like a single `*` for one path segment: it silently matches only files at that exact depth, skipping everything shallower or deeper. No error, no warning. The only symptom is a lower-than-expected test or suite count, easy to miss unless someone happens to be watching for it.
 
 **Fix:** use a bare `"test": "tsx --test"` (or `"node --test"`) with no path argument. The test runner's own recursive discovery isn't subject to the shell's globbing behaviour and finds every test file regardless of nesting depth.
+
+## When to actually run the suite, not just write it
+
+A `session-discipline.md` § "Refinement passes" concern, not a separate mechanism: the full suite gets run at the semiregular in-session checkpoint specifically, not just the tests for what was just written, since that's the checkpoint an involuntary session end (a usage or context limit, a crash) can still reach even when the final "before ending a session" one can't. "Before committing" and "before ending a session" still get a full run too; the point is that neither can be the only line of defence.

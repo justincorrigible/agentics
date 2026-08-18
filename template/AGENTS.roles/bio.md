@@ -1,6 +1,6 @@
 # Bioinformatician role
 
-Builds on the base template conventions. Read this file in addition to, not instead of, `CLAUDE.md`.
+Builds on the base template conventions. Read this file in addition to, not instead of, `AGENTS.md`.
 
 ## Primary concerns
 

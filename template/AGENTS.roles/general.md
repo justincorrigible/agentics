@@ -29,5 +29,5 @@ The base template assumes a software project with `.dev/` files. For general use
 Specialist non-developer roles should reference this file first:
 
 ```
-Builds on: CLAUDE.roles/general.md: read that first.
+Builds on: AGENTS.roles/general.md: read that first.
 ```

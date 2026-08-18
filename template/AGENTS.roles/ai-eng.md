@@ -1,6 +1,6 @@
 # AI engineering role
 
-Builds on the base template conventions. Read this file in addition to, not instead of, `CLAUDE.md`.
+Builds on the base template conventions. Read this file in addition to, not instead of, `AGENTS.md`.
 
 Applies when the project involves building, evaluating, or maintaining AI systems: agentic workflows, prompt pipelines, fine-tuning, evaluation infrastructure, or agent instruction design.
 
