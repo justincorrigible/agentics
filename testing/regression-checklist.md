@@ -561,3 +561,73 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Used to break:** the dash rule banned four forms and the check it mandated grepped for two, so double hyphens and space-hyphen-space connectors accumulated across shipped files unnoticed, including fifteen in a human-facing security document.
 **Correct now:** `check-consistency.sh` checks all four forms, skipping fenced blocks, code spans, HTML comments and table separators, and allowing the convention files that must contain the characters; the mandated in-prose check names all four and warns that the old grep passes on the other two.
 **Re-verify:** add ` -- ` or a space-hyphen-space connector to any shipped markdown file and confirm the consistency check fails; confirm a CLI flag in a code span and an HTML comment still pass.
+
+### a-message-asserting-state-goes-stale
+**Used to break:** several sessions were messaged simultaneously with a claim about which index entries lacked an `id`; the first reply changed the file, so a later recipient read a claim that no longer matched reality and could not distinguish it from fabrication. The same message asserted the recipient's own runtime handle with no derivation attached, asking them to accept on faith the one fact they cannot verify about themselves.
+**Correct now:** `agent-index.md` requires that a message asserting current shared state either stamp when the claim was true or point at the live source, and that a peer's id always travel with the sender's own `ListAgents` listing so the recipient can derive it by set difference; refusing an unverifiable identity claim is named as correct behaviour.
+**Re-verify:** message two peers at once about a shared file's state, change it between their replies, and confirm the second recipient can still tell what was true when; separately, confirm an id claim arrives with the listing needed to derive it independently.
+
+### recurring-wrong-answer-wants-a-field
+**Used to break:** ownership of an in-house service was inferred from its GitHub organization and reported as awaiting another team's commitment; corrected once, it recurred the next day, and the correction was then written into two places at once (a family-level note plus a field on the one component where the error appeared), leaving ten sibling components still unanswerable and two copies of one fact free to drift.
+**Correct now:** `persistence-map.md` states that a question answered wrongly more than once is a question the records do not answer, so the fix is a named field in the single place that question is asked rather than prose at the symptom site, and that answering in several places at once is duplication rather than thoroughness; `global-context/projects.md` ships an `Owner` field with the default stated once.
+**Re-verify:** ask an agent who owns a component whose repo lives in a partner organization; confirm it reads the `Owner` field rather than inferring from the org, and that correcting any such error produces one field rather than several prose notes.
+
+### project-memory-location-undefined
+**Used to break:** the initialization block said to record answers "in project memory" and nothing anywhere said where that is, so during an upgrade a session created `<repo>/.claude/memory/` and wrote the `roadmap_split` answer there. Nothing reads that path, so the flag was invisible to every later session, and the directory was untracked rather than ignored, so a broad `git add` would have committed per-developer notes into a shared repo.
+**Correct now:** `AGENTS.md` § Memory and contribution hygiene states the location agent-neutrally, bans an in-repo memory directory including under `.claude/`, and the initialization line points at it; `template/README.md` adds `.claude/memory/` to the project's `.gitignore` as containment for directories that already exist.
+**Re-verify:** run initialization in a fresh project and confirm the recorded answers land in the agent's global per-project memory rather than anywhere inside the repo; then create `<repo>/.claude/memory/` by hand and confirm the adoption steps have it ignored.
+
+### bridge-dispatch-over-broadcast
+**Used to break:** with several candidate sessions in one window, an agent messaged all of them at once, costing N messages, interrupting sessions unrelated to the question, and delivering one claim to several readers at different moments, so a later recipient read a statement that had been true when sent and was false on arrival.
+**Correct now:** `agent-index.md` says to ask a single sibling, since any session in a window can see every other handle and can answer or point far more cheaply than an outsider; the board is the fallback and the developer comes last, because runtime handles are not visible to them at all.
+**Re-verify:** ask an agent to reach a labelled session in a window holding four candidates; confirm it messages one and asks for a pointer rather than messaging four, and that it does not ask the developer for a handle.
+
+### session-start-sibling-handshake
+**Used to break:** every recorded `id` went stale after an overnight restart, and nothing recovered them: a new session cannot observe its own handle, so the whole directory needed rebuilding by peer diffs at the moment every session was least able to help.
+**Correct now:** a session opens by exchanging ids with one sibling in its window, which refreshes both entries in one exchange, and re-checks by comparing `date -u` against its entry's `updated` rather than waiting on an undetectable "after silence" trigger.
+**Re-verify:** restart every session, then have one begin work; confirm it handshakes with a sibling before relying on the index, and that both entries end up with correct ids from that single exchange.
+
+### memory-is-the-windows-not-yours
+**Used to break:** a memory entry written to carry a reminder across a sign-off opened with "at the next session start, surface these unprompted"; project memory is keyed by resolved path, so an unrelated session opened in the same multi-root window loaded it and raised work it had nothing to do with, with no error and no signal that anything had gone wrong.
+**Correct now:** `AGENTS.md` § Memory and contribution hygiene states that memory belongs to the window rather than the session, that it holds durable facts and never a carry-forward task or an instruction addressed to whoever reads next, and that carry-forward belongs in `.dev/roadmap.md` or the session file.
+**Re-verify:** record a reminder intended for your own next session, then open a session in the same window on unrelated work; confirm it does not surface the reminder, and that the item is still found through the session-start roadmap read.
+
+### opening-the-index-is-itself-a-trigger
+**Used to break:** an agent registered itself, or posted and amended its own Requests entry, while an entry whose `looking_for` named it sat a few lines above in the same list; the check triggers covered session start, a new unit of work, and any background mechanism, but not the moment the file was already open, so the evidence was on screen and unread. The requester meanwhile waited on a board whose unanswered entry still read as "nobody has been by".
+**Correct now:** any read or write of the index includes scanning Requests for an entry naming you before finishing, stated as inherent to the action rather than a remembered checkpoint, with the board-editing case called out and `heard:` named as the response when the requester cannot be reached.
+**Re-verify:** post an entry looking for a session, then have that session register or update its own entry; confirm it notices and answers before completing its own write, rather than after a later session-start check.
+
+### window-is-not-the-handle-prefix
+**Used to break:** `window` was defined as the basename of the workspace's first-listed folder and required to equal the handle prefix, which forced a meaningful container name to equal an artifact of folder ordering: the `softeng` workspace lists `agentics` first, so the check demanded `window: agentics` for a window everyone calls softeng. Six of seven entries failed it and at least one of those was correct; the rule was withdrawn after two sessions and the developer pushed back.
+**Correct now:** `window` is the container's name and the prefix is not stored at all, being a substring of `id` that a dead `id` still yields. The rotation measurement that briefly justified storing it (zero of fifteen handles surviving, four of four prefixes) counted cardinality rather than durability and does not support a split.
+**Re-verify:** in a workspace whose first-listed folder differs from what the container is called, confirm a Member entry records the container's name in `window` without being flagged, and that no entry carries a prefix field alongside `id`.
+
+### a-stored-id-is-checked-against-the-listing-not-sent-blind
+**Used to break:** `id` was described as advisory and settled by the send itself ("send to it, and let the send's outcome settle it"), on the stated premise that validating it first would save nothing because the same `ListAgents` call could have filtered by `window` instead. Both halves were wrong: one call answers both questions, and their answers differ in kind, since an exact handle match resolves to one session or none while a prefix filter resolves to the container's whole population. The premise made a wasted message look mandatory and made prefix-narrowing look like an equivalent fallback.
+**Correct now:** call `ListAgents` once up front and look for the stored `id` in it. Present means send; absent means dead, established without sending. Falling back to the handles sharing its prefix is prohibited, since the rule against guessing already covers that shortlist.
+**Re-verify:** with several recorded ids of which some have rotated, confirm the live and dead ones are separated before any message is sent, and that a dead one does not become a prefix-based guess.
+
+### relay-what-you-see-on-the-board
+**Used to break:** the "opening the index is a trigger" rule fired only for sessions with reason to open the index, so a quiet session with an entry addressed to it was never covered, and quiet sessions are the ones most likely to be waited on.
+**Correct now:** an agent scanning the board tells any session it can reach that an entry names them, converting active sessions' traffic into coverage for idle ones, without taking on the request itself.
+**Re-verify:** post an entry for a session that has no reason to open the index; confirm another session scanning the board notifies it rather than leaving it to a restart.
+
+### recording-an-unknown-is-a-claim
+**Used to break:** an agent wrote "needs coordination with whoever owns X" into a committed tech-debt entry while the cross-project map already recorded the owner; the fact was present and available, but nothing about writing a project-local file triggered a look at the global one, so the uncertainty was persisted as though it were a finding.
+**Correct now:** `persistence-map.md` treats an uncertainty about to be persisted as a claim about the state of your records, requiring a check of the one place that would hold the answer before writing it, with ownership pointing at the map's `Owner:` field.
+**Re-verify:** ask an agent to log tech debt that depends on who maintains another component; confirm it consults the cross-project map and names the owner rather than recording the question.
+
+### a-session-cannot-claim-an-entry-by-workspace
+**Used to break:** a new session opened in the same window and base directory as a registered agent inferred from the cwd match that it was that agent, adopted the Member entry, and acted on the developer-assigned family-head designation it carried; the entry's `focus` described work at the head of that session's own git log, which read as confirmation while being equally consistent with being a stranger in the same repository.
+**Correct now:** `agent-index.md` states that a workspace match proves nothing because the workspace outlives every session in it, that the default is unregistered, and that identity is established by deriving your handle first and then finding an entry that records that handle; a stale `id` is not a vacancy, and a developer-designated role does not travel with the folder.
+**Re-verify:** open a new session in a repo whose agent is already registered; confirm it derives its handle and finds no entry recording it, registers as new or asks, and does not act on any designation carried by the existing entry.
+
+### identity-guard-in-workspace-memory
+**Used to break:** the rule that a workspace match is not identity lived only in the index, which is a pull resource opened to find someone else; the session most at risk either had not opened it or had already misread the entry that looked like itself, so the warning never reached the moment the false inference formed.
+**Correct now:** registration writes an identity guard into the workspace's own memory in the same step, naming the `label` rather than the rotating handle, with the warning carried in the memory index's one-line entry since only that line is guaranteed to load; absence of a guard proves nothing, the framing is multiplicity rather than exclusivity, and only the registered agent maintains it.
+**Re-verify:** register an agent in a workspace, then open a fresh session there; confirm the guard is in context at session start without the new session opening the index, that its hook line states the claim rather than a title, and that a workspace with no guard still defaults to unregistered.
+
+### label-first-when-reporting-to-the-developer
+**Used to break:** status reports led with the runtime handle and glossed it with the label in brackets, and listed dead handles as facts, so the developer was handed two meaningless characters as a name plus further handles with no referent; two separate sessions did this within minutes despite the rule already covering reports to the developer.
+**Correct now:** the label is the subject of the sentence, a handle appears only when live and actionable or when the handle is itself the subject of the fact, and a dead session is reported by label as not live with its former handle dropped.
+**Re-verify:** ask an agent for the status of several registered sessions, some live and some not; confirm every session is named by label, no dead handle appears, and any live handle included is one the developer could act on.
