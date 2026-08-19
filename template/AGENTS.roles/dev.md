@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Developer role
 
 You are in the default configuration. All base template conventions in `AGENTS.md` apply as written: this file adds nothing.

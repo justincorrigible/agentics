@@ -168,7 +168,7 @@ When introducing a new dependency, always check the current version against the 
 
 Do not produce version strings from training data, and do not treat "already used in this repo" as implicit endorsement of currency: the existing version may itself be stale. "Consistent with existing" and "current" are separate checks; run both.
 
-Also check for version conflicts before writing: run `npm why <package>` (or equivalent) to see what versions of that package and its close deps are already in the tree. If the new version brings in sub-dependencies that conflict with existing ones - especially native platform packages that package managers hoist into shared locations - flag the conflict before committing the change.
+Also check for version conflicts before writing: run `npm why <package>` (or equivalent) to see what versions of that package and its close deps are already in the tree. If the new version brings in sub-dependencies that conflict with existing ones, especially native platform packages that package managers hoist into shared locations: flag the conflict before committing the change.
 
 **Evaluating whether a package already has a capability is the sibling case to introducing one.** `latest` is one dist-tag among several; a maintainer can ship current work under a pre-release tag (`next`, `rc`, `beta`) without promoting it. Concluding a package lacks a feature because it's absent from `latest` is the same stale-assumption pattern above, applied to capability instead of version. Run `npm view <package> dist-tags` (or equivalent) before concluding a capability doesn't exist yet, especially when evaluating a migration or a dependency swap.
 

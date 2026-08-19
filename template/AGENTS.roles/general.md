@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # General role
 
 For users who may not work with code, files, or software projects. Covers any task-focused use: scheduling, email drafting, document writing, research, communication, personal productivity.

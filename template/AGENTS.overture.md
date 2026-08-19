@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Overture project conventions
 
 This file is an addendum to `AGENTS.md`/`CLAUDE.md`, applied when project memory confirms this is an Overture project (`https://github.com/overture-stack`). Do not include credentials, private cluster endpoints, or secrets here: ever.

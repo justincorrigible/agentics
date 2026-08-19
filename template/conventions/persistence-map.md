@@ -18,7 +18,7 @@ A quick-reference index across every persistence layer agentics currently define
 
 5. **If it needs substance, what kind?**
    - An open work item, feature, or design question: `.dev/roadmap.md`. Terse status only, with depth relocated to `.dev/docs/atlas/roadmap/<topic>.md`, if this project has `roadmap_split: yes` recorded (see `session-discipline.md` § Keeping `.dev/` current); otherwise the roadmap entry itself carries the depth, as normal.
-   - A known issue, bug, or deferred problem: `.dev/tech-debt.md` (see `session-discipline.md` § Tech-debt entry format).
+   - A known issue, bug, or deferred problem: `.dev/tech-debt.md` (see `entry-formats.md` § Tech-debt entry format).
    - Reference material clearly specific to an already-established, human-curated service folder: write there, matching its own existing organization; no atlas index or cross-linking requirement applies to that pre-existing content.
    - Anything else durable and agent-generated with no obvious existing home: `.dev/docs/atlas/<topic>.md` (see `documentation.md` § The atlas), updating `.dev/docs/atlas/index.md` in the same pass.
 

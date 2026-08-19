@@ -4,7 +4,7 @@ A global roadmap tracks work items and initiatives that span multiple projects o
 
 ## Splitting by context
 
-If you work across distinct contexts - professional and personal, or multiple organisations - use one roadmap file per context rather than one combined file:
+If you work across distinct contexts (professional and personal, or multiple organizations), use one roadmap file per context rather than one combined file:
 
 ```
 ~/.claude/roadmap-work.md      # professional projects and initiatives

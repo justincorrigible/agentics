@@ -5,15 +5,16 @@ Place this file in your agent's global context directory (for Claude: `~/.claude
 
 ## Members
 
-Exact-match lookup, normalized (case-insensitive, spaces/hyphens/underscores equivalent). No `name`/ref field: it's too dynamic to store usefully, reach a Member by filtering `ListAgents` (or your agent's equivalent) to sessions matching `project`/`window`/`scope`, defaulting to the most recently started candidate. Zero matches: report to the developer, don't guess. Several matches, or the guess turns out wrong: disambiguate via a Requests post, before asking the developer. Check for a label collision before registering; negotiate directly with any existing holder.
+Exact-match lookup, normalized (case-insensitive, spaces/hyphens/underscores equivalent). `id` is this session's current runtime handle, peer-supplied: you cannot see your own, so ask a sibling to diff listings, the handle in theirs and not yours is you. Advisory only, true for this session's lifetime: refresh it at session start, and on a failed or misrouted send treat it as stale and fall back to `window` rather than treating it as an error. `window` is the basename of the workspace's first-listed folder, which is what a handle prefix is generated from, so a prefix identifies a window and never a project. Reach a Member by `id` first, then by filtering to that `window`. Never break a tie by start time: recency carries no information about which candidate is current. Zero matches: report to the developer, don't guess. Several matches, or the guess turns out wrong: disambiguate via a Requests post, before asking the developer. Check for a label collision before registering; negotiate directly with any existing holder.
 
 ```
 - label:
+  id:
   project:
   window:
   scope:
   focus:
-  updated:
+  updated:   <UTC, e.g. 2026-08-19T03:06Z>
 ```
 
 ## Requests
@@ -22,7 +23,9 @@ Handshake only, no payload. `re:` is a feature/module name, never a finding or t
 
 ```
 - from:
+  id:
   looking_for:
   re:
-  posted:
+  posted:    <UTC, e.g. 2026-08-19T03:06Z>
+  heard:     <only if the post carried no id: sought agent's label, its own id, UTC>
 ```

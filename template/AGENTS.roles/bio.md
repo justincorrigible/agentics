@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Bioinformatician role
 
 Builds on the base template conventions. Read this file in addition to, not instead of, `AGENTS.md`.

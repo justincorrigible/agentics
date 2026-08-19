@@ -26,7 +26,7 @@ The second reads in one pass because it separates what happened from why it matt
 
 **Where this applies:** design docs, tech-debt entries, roadmap items, anything a reader outside the conversation that produced it will read cold.
 
-**Where it does not:** `.dev/sessions/` logs, which are correctly terse by `session-discipline.md` § Session file entry format: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
+**Where it does not:** `.dev/sessions/` logs, which are correctly terse by `entry-formats.md` § Session file entry format: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
 
 ## Rewrite freely until committed
 
@@ -47,6 +47,12 @@ The failure has two depths, not one. A chain of `X → Y`, `Y → Z`, `Z → A` 
 Once content is committed, git history is the record of how it got there. Before that point, the file's job is to state the current fact, not preserve a draft's own revision log.
 
 **Exception: a document whose entire job is recording change.** A CHANGELOG entry, a migration guide, a PR description: there, "renamed X to Y" is the point, not noise, since the "before" state is something a reader or their deployed instance may actually have been running against. This exception is narrow: artifacts whose stated purpose is documenting a transition for someone on the other side of it, not roadmap items, tech-debt entries, or convention prose describing current design.
+
+**A removal note is not documentation of the current system, even when the removed thing did ship.** The exception above covers artifacts whose job is recording change; project documentation is not one of them, so "we removed X" sitting in a README, a `DEVELOPMENT.md`, or a contributor guide is a changelog entry that wandered into the wrong file. Git history and the CHANGELOG already record it, and the note ages badly in a way neither of those do: it has no expiry, so a reader two years later still meets a paragraph about a file that has not existed for most of the project's life, and may reasonably infer the removal is recent or that the thing is still somehow relevant.
+
+Keep such a note in project documentation only when a reader would otherwise recreate the thing, or is holding a stale local copy that needs action. Then write it as the action, not as history ("delete `<path>` if you still have one" rather than "`<path>` was removed"), and put it where that action is actually taken, which is usually the migration or upgrade path rather than a general guide. Once the migration window has passed, it goes.
+
+Check the audience too, since a removal note fails especially quietly when it is aimed at a tool rather than a person. Confirmed directly: an adopting project's `DEVELOPMENT.md` recorded the removal of a Copilot-specific instructions file. A human contributor reading that guide does not need to know a file that no longer exists once did, and a Copilot agent, the only audience the note could serve, never reads `DEVELOPMENT.md` at all. Content placed where its intended audience does not look is a recurring failure in its own right; see § Two-tier model for which reader each tier is actually written for.
 
 **Exception: session files close earlier, at day's end, not at commit.** `session-discipline.md` § "Collapse iteration to outcome" applies this same principle to `.dev/sessions/` entries, but with a stricter boundary than "uncommitted": a session file is meant to be an honest same-day account, so it stays open only while that day's work continues, even if it happens to remain uncommitted for days afterward (nothing requires committing same-day). See that section for the full reasoning. This is a narrower exception, not a looser instance, of the rule above.
 

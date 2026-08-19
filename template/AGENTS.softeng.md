@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # softeng team conventions
 
 This file is an addendum to `AGENTS.md`/`CLAUDE.md`, applied when project memory confirms the user is part of the softeng team. Do not include credentials, private cluster endpoints, or secrets here: ever.
@@ -80,7 +81,7 @@ When a new tool requires a Terraform provider (e.g. the Keycloak admin provider)
 | MongoDB | MongoDB Community Operator | `MongoDBCommunity` CR |
 | OpenSearch | opensearch-k8s-operator | `opensearch-cluster` chart from the operator Helm repo |
 | Kafka | Strimzi | project-specific resources |
-| Auth | Keycloak - codecentric/keycloakx chart | Ego is discontinued; any Ego references are tech-debt |
+| Auth | Keycloak: codecentric/keycloakx chart | Ego is discontinued; any Ego references are tech-debt |
 
 ---
 
@@ -123,21 +124,21 @@ Open a PR to `config-jenkins-instances` and get it merged before attempting the 
 
 The direction of the credential flow differs by operator type. Get this wrong and VSO or the operator will fail to start.
 
-**CNPG (PostgreSQL): operator generates - you copy to Vault afterward**
+**CNPG (PostgreSQL): operator generates, you copy to Vault afterward**
 
 1. Deploy the CNPG cluster via Jenkins. CNPG auto-generates credentials and writes K8s secrets named `<cluster-name>-app` and `<cluster-name>-superuser`.
 2. Read the generated password: `kubectl get secret <cluster-name>-app -n <namespace> -o jsonpath='{.data.password}' | base64 -d`
 3. Write to Vault: `vault kv put kv2/<env>/<path> username=<user> password=<pass>`
 4. VSO then keeps the K8s secret synced from Vault on rotation.
 
-**MongoDB Community Operator: you seed Vault first - operator reads from VSO**
+**MongoDB Community Operator: you seed Vault first, operator reads from VSO**
 
 The operator requires a `passwordSecretRef` pointing to an existing K8s secret. It does not generate credentials.
 
 1. Generate a password: `openssl rand -base64 32`
 2. Write to Vault first: `vault kv put kv2/<env>/<path> mongodb_root_password=<pass>`
-3. Deploy the VSO companion via Jenkins - VSO creates the K8s secret from Vault.
-4. Deploy the MongoDB CR via Jenkins - the operator reads from that K8s secret.
+3. Deploy the VSO companion via Jenkins: VSO creates the K8s secret from Vault.
+4. Deploy the MongoDB CR via Jenkins: the operator reads from that K8s secret.
 
 The VSO-managed K8s secret and the operator's `passwordSecretRef` point to the same secret name.
 
@@ -151,7 +152,7 @@ Operators (Strimzi, CNPG, opensearch-k8s-operator, MongoDB Community) generate N
 
 **Always verify:** when deploying or debugging a stateful service, confirm that a NetworkPolicy exists allowing ingress from client pods to the service's main listener port. This is separate from any egress the operator pods may need (e.g. broker → K8s API for secret reads).
 
-**How to apply:** use the kustomize postrender pattern (supplemental manifests in `kustomize/manifests/np.yaml`) to add client ingress NPs without modifying the operator chart. A NP ingress rule with no `from:` selector allows all pods in the namespace - appropriate for internal cluster services. Tighter scoping by `app.kubernetes.io/name` is a follow-up once the service is confirmed working.
+**How to apply:** use the kustomize postrender pattern (supplemental manifests in `kustomize/manifests/np.yaml`) to add client ingress NPs without modifying the operator chart. A NP ingress rule with no `from:` selector allows all pods in the namespace, appropriate for internal cluster services. Tighter scoping by `app.kubernetes.io/name` is a follow-up once the service is confirmed working.
 
 Common ports to check: Kafka plain 9092 / TLS 9093, PostgreSQL 5432, OpenSearch 9200 / 9300, MongoDB 27017.
 

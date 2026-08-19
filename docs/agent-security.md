@@ -12,7 +12,7 @@ This document covers the threat landscape relevant to agentics users, the sessio
 
 ## The core vulnerability
 
-Agents mix two things that should be separate: **the execution context** (tools, credentials, shell access) and **the input processing context** (documents, web pages, tool outputs, other agents' messages). When malicious content reaches the input processing side, it can cross into the execution side — running commands, exfiltrating credentials, modifying config files, or propagating to other agents.
+Agents mix two things that should be separate: **the execution context** (tools, credentials, shell access) and **the input processing context** (documents, web pages, tool outputs, other agents' messages). When malicious content reaches the input processing side, it can cross into the execution side: running commands, exfiltrating credentials, modifying config files, or propagating to other agents.
 
 This is not a bug that gets patched. It is structural to how agents work. The mitigations are design constraints, not fixes.
 
@@ -22,7 +22,7 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 ### 1. Configuration and hook file injection
 
-**What it is:** Attackers write malicious content into `.claude/settings.json`, `CLAUDE.md`, or `AGENTS.md` — files that control agent behaviour and execute automatically.
+**What it is:** Attackers write malicious content into `.claude/settings.json`, `CLAUDE.md`, or `AGENTS.md`: files that control agent behaviour and execute automatically.
 
 **How it works:** Claude Code (and similar tools) load `settings.json` on startup. Hooks in this file execute without user confirmation. If an attacker can write to `.claude/` inside a sandbox (via prompt injection or a compromised tool), they can add hooks that run on the host with full user privileges when the agent next starts. This is called Configuration-Based Sandbox Escape (CBSE).
 
@@ -34,11 +34,11 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 ### 2. Indirect prompt injection via documents, web pages, and tool outputs
 
-**What it is:** Malicious instructions are embedded in content the agent retrieves and processes — not from the user. The user never sees the injected prompt; the agent acts on it silently.
+**What it is:** Malicious instructions are embedded in content the agent retrieves and processes: not from the user. The user never sees the injected prompt; the agent acts on it silently.
 
 **How it works:**
 
-- **HTML injection (ZombAIs):** Hidden instructions in white-on-white text, collapsed HTML, or off-screen elements. An agent browsing a malicious page executes the hidden commands — downloading and running binaries, connecting to command-and-control servers.
+- **HTML injection (ZombAIs):** Hidden instructions in white-on-white text, collapsed HTML, or off-screen elements. An agent browsing a malicious page executes the hidden commands: downloading and running binaries, connecting to command-and-control servers.
 - **Document injection:** Invisible text in PDF metadata, hidden content in email attachments, encoded instructions in files the agent reads.
 - **Tool output injection:** A compromised external API or database returns a payload that the agent treats as trusted data and acts on.
 
@@ -50,7 +50,7 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 **What it is:** Specially crafted content in GitHub PR titles, issue bodies, or comments hijacks coding agents reviewing those PRs.
 
-**How it works:** The agent reads the PR comment as part of its context, encounters the injection payload, and executes arbitrary commands — including extracting API keys, tokens, and SSH keys from the agent's environment and leaking them in GitHub Actions logs.
+**How it works:** The agent reads the PR comment as part of its context, encounters the injection payload, and executes arbitrary commands: including extracting API keys, tokens, and SSH keys from the agent's environment and leaking them in GitHub Actions logs.
 
 **Real impact:** This was demonstrated against Claude Code, Gemini CLI, and GitHub Copilot in 2026. Never run coding agents against untrusted repositories or PRs without understanding this risk.
 
@@ -76,7 +76,7 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 **What it is:** Malicious packages are published to npm or PyPI. An agent running `npm install` or `pip install` autonomously executes the attacker's code with the agent's full permissions.
 
-**How it works:** Attackers publish typosquats (e.g., `easy-day-js` instead of `dayjs`) or compromise legitimate packages. The payload typically runs as a postinstall script and hunts for credentials, API keys, tokens, and SSH keys in the environment — then exfiltrates them. Agents are uniquely dangerous here: a human developer might notice something odd; an agent processes the install as a routine step.
+**How it works:** Attackers publish typosquats (e.g., `easy-day-js` instead of `dayjs`) or compromise legitimate packages. The payload typically runs as a postinstall script and hunts for credentials, API keys, tokens, and SSH keys in the environment: then exfiltrates them. Agents are uniquely dangerous here: a human developer might notice something odd; an agent processes the install as a routine step.
 
 **Real incidents (2025-2026):** TanStack, Mistral AI, UiPath, and OpenSearch npm packages were compromised in a coordinated attack hitting 170+ packages. The Mastra AI ecosystem had 140+ packages backdoored via an easy-day-js typosquat.
 
@@ -100,7 +100,7 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 **What it is:** Malicious content is written into the agent's long-term memory or knowledge base, persistently altering its behaviour across all future sessions.
 
-**How it works:** Attacks like MINJA (Memory Injection Attack) allow a regular user interacting with an agent to inject into that agent's long-term memory — no elevated privileges required. Once injected, the agent's semantic similarity retrieval surfaces the poisoned memory in future sessions and the agent imitates it.
+**How it works:** Attacks like MINJA (Memory Injection Attack) allow a regular user interacting with an agent to inject into that agent's long-term memory: no elevated privileges required. Once injected, the agent's semantic similarity retrieval surfaces the poisoned memory in future sessions and the agent imitates it.
 
 **Relevance to this template:** Project memory files (`.claude/projects/.../memory/`) are a lightweight version of this. If an agent writes malicious content to memory (via prompt injection), that content is loaded in future sessions.
 
@@ -147,7 +147,7 @@ Be clear-eyed about what the session-start check does and does not do:
 
 **Cannot detect semantic manipulation.** If an instruction file has been subtly reworded to change agent behaviour (e.g., "never commit" changed to "commit when the user says so"), `git log` will show the change but only human review will catch what it means.
 
-**Cannot detect sophisticated prompt injection in retrieved content.** An agent cannot reliably recognise that a document it just read contains hidden instructions — that is the entire premise of the attack. The check is: did the agent do something unexpected after reading external content?
+**Cannot detect sophisticated prompt injection in retrieved content.** An agent cannot reliably recognise that a document it just read contains hidden instructions: that is the entire premise of the attack. The check is: did the agent do something unexpected after reading external content?
 
 **Cannot fetch real-time threat intelligence automatically.** There is no standardised machine-readable feed of AI agent IoCs. Periodically check the sources below manually, or prompt your agent to summarise them when starting security-relevant work.
 
@@ -157,11 +157,11 @@ Be clear-eyed about what the session-start check does and does not do:
 
 These are the sources worth monitoring for new agent-specific threats:
 
-- **OWASP LLM Top 10** — [owasp.org/www-project-top-ten-for-large-language-model-applications](https://owasp.org/www-project-top-ten-for-large-language-model-applications/) — updated periodically; the canonical list for LLM-specific risks
-- **OWASP MCP Top 10** — [owasp.org/www-project-mcp-top-10](https://owasp.org/www-project-mcp-top-10/) — emerging standard for MCP-specific risks
-- **Invariant Labs blog** — MCP and tool poisoning research
+- **OWASP LLM Top 10**: [owasp.org/www-project-top-ten-for-large-language-model-applications](https://owasp.org/www-project-top-ten-for-large-language-model-applications/): updated periodically; the canonical list for LLM-specific risks
+- **OWASP MCP Top 10**: [owasp.org/www-project-mcp-top-10](https://owasp.org/www-project-mcp-top-10/): emerging standard for MCP-specific risks
+- **Invariant Labs blog**: MCP and tool poisoning research
 - **GitHub Security Advisories** for your specific tools (Claude Code, Copilot, Gemini CLI)
-- **npm security advisories** — [npmjs.com/advisories](https://www.npmjs.com/advisories) — check before adding new dependencies
+- **npm security advisories**: [npmjs.com/advisories](https://www.npmjs.com/advisories): check before adding new dependencies
 
 Ask your agent to summarise recent advisories from these sources at the start of any session that involves security-sensitive work (auth, credential handling, external integrations, new dependencies).
 

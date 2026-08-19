@@ -248,6 +248,105 @@ else
 fi
 
 echo
+echo "== Schema field drift between a convention and its bootstrap copy =="
+if command -v python3 >/dev/null 2>&1; then
+  python3 - <<'PYEOF'
+import re, sys, os
+
+# Files that restate the same schema block. A field added to one and not the other has
+# shipped three times; see CHANGELOG.md § schema-propagation-missed-a-third-time.
+PAIRS = [("template/conventions/agent-index.md", "template/global-context/agent-index.md")]
+
+def fields(path):
+    """Field names from every fenced block that looks like a `- key:` record."""
+    try:
+        text = open(path).read()
+    except OSError:
+        return None
+    out = []
+    for block in re.findall(r"```\n(.*?)```", text, re.S):
+        names = re.findall(r"^\s*([a-z_]+):", block, re.M)
+        if names:
+            out.append(names)
+    return out
+
+bad = False
+for canonical, copy in PAIRS:
+    a, b = fields(canonical), fields(copy)
+    if a is None or b is None:
+        print(f"  FLAG: could not read {canonical} or {copy}")
+        bad = True
+        continue
+    for i, block_a in enumerate(a):
+        if i >= len(b):
+            break
+        missing = [f for f in block_a if f not in b[i]]
+        extra = [f for f in b[i] if f not in block_a]
+        if missing:
+            print(f"  FLAG: {copy} block {i+1} is missing {missing} declared in {canonical}")
+            bad = True
+        if extra:
+            print(f"  FLAG: {copy} block {i+1} declares {extra} absent from {canonical}")
+            bad = True
+if not bad:
+    print("  ok")
+sys.exit(1 if bad else 0)
+PYEOF
+  if [ $? -ne 0 ]; then FAIL=1; fi
+else
+  echo "  skipped (python3 not found)"
+fi
+
+echo
+echo "== Dash rule: all four banned forms, not just the two the prose check greps =="
+if command -v python3 >/dev/null 2>&1; then
+  python3 - <<'PYEOF'
+import re, sys, glob
+
+# writing-style.md bans four things. The check it mandates greps for two of them, so the
+# other two accumulated unnoticed in shipped files; see CHANGELOG.md § dash-check-narrower-than-rule.
+# Files that define the rule must contain the characters to ban them.
+ALLOW_LITERAL = {"template/conventions/writing-style.md", "template/conventions/entry-formats.md"}
+
+def strip_noncontent(line):
+    line = re.sub(r"`[^`]*`", "", line)        # inline code
+    line = re.sub(r"<!--.*?-->", "", line)     # html comments
+    return line
+
+bad = []
+for path in sorted(set(glob.glob("template/**/*.md", recursive=True) + glob.glob("docs/*.md")
+                       + ["README.md", "CONTRIBUTING.md", "AGENTS.md", "CLAUDE.md"])):
+    try:
+        raw = open(path).read()
+    except OSError:
+        continue
+    fenced = False
+    for n, line in enumerate(raw.split("\n"), 1):
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced or line.lstrip().startswith("|--") or set(line.strip()) <= {"|", "-", ":", " "}:
+            continue
+        text = strip_noncontent(line)
+        if path not in ALLOW_LITERAL and re.search(r"[\u2014\u2013]", text):
+            bad.append((path, n, "em or en dash"))
+        if re.search(r"[a-zA-Z,)\"] -- [a-zA-Z(]", text):
+            bad.append((path, n, "double hyphen as a dash"))
+        if re.search(r"[a-zA-Z,)\"] - [a-zA-Z(]", text):
+            bad.append((path, n, "space-hyphen-space connector"))
+
+for path, n, what in bad:
+    print(f"  FLAG: {path}:{n}: {what}")
+if not bad:
+    print("  ok")
+sys.exit(1 if bad else 0)
+PYEOF
+  if [ $? -ne 0 ]; then FAIL=1; fi
+else
+  echo "  skipped (python3 not found)"
+fi
+
+echo
 if [ "$FAIL" -eq 0 ]; then
   echo "All checks passed."
 else
