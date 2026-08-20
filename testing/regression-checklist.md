@@ -582,10 +582,26 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Correct now:** `agent-index.md` says to ask a single sibling, since any session in a window can see every other handle and can answer or point far more cheaply than an outsider; the board is the fallback and the developer comes last, because runtime handles are not visible to them at all.
 **Re-verify:** ask an agent to reach a labelled session in a window holding four candidates; confirm it messages one and asks for a pointer rather than messaging four, and that it does not ask the developer for a handle.
 
-### session-start-sibling-handshake
-**Used to break:** every recorded `id` went stale after an overnight restart, and nothing recovered them: a new session cannot observe its own handle, so the whole directory needed rebuilding by peer diffs at the moment every session was least able to help.
-**Correct now:** a session opens by exchanging ids with one sibling in its window, which refreshes both entries in one exchange, and re-checks by comparing `date -u` against its entry's `updated` rather than waiting on an undetectable "after silence" trigger.
-**Re-verify:** restart every session, then have one begin work; confirm it handshakes with a sibling before relying on the index, and that both entries end up with correct ids from that single exchange.
+### unpushed-commits-are-drafts-too
+**Used to break:** "rewrite freely until committed" governed the content of files but not the commit series carrying them, so a session would collapse a chain of corrections inside a document and then publish six commits documenting how it arrived at that document. Same failure one layer up, and easy to miss because each commit felt settled when written. Found by the developer, who named it as the equivalent of narrating process in a session file.
+**Correct now:** what settles content is publication, not committing, so amend and squash freely until the work is pushed. What collapses is iteration on a unit of work, never the units themselves: separate units keep separate commits in every repo. A project publishing at a coarser unit may collapse further under its own contributor docs, which is where agentics' release-commits-only rule lives; it does not travel with the template.
+**Re-verify:** make several rounds of corrections to one change before publishing; confirm the published history shows the outcome rather than the path, and that nothing was left as a separate commit whose only content is fixing the commit before it.
+
+### a-name-and-a-handle-cannot-be-joined-without-a-message
+**Used to break:** the bridge rule claimed a session inside a window could resolve a peer's identity "far more cheaply than you can from outside", treating co-location as an advantage. It is not one. The listing exposes handles and no display names, identically to every session inside or outside the window, so a sibling asked to identify a named session had exactly the same view and would have had to probe its neighbours one at a time. Escalating to the developer does not help either: they see display names and no handles, so they hold the other half of the join and equally cannot complete it.
+**Correct now:** an agent holds handles, the developer holds names, and only an inbound message carries both at once. So the announcement is load-bearing rather than a courtesy, since without it a named session costs a probe per candidate every session forever. A sibling is still worth asking, but because it may have already spoken with the target and hold the join, not because it is nearby. Prior contact makes a bridge useful, proximity does not.
+**Re-verify:** ask a session in the target's own window to identify a peer by display name; confirm the answer is that it cannot without probing, and that the resolution path taken is an announcement or a developer conferral rather than an escalation asking for a handle.
+
+### the-holder-of-a-role-announces-it-first
+**Used to break:** newcomers were told to introduce themselves to their window's main agent, which requires finding the main agent, which is the problem. Worse, a conferred role is invisible: a window's main agent was named `Search Server - multicatalogue`, indistinguishable from the task threads beside it, so a probe went to the wrong candidate and reached a session that could only relay a third-hand guess about which one was the owner. Neither name, handle, nor working directory encoded the assignment.
+**Correct now:** the direction is inverted, following from identity being knowable only from outside. The holder of a conferred role is the only party who knows it, so the main agent announces itself to its window once per session and newcomers introduce back to a known address. Hearing no announcement means the main agent is not running, which is a true and useful conclusion rather than a prompt to guess.
+**Re-verify:** start a main agent and a newcomer in one window; confirm the announcement travels from the main agent outward, that the newcomer never searches for it, and that a newcomer in a window with no live main agent concludes exactly that rather than probing candidates.
+
+### session-start-sibling-introduction
+**Used to break:** the sibling exchange existed to refresh runtime handles in the index, which no longer stores any. Its real value was never the handle: it was that co-owners of a container, and especially of one repository, each learn the other's ownership boundary before either starts editing.
+**Correct now:** a session introduces itself to its window's main agent at session start, stating the label it was conferred and what it owns. The main agent accumulates the handle-to-label map for its own window, held in session rather than persisted, so it is small and never stale.
+**Re-verify:** start a second session in a window that already has a main agent; confirm it introduces itself with its label and `owns`, and that the main agent can subsequently route to it without any stored handle.
+
 
 ### memory-is-the-windows-not-yours
 **Used to break:** a memory entry written to carry a reminder across a sign-off opened with "at the next session start, surface these unprompted"; project memory is keyed by resolved path, so an unrelated session opened in the same multi-root window loaded it and raised work it had nothing to do with, with no error and no signal that anything had gone wrong.
@@ -602,10 +618,51 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Correct now:** `window` is the container's name and the prefix is not stored at all, being a substring of `id` that a dead `id` still yields. The rotation measurement that briefly justified storing it (zero of fifteen handles surviving, four of four prefixes) counted cardinality rather than durability and does not support a split.
 **Re-verify:** in a workspace whose first-listed folder differs from what the container is called, confirm a Member entry records the container's name in `window` without being flagged, and that no entry carries a prefix field alongside `id`.
 
-### a-stored-id-is-checked-against-the-listing-not-sent-blind
-**Used to break:** `id` was described as advisory and settled by the send itself ("send to it, and let the send's outcome settle it"), on the stated premise that validating it first would save nothing because the same `ListAgents` call could have filtered by `window` instead. Both halves were wrong: one call answers both questions, and their answers differ in kind, since an exact handle match resolves to one session or none while a prefix filter resolves to the container's whole population. The premise made a wasted message look mandatory and made prefix-narrowing look like an equivalent fallback.
-**Correct now:** call `ListAgents` once up front and look for the stored `id` in it. Present means send; absent means dead, established without sending. Falling back to the handles sharing its prefix is prohibited, since the rule against guessing already covers that shortlist.
-**Re-verify:** with several recorded ids of which some have rotated, confirm the live and dead ones are separated before any message is sent, and that a dead one does not become a prefix-based guess.
+### no-runtime-handle-is-ever-stored
+**Used to break:** the index stored each session's runtime handle and routed by it. Measured across every inter-agent message sent on one machine, at least 17% existed purely because a session could not be reliably addressed, and over one in ten was a misroute or routing correction. Three rules built on the field were withdrawn inside one week.
+**Correct now:** no handle appears anywhere in the index. Contact resolves live: reply to an inbound message, which carries a known-good address, or post to Requests, or ask one session in the target's window to answer or point.
+**Re-verify:** confirm no Member entry carries a handle in any field, and that reaching an unfamiliar owner goes through a reply address, the board, or a single bridging sibling, never a stored value.
+
+### ownership-resolves-by-longest-prefix
+**Used to break:** ownership was assumed flat, one owner per repo, so a monorepo whose UI subtree belongs to a different agent than the repo had no representable answer, and "is this mine?" was a judgment call.
+**Correct now:** a path belongs to the entry with the longest `owns` prefix matching it. Containment is legal and expected; only two entries claiming the identical path are an error. A family head is the shortest prefix for a family and owns whatever no more specific entry claims, so it is never enumerated and a new assignment is always a pure narrowing.
+**Re-verify:** with a repo owner and a subtree owner registered, confirm a file in the subtree resolves to the subtree owner and a file elsewhere in the repo resolves to the repo owner, with no edit to either entry when the subtree owner was added.
+
+### an-unnamed-sessions-display-name-is-its-handle
+**Used to break:** the display-name rule was written as though a message always carries a name, so an agent would read `from-name` and treat whatever it held as the sender's label. An unnamed session's display name falls back to its runtime handle, so a message can arrive announcing `from-name="arranger-cf"`, and following the rule literally produces exactly the "never use the address as a name" error that the same file forbids. Found live: the reply that first confirmed the mechanism also defeated it, because the sender had no name set.
+**Correct now:** check the value before trusting it. If `from-name` is the sender's handle, or matches the shape of one, the session is unnamed and nothing has been learned about its identity. Report it as an unnamed session in its window rather than repeating the handle as a name, and ask if you need to know.
+**Re-verify:** message a session that has never been renamed; confirm the reply's display name is not recorded, quoted, or reported as that session's label.
+
+### display-name-is-identity-socket-is-address
+**Used to break:** the index tried to make one stored value serve as both identity and address, which is why the field kept dying: a handle rotates, so an identity built on it expires, while an address that outlives its process misroutes. Cold contact was also treated as an unrecoverable guess.
+**Correct now:** an inbound message carries the sender's session display name beside its reply address, so the two values are distinct and separately sourced. Identity is observable from outside and never from inside: peers learn who you are on contact, you never see your own name. Conferral is therefore a rename by the developer, with the label in front of the session name, set once and read by every peer for free. A probe to a guessed candidate is cheap because the reply identifies its sender; a claim, task, or state assertion to a guessed candidate is still forbidden.
+**Re-verify:** message a candidate you have not confirmed; check the reply names its sender without being asked, and that nothing substantive was sent before that reply arrived.
+
+### read-the-index-convention-fresh-before-writing
+**Used to break:** the live index file restated the rules beside the data, so agents acted on that summary and never opened the convention. With the convention changing daily, a session would enforce a rule already withdrawn or miss one already added, and nothing prompted a re-read. Observed: when a main agent announced itself to its window, the surrounding task threads began registering themselves, one named for a bounded piece of work. Their behaviour was reasonable given what they had last read; the membership rule simply did not exist then.
+**Correct now:** the convention is read fresh before every write to the index, as a direct instruction rather than a citation, because a citation does not reliably cause a read. The trigger is the write, not the read: lookups need nothing, while registering, claiming, editing, or clearing needs the file open. The live index carries only defaults that must fail safe before anyone has read anything, and everything fluid lives in the convention alone.
+**Re-verify:** change a rule in the convention, then have a session that has already read the old one register an entry; confirm it re-reads before writing and applies the new rule. Confirm too that the live file states no rule the convention could contradict.
+
+### the-registry-holds-owners-not-task-threads
+**Used to break:** nothing said who belongs in the registry, so a session doing developer-directed work inside a repo could reasonably register itself as that repo's owner, claiming a boundary it does not hold and colliding with the real owner.
+**Correct now:** the registry holds owners, which are rare. Task threads register nothing and own nothing. Observed directly: one window held ten concurrent sessions named for tasks and exactly one named for an owner. Unsure means task thread.
+**Re-verify:** open a session scoped to a task inside an owned repo; confirm it does not register, does not claim the owner's entry or mail, and routes what it learned to the owner instead.
+
+### identity-is-conferred-never-inferred
+**Used to break:** every mechanism tried for self-identification (handle, window, handle prefix, working directory) is shared by every session in the container, so each returned true for any new session. Inside a monorepo with co-owners there is no observable difference between two agents at all.
+**Correct now:** identity comes from the developer, once per session. A session not told which label it holds owns no entry, claims no mail, and holds no conferred role. Ambient resemblance is treated as evidence of nothing.
+**Re-verify:** open a fresh session in a workspace that has a registered owner; confirm it does not claim that entry, that role, or mail addressed to that label, and that it says plainly it has not been told who it is.
+
+### mail-names-a-label-never-a-role
+**Used to break:** addressing anything to "the main agent of this window" is unresolvable by construction, because the role is ambient and every session in the container matches it, so each new session concludes the mail is theirs.
+**Correct now:** every message and board entry names a conferred label. A session claims it only if the developer conferred that label in this session, and otherwise surfaces it without claiming, naming the label it is addressed to.
+**Re-verify:** post an entry for a conferred label, then open a session in the same window without conferring anything; confirm it reports the waiting entry and explicitly does not claim it.
+
+### assigned-marks-a-conferral-and-gates-overlap
+**Used to break:** nothing distinguished an entry the developer conferred from one an agent drafted on a guess, and nothing noticed when a conferral overlapped existing territory. A second conferral of the same label produced a silent double claim.
+**Correct now:** `assigned` records developer conferral, making the entry authoritative. Registration checks new paths against every entry: an identical path is a hard error, while a nested or similarly-named one asks the developer with options, since only they know whether it is a narrowing. Conferring an already-`assigned` label asks whether it replaces that assignment.
+**Re-verify:** confer a label owning a subtree of an assigned owner's repo; confirm the developer is asked to disambiguate rather than the entry landing silently, and that the incumbent's entry is not edited by the new agent.
+
 
 ### relay-what-you-see-on-the-board
 **Used to break:** the "opening the index is a trigger" rule fired only for sessions with reason to open the index, so a quiet session with an entry addressed to it was never covered, and quiet sessions are the ones most likely to be waited on.

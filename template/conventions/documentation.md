@@ -32,6 +32,8 @@ The second reads in one pass because it separates what happened from why it matt
 
 Uncommitted content, in any file, is a draft: rewrite it in place as understanding changes, don't layer a new note on top documenting the change from the old one. This applies to README updates, `/docs` and `.dev/docs` pages, tech-debt entries, roadmap items, and CHANGELOG's `## Unreleased` section.
 
+**The heading understates where the boundary actually falls: a commit nobody else can see is still a draft.** What settles content is publication, not the act of committing, so the same rule governs the commit series itself and not merely the files inside it. `session-discipline.md` § Git carries the application.
+
 The failure has two depths, not one. A chain of `X → Y`, `Y → Z`, `Z → A` notes is the shallow version: it documents the note's own edit history instead of stating `A` once. The deeper version survives even without chaining: a single, unchained note still mentioning `X` is noise if `X` never existed in any committed or shipped state, since no reader could ever encounter it. A document whose job is describing current design or a current bug (a roadmap rationale, a tech-debt issue, a convention) gains nothing from "this field used to be called `reason`" when nothing ever shipped under that name.
 
 **The test:** would the sentence stay true and useful to someone who only ever sees the current, merged state? If not, and the earlier value never shipped, cut the reference entirely, not just the chained instances of it.
