@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Global roadmap template
 
 A global roadmap tracks work items and initiatives that span multiple projects or belong to a specific work context. Place these files in your agent's global context directory (e.g. `~/.claude/` for Claude Code).

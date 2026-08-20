@@ -21,6 +21,19 @@ Both are run from the agentics clone rather than copied, for the same reason `co
 |---|---|---|
 | `check-agent-index.sh` | ownership registry integrity: duplicate paths, absolute paths, leftover schema, and the resolution tree | `conventions/agent-index.md` § Registering and changing ownership |
 
+### `check-prune-ratio.sh`
+
+```
+./scripts/check-prune-ratio.sh              # compares HEAD against origin/main
+./scripts/check-prune-ratio.sh <base-ref>   # or any base you name
+```
+
+**Only useful if your project accumulates convention or documentation text over many small changes.** It answers one question: has anything been removed lately, or has the corpus only grown. It reports the insertion and deletion counts across `template/` and `docs/`, and exits non-zero when a batch has grown past a threshold and no pre-existing file got smaller.
+
+It measures whether a pruning pass ran, never whether one was needed. That distinction is the whole design: deciding what to cut requires judgement no script has, while whether anything was cut is arithmetic. A newly added file is excluded from the shrink test, since having no deletions says nothing about it.
+
+Written because this repository's own release procedure had required a simplification pass for many releases in prose alone, and it had never once been executed. Run it from a hook rather than by hand if you want it to matter; a check you have to remember is subject to the failure it exists to catch.
+
 ## Conventions for scripts here
 
 - Take the target as an argument, with a sensible default, so the script is testable against a fixture rather than only against real state

@@ -4,6 +4,10 @@
 
 Default: write no comments. Add one only when the WHY is non-obvious: a hidden constraint, a subtle invariant, a workaround for a specific bug, behaviour that would surprise a reader. If removing the comment wouldn't confuse a future reader, don't write it.
 
+**Iterative work compounds this, and each comment earned its place at the time.** A note explaining a fix just made, or what a reviewer just confirmed, reads as a legitimate "why" in the moment. Across several rounds of fixes and review the accumulation is a changelog embedded in the source rather than documentation of the code as it stands, and none of it will still be true or relevant a week later. Reported by Arranger MCP from a file that went through four rounds of independent review.
+
+**Fix it with a dedicated pass once work on the file settles, not incrementally.** Re-read every comment and ask this section's question again, per comment. That pass cut the reported file by 17%, comments only, no logic touched. It has to be separate because no per-comment judgement made during the work can see the total.
+
 Never explain WHAT the code does; well-named identifiers already do that. Never reference the current task, fix, or callers: those belong in the PR description and rot as the codebase evolves.
 
 ## Naming conventions
@@ -160,7 +164,7 @@ Don't add features, refactor, or introduce abstractions beyond what the task req
 
 ## Library awareness
 
-When a well-established library would do more thorough work than a hand-rolled solution, surface it as an option with a brief explanation. Let the user decide: they may learn something useful from it regardless of whether they adopt it.
+When a well-established library would do more thorough work than a hand-rolled solution, surface it as an option with a brief explanation. Let the developer decide: they may learn something useful from it regardless of whether they adopt it.
 
 ## Dependency version verification
 
@@ -207,3 +211,25 @@ Apply from the start of any feature involving:
 Set up structured logging before writing application logic, the same way you set up a test runner before writing tests. It is not optional plumbing.
 
 **Baseline justification: OWASP A09 (Security Logging and Alerting Failures)**, see `security-guidelines.md` § A09. The value extends past security, though: structured logs are machine-queryable and are the foundation for any audit trail, not just a security control.
+
+## Property ordering
+
+Alphabetize properties within objects and mappings in config files (YAML, JSON, etc.) at all nesting levels: scalars and block properties interleaved together, not split by type. This prevents silent duplicate key overwrites and makes additions easier to place consistently.
+
+**This applies to code, not only config files.** Alphabetize the properties of an object literal, the fields of a `type`/`interface`, and the names in a destructured parameter (`{ a, b, c }: Params`), the same way and at every nesting level. A plain positional argument list is unaffected: its order comes from the function signature, not from sorting. This rule is about named fields, not every list.
+
+**Exception: key order that's semantically meaningful.** Doesn't apply where the order itself is part of the meaning: a reducer's accumulator, an enum-like object whose entries represent an intentional sequence (pipeline steps, ordered states). Alphabetizing there would destroy something deliberate, not leave an arbitrary order unsorted. This is about named fields with no inherent order of their own, not every object.
+
+**And to markdown reference documents with named per-item sections**, not just code or config: a project map's `### project-name` headings, a glossary's terms, anything enumerating discrete named entries. Same reasoning as config keys: scanning for whether an entry already exists, and knowing where a new one belongs, both get harder without it. A prose document that isn't enumerating named items (a narrative walkthrough, an ordered set of steps) isn't affected: this is about named-entry lists, not every heading in existence.
+
+Apply when writing new content, config or code. When editing existing files, fix ordering within the sections being touched. When inserting a new key, resource block, or field into an existing structure, place it at its alphabetical position: not at the current edit point, not at the end.
+
+**Watch for drift across a multi-step task.** Alphabetization is easy to get right in isolation and easy to lose when a field gets bolted onto an existing object mid-task (new key appended at the end instead of inserted in place) or when the same shape gets copy-pasted across several call sites (one gets fixed, the copies don't). Before treating a multi-file change as done, sweep back over every object literal, type, and destructured parameter it touched, not just the one you were looking at when you added the field.
+
+**The mechanism, confirmed first-hand by the session it happened to rather than inferred: you copy an adjacent line for its form and inherit its position.** You are looking at what the line *is*, and position is not a property of a line: it is a property of where it sits relative to its neighbours, which you are not looking at. So the incidental rides in unexamined, and the copy even supplies its own justification, since "matching the existing pattern" is true of the form and false of the placement. Reported by a session that said exactly that to its developer while offering the wrong thing as the reason.
+
+**That also explains the conditional-spread correlation better than syntax noise does.** A conditional spread is fiddly enough that you copy a neighbouring one rather than writing it out, so the syntax difficulty causes the copying and the copying causes the position inheritance. The risk is not that the shape is hard to eyeball; it is that you never wrote it in the first place.
+
+**Conditional spreads are a higher-risk spot for exactly this drift.** A shape built with `...(condition ? { key } : {})` mixed with plain keys is harder to eyeball for correct position than a flat literal, since checking order means mentally stripping the spread syntax first. This matters most for output an external reader or system actually scans (an API response body, a persisted structure), not just a maintainer's own read: nothing catches a misplaced key there beyond someone noticing the output looks wrong.
+
+**Optional automated enforcement:** [`eslint-plugin-perfectionist`](https://npmjs.com/package/eslint-plugin-perfectionist) has autofixable rules for exactly this (`sort-objects`, `sort-interfaces`, `sort-object-types`, among others) and can catch what manual review misses. Surfacing it here as an option per `code-style.md` § Library awareness, not a requirement: check its current version against the registry before adopting, and confirm which of its rules cover destructured parameters versus plain object literals before relying on it as the sole enforcement mechanism.

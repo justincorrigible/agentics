@@ -22,6 +22,19 @@ else
   echo "  (no hits)"
 fi
 
+# .dev/ travels to other users too and had never been scanned here: an assumption stack three
+# deep (Claude Code specifically, a Unix-style ~ home, and GNU-vs-BSD tooling in scripts).
+# Environment-specific findings are legitimate in the atlas; asserting them without saying which
+# environment is the defect. Listed by file rather than by line, since the judgment is per file.
+devhits=$(grep -rn '~/\.claude\|Claude Code\|ListAgents\|SendMessage' .dev/ 2>/dev/null || true)
+if [ -n "$devhits" ]; then
+  echo
+  echo "  -- .dev/ (review: is the environment declared, or asserted as universal?) --"
+  echo "$devhits" | awk -F: '{c[$1]++} END {for (f in c) printf "  %-54s %s\n", f, c[f]}' | sort
+  echo "  An atlas file recording tool-specific findings declares its scope once at the top."
+  echo "  Per-line hedging of an empirical observation is dishonest; a scope header is not."
+fi
+
 # 2. Orphaned convention files: every template/conventions/*.md has a dispatch line in AGENTS.md's
 #    "When to read what" table specifically (not just a mention anywhere in the file), and a row in
 #    README.md's file table.
@@ -298,6 +311,113 @@ else
 fi
 
 echo
+echo "== Naming the person: generic label in template files (review, not a failure) =="
+# Legitimate where the person is described to a third party, wrong where a shared instruction
+# file addresses or names them, and no check can separate those. Lists rather than fails. The
+# half that actually fails is conversational and ungreppable. See writing-style.md.
+if grep -rn "the user" template/ >/dev/null 2>&1; then
+  grep -rn "the user" template/ | cut -c1-150 | sed "s/^/  /"
+  echo "  (\"the developer\" in a shared instruction file; a name or \"you\" in a live reply)"
+else
+  echo "  ok"
+fi
+
+echo "== Session filenames: zeroed time components (review, not a failure) =="
+# A partly padded timestamp survives a glance and a T000000 check. Seconds land on 00 about once
+# in sixty naturally, so this is a note rather than a failure. See session-discipline.md.
+# All-zeros is a declared backfill placeholder that session-discipline.md tells readers not to
+# "fix", and the never-rename rule forbids the only remedy a report would suggest, so it is
+# excluded. Partial padding is the discriminator: a real-looking HHMM with zeroed seconds is the
+# signature of reaching for a plausible value rather than a clock.
+padded=$(ls .dev/sessions/ 2>/dev/null | grep -E 'T[0-9]{4}00\.md$' | grep -v 'T000000\.md$' || true)
+if [ -n "$padded" ]; then
+  echo "$padded" | sed 's/^/  zeroed seconds: /'
+  echo "  (legitimate about 1 in 60 times; confirm it was read from a clock)"
+else
+  echo "  ok: no zeroed seconds in .dev/sessions/"
+fi
+
+echo "== Release gate: did a pruning pass run? (advisory here, enforced at the release commit) =="
+# Shown rather than enforced, because this runs constantly during a session and a check that
+# fails the ordinary loop trains readers to skip it. Compulsion belongs at the commit, where a
+# hook fires without anyone choosing to run it. See CONTRIBUTING.md § Publishing a release.
+if bash scripts/check-prune-ratio.sh 2>/dev/null; then :; else
+  echo "  (advisory only: this run is not failed by the above)"
+fi
+
+echo "== Prose density in human-facing files (review, not a failure) =="
+# Length is not the defect. A long sentence is where a doubled claim usually hides, so this is
+# a proxy for the re-read test in writing-style.md § Density, which cannot be checked directly.
+if command -v python3 >/dev/null 2>&1; then
+  python3 - <<'PYDENSITY'
+import re, glob
+worst = []
+tot = 0
+# Human-facing files only: density costs a person and saves an agent, so unpacking a convention
+# would inflate a file every adopter loads every session. See writing-style.md § Density.
+# Not a directory test: .dev/ spans both sides. roadmap and tech-debt are read by a person to
+# decide something, so the human rule applies; session logs are condensed and excluded. The
+# document that prompted this rule lived in .dev/docs/, which an earlier path list exempted.
+files = (['README.md', 'CONTRIBUTING.md', 'template/README.md', 'template/DEVELOPMENT.md',
+          '.dev/roadmap.md', '.dev/tech-debt.md']
+         + sorted(glob.glob('docs/*.md'))
+         + sorted(glob.glob('.dev/docs/**/*.md', recursive=True)))
+for f in files:
+    t = re.sub(r'```.*?```', '', open(f).read(), flags=re.S)
+    for line in t.split('\n'):
+        line = line.strip()
+        if not line or line[:1] in '#-*|>' or re.match(r'^\d+\.', line):
+            continue
+        # Bold emphasis closing after a full stop hides the boundary from the splitter, so
+        # '...resolvable.** Agentics...' measured as one sentence. Same false-merge class as a
+        # bullet list with no terminal punctuation, found by the maximum rather than by reading.
+        for sent in re.split(r'(?<=[.!?:])\s+', line.replace('**', '')):
+            sent = ' '.join(sent.split())
+            n = len(sent.split())
+            if n < 4:
+                continue
+            tot += 1
+            if n > 30:
+                worst.append((n, f, sent))
+mx = max((n for n, _, _ in worst), default=0)
+# The extreme is where a splitter artifact announces itself; the count never shows it, and
+# the summary line is the part that gets quoted elsewhere. See deterministic-by-design.md.
+print(f"  {len(worst)} of {tot} prose sentences over 30 words, worst {mx}w")
+for n, f, sent in sorted(worst, reverse=True)[:5]:
+    print(f"    {n:>3}w  {f}")
+    print(f"         {sent[:96]}...")
+if len(worst) > 5:
+    print(f"    ... and {len(worst)-5} more")
+PYDENSITY
+else
+  echo "  skipped (python3 not found)"
+fi
+
+echo "== A script with a shebang is executable =="
+# A shebang promises direct invocation; without the bit, `./script` gives permission denied.
+# Shipped that way once because every local test used `bash script`, the form already written down.
+notexec=0
+for f in scripts/*.sh testing/scripts/*.sh; do
+  [ -f "$f" ] || continue
+  if head -1 "$f" | grep -q '^#!' && [ ! -x "$f" ]; then
+    echo "  FLAG: $f has a shebang but is not executable (chmod +x)"
+    notexec=1
+  fi
+done
+if [ "$notexec" -eq 0 ]; then echo "  ok"; else FAIL=1; fi
+
+echo "== Every global-context file carries a version tag =="
+# A deployed copy in a global context is outside upstream-check.md's reach, so the tag is the
+# only way it can announce its own staleness. See CHANGELOG.md § deployed-global-context-cannot-know-it-is-stale.
+missing=0
+for f in template/global-context/*.md; do
+  if ! head -1 "$f" | grep -q 'agentics-template-version'; then
+    echo "  FLAG: $f has no version tag on line 1"
+    missing=1
+  fi
+done
+if [ "$missing" -eq 0 ]; then echo "  ok"; else FAIL=1; fi
+
 echo "== Dash rule: all four banned forms, not just the two the prose check greps =="
 if command -v python3 >/dev/null 2>&1; then
   python3 - <<'PYEOF'

@@ -1,5 +1,7 @@
 # Agent index: cross-project session directory and bulletin board
 
+**Scope: designed against Claude Code on macOS.** The mechanisms this leans on, cross-session messaging, per-session state files, and path-derived memory, are that harness on that platform. Another agent may have none of them. The ownership model is portable; the plumbing described here is not.
+
 Design spec from a real, live design conversation (2026-08-08 through 2026-08-16), now shipped as `template/conventions/agent-index.md` (see Status below). Supersedes the earlier family-registry prototype described in `interagent-communication-findings.md`: workspace becomes a field on one global index instead of a second, workspace-scoped file.
 
 **Same gating as the rest of this investigation.** Built entirely on Claude Code's cross-session messaging (`ListAgents`/`SendMessage`). Any eventual convention must check the capability exists rather than assume it, and stay an optional accelerant, never a dependency: devctx/memory already cover the general case where no peer session is running. See `interagent-communication-findings.md`'s caveat block for the full statement.

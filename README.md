@@ -69,6 +69,29 @@ That's it: a fact about the system, the same kind of line any mature codebase al
 
 ---
 
+## Scripts you can run yourself
+
+Nothing in [`scripts/`](scripts/) is copied into your project. Run it from this clone, the same way `conventions/` stays a live pointer rather than a copy: a checker that gets copied goes stale silently and then reports "ok" about rules that have since changed.
+
+### `check-agent-index.sh`
+
+```
+./scripts/check-agent-index.sh              # reads ~/.claude/agent-index.md
+./scripts/check-agent-index.sh <some-path>  # or any file you point it at
+```
+
+**Skip this entirely unless you run several agent sessions at once across different projects.** It inspects the optional agent index, which records which agent owns which repositories or subtrees. If you work with one agent in one project, there is nothing here for you, and having no index at all is a perfectly normal state that the script will tell you so.
+
+If you do, it answers a question that turns out to be hard to answer by reading: **who owns what, and what does that actually resolve to.** Ownership can be a subtree, so a monorepo may have several owners, and a path belongs to whoever holds the longest matching prefix. That is easy to get wrong by eye once entries nest. It prints the resolution tree explicitly, flags an entry claiming a whole family root (which quietly makes its holder the owner of everything beneath it), and reports duplicate paths, machine-specific absolute paths, and entries still on an older schema. It never edits anything.
+
+**It also prints what it cannot know, on purpose.** Whether any session is currently holding a given label, whether a session that holds one knows that it does, and which sessions are live. Those live in the sessions themselves rather than in a file, because an agent's identity is assigned by you rather than inferred from its surroundings, so nothing on disk can answer them. A report that let you read the registry as a complete census of your running agents would be actively misleading, which is the whole reason the limitation is in the output rather than in a footnote here.
+
+Exits non-zero when something is genuinely wrong, so you can wire it into a hook if you want to.
+
+`testing/` is a different thing and is for people contributing to agentics itself, not for adopters; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+---
+
 ## If this repo is not yet in your agent's working directories
 
 Add it, or clone it and point your agent at the local path. Then repeat the quick start prompt above.
@@ -117,7 +140,7 @@ A convention only needs to be copied into the adopting project if reading it liv
 
 ## Keeping up to date
 
-On adoption, extend the version tag in the adopting project's `AGENTS.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. `CLAUDE.md` carries no tag at all: it's a stub pointing at `AGENTS.md` for everything, including this. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/upstream-check.md`) instead of requiring a manual CHANGELOG comparison.
+On adoption, extend the version tag in the adopting project's `AGENTS.md` with a sync marker: `<!-- agentics-template-version: X.Y.Z | synced: <commit-sha> -->`, where `<commit-sha>` is this repo's `HEAD` at copy time. **Treat the SHA as advisory, because it will not stay resolvable.** Agentics amends its release commit until the release is actually cut. One set of changes therefore appears under several hashes beforehand, four of them in a single day during 0.19.0's development. A stamp matching no commit in the history is the expected end state, not a sign of a bad copy or a rewritten history. It records which commit was copied rather than one you can still look up. The version number is the half that survives an amend, and it is the half `upstream-check.md` compares. `CLAUDE.md` carries no tag at all: it's a stub pointing at `AGENTS.md` for everything, including this. With `propagation_suggestions: yes` set in the adopter's global context, their agent checks for updates automatically at session start (`template/conventions/upstream-check.md`) instead of requiring a manual CHANGELOG comparison.
 
 ## Security
 

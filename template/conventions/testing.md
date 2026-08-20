@@ -60,6 +60,22 @@ Under plain `sh`, `**` behaves like a single `*` for one path segment: it silent
 
 **Fix:** use a bare `"test": "tsx --test"` (or `"node --test"`) with no path argument. The test runner's own recursive discovery isn't subject to the shell's globbing behaviour and finds every test file regardless of nesting depth.
 
+## A test that builds its own input cannot discover the input it was never given
+
+**The author of a test and the author of the code hold the same assumption about what the input looks like, so a test that constructs its input proves the code handles the shape it already expected.** The contract that matters is the one a real caller supplies, and it is exactly the one that never appears in the fixture. This is not a coverage problem: a line-coverage report can read as complete while the interesting case has never been constructed at all.
+
+Two independent instances surfaced in one week, in repositories sharing no code, reported by the sessions that found them:
+
+- A suite exercising string handling where **no input contained a quote character**, so the escaping contract was never exercised at all. Escaping is the reason that code path exists.
+- A suite exercising access control where **every test passed a null filter**, so nothing ever exercised a filter that filters. Every assertion passed and the feature under test was absent from all of them.
+- A query builder whose `IN` clause construction was **never tested against a multi-element array**, so the one case the clause exists for was the one case never constructed. The same fix also reimplemented an `inArray()` helper the codebase already provided, which is the same assumption going unchallenged in two directions at once.
+
+**The failure is not a security-testing failure, and filing it as one is how it survives.** Two of the instances above look like security dimensions and the third is ordinary correctness, which is the point: a reader who files this under injection or access control will not apply it to a query builder. The mechanism is indifferent to the dimension, because it comes from the author's assumption about input shape rather than from anything about what the code does. Reported by a session noting the same failure hit one file twice in a single day, once on an injection dimension and once on an ordinary one.
+
+**The check is one question per test double or fixture: what value would a real caller supply that I have not written here?** Then write that one. The high-yield answers are consistent across both cases above and worth walking deliberately: the value that needs escaping, the non-empty version of a filter, the absent field rather than the present one, the input that is already encoded, and the case that another component produces rather than the one you would type.
+
+**A "passing" suite is evidence about the inputs it contains and nothing else.** When a test is meant to prove a transformation happens, assert the transformation, since a fixture needing no transformation makes an identity function pass the same test.
+
 ## When to actually run the suite, not just write it
 
 A `session-discipline.md` § "Refinement passes" concern, not a separate mechanism: the full suite gets run at the semiregular in-session checkpoint specifically, not just the tests for what was just written, since that's the checkpoint an involuntary session end (a usage or context limit, a crash) can still reach even when the final "before ending a session" one can't. "Before committing" and "before ending a session" still get a full run too; the point is that neither can be the only line of defence.

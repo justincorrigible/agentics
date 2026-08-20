@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Contributor-only, and never shipped: `.githooks/` is not part of `template/`, so adopters do
+# not receive it. Sits beside `pre-commit`, which already runs `check-consistency.sh`, and needs
+# no separate setup because `git config core.hooksPath .githooks` already covers this directory.
+#
+# Two rules, one deliberately narrow and one universal:
+#
+#   1. A release commit must show that a pruning pass ran. The simplification pass has been
+#      required in prose for many releases and never once executed, which is the regress this
+#      exists to break: a rule enforced by remembering is not enforced. Only fires on a
+#      `Release X.Y.Z` subject, so ordinary commits pay nothing.
+#   2. No AI-tool attribution, on every commit. `check-consistency.sh` already detects this after
+#      the fact; catching it here prevents it instead, and the message is still editable.
+#
+# `git commit --no-verify` bypasses both. That is the design rather than a hole: the point is to
+# convert forgetting into deciding, not to make either rule unskippable.
+
+set -uo pipefail
+MSG_FILE="$1"
+SUBJECT="$(head -1 "$MSG_FILE")"
+FAIL=0
+
+# Rule 2 first: it applies to every commit and is cheap.
+if grep -niE 'co-authored-by|generated (with|by) claude|written by claude' "$MSG_FILE" >/dev/null; then
+  echo "commit-msg: AI-tool attribution found in the message." >&2
+  grep -niE 'co-authored-by|generated (with|by) claude|written by claude' "$MSG_FILE" | sed 's/^/  /' >&2
+  echo "  session-discipline.md overrides your agent's default commit template for this." >&2
+  FAIL=1
+fi
+
+# Rule 1: release commits only.
+if printf '%s' "$SUBJECT" | grep -qE '^Release [0-9]+\.[0-9]+\.[0-9]+'; then
+  echo "commit-msg: release commit detected, checking the pruning gate." >&2
+  if ! bash scripts/check-prune-ratio.sh >&2; then
+    echo "  A release may not ship without a simplification pass having run." >&2
+    echo "  Cut what is duplicated or superseded, then commit again." >&2
+    FAIL=1
+  fi
+fi
+
+exit "$FAIL"

@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Project Map
 
 Global index of known projects, memory locations, and key cross-project relationships.

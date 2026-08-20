@@ -1,3 +1,4 @@
+<!-- agentics-template-version: see CHANGELOG.md § Released (latest entry) -->
 # Security Guidelines: OWASP Top 10:2025
 
 > This document is keyed to the 2025 edition. Before relying on the category numbers or names below in security-relevant work, fetch https://owasp.org/www-project-top-ten/ and confirm 2025 is still current; if a newer edition exists, treat this document as needing a re-map, not as authoritative on its own.

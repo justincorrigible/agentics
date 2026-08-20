@@ -28,11 +28,21 @@ The second reads in one pass because it separates what happened from why it matt
 
 **Where it does not:** `.dev/sessions/` logs, which are correctly terse by `entry-formats.md` § Session file entry format: a historical record for someone already oriented, not a first introduction to the topic. Loosening that convention would be the wrong fix for a different problem.
 
+## An environment-specific finding declares its environment, once, at the top
+
+**Findings tied to one tool, one operating system, or one shell are legitimate content.** An atlas page recording what a specific agent harness actually does, verified by running it, is exactly the kind of durable knowledge the atlas exists for. The defect is not writing it down; it is **writing it as though it were universal**, so a reader on a different agent, a different OS, or a different shell applies it and finds nothing there.
+
+**The assumption stack is usually deeper than the author notices.** A path like `~/.claude/sessions/` assumes a particular agent, a Unix-style home directory, and that the tool still lays its state out that way. A `sed -i ''` assumes BSD rather than GNU. Each is invisible to whoever wrote it, because it was true where they were standing.
+
+**Declare the scope once in a header rather than hedging every line.** Per-line qualification of an empirical finding is dishonest as well as unreadable: the observation *was* made on one tool on one platform, and rewriting it into neutral language claims a generality nobody verified. A header saying which agent, which platform, and when, keeps the finding exactly as strong as the evidence supports and tells a reader in one sentence whether it applies to them.
+
+**This is the opposite trade from the template's own prose**, where `(for Claude: X; for other agents: Y)` framing is correct because those files instruct every reader. An atlas page reports what happened somewhere specific; the honest form is to name the somewhere.
+
 ## Rewrite freely until committed
 
 Uncommitted content, in any file, is a draft: rewrite it in place as understanding changes, don't layer a new note on top documenting the change from the old one. This applies to README updates, `/docs` and `.dev/docs` pages, tech-debt entries, roadmap items, and CHANGELOG's `## Unreleased` section.
 
-**The heading understates where the boundary actually falls: a commit nobody else can see is still a draft.** What settles content is publication, not the act of committing, so the same rule governs the commit series itself and not merely the files inside it. `session-discipline.md` § Git carries the application.
+**The heading understates where the boundary actually falls: a commit nobody else can see is still a draft.** What settles content is publication, not the act of committing, so the same rule governs the commit series itself and not merely the files inside it. `git.md` carries the application.
 
 The failure has two depths, not one. A chain of `X → Y`, `Y → Z`, `Z → A` notes is the shallow version: it documents the note's own edit history instead of stating `A` once. The deeper version survives even without chaining: a single, unchained note still mentioning `X` is noise if `X` never existed in any committed or shipped state, since no reader could ever encounter it. A document whose job is describing current design or a current bug (a roadmap rationale, a tech-debt issue, a convention) gains nothing from "this field used to be called `reason`" when nothing ever shipped under that name.
 

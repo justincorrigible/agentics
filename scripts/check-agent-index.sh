@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Ownership registry integrity check for an agent index.
+# Ownership registry status and integrity report for an agent index.
 #
-# Called by conventions/agent-index.md § Registering and changing ownership, before an agent
-# writes a new entry. Reports; never edits.
+# Called by conventions/agent-index.md § Registering and changing ownership before an agent
+# writes an entry, and usable on its own by a developer wanting the current picture.
+# Reports; never edits.
 #
 # Usage: bash scripts/check-agent-index.sh [path-to-agent-index.md]
 #        defaults to ~/.claude/agent-index.md
@@ -27,7 +28,6 @@ import re, sys, os
 path = sys.argv[1]
 text = open(path).read()
 
-# Members runs from its heading to the next one at the same level.
 m = re.search(r'^## Members\b.*?\n(.*?)(?=^## |\Z)', text, re.S | re.M)
 if not m:
     print("  FLAG: no '## Members' section found; is this an agent index?")
@@ -41,70 +41,177 @@ entries, cur = [], None
 for line in members.splitlines():
     key = re.match(r'\s*-\s+([a-z_]+):\s*(.*)$', line)
     if key and key.group(1) == 'label':
-        cur = {'label': key.group(2).strip(), '_fields': {}}
+        cur = {'label': key.group(2).strip(), 'f': {}}
         entries.append(cur)
         continue
     field = re.match(r'\s+([a-z_]+):\s*(.*)$', line)
     if field and cur is not None:
-        cur['_fields'][field.group(1)] = field.group(2).strip()
+        cur['f'][field.group(1)] = field.group(2).strip()
 
 if not entries:
     print("  ok: Members section present, no entries yet")
     sys.exit(0)
 
-errors, notes = [], []
-
-# Fields the ownership-registry schema replaced. A leftover one means the entry predates the
-# rewrite and still carries a runtime handle or a value that decays.
 LEGACY = {'id', 'focus', 'updated', 'project', 'scope'}
-REQUIRED = {'owns', 'expert', 'window'}
+REQUIRED = {'owns', 'expert', 'workspace'}
 
-owners = []  # (path, label)
+errors, notes, owners, path_errors = [], [], [], []
+
+print(f"REGISTRY STATUS  ({path})\n")
+print(f"  {'label':<32}{'owns':<34}{'conferred':<11}{'schema'}")
+print(f"  {'-'*31} {'-'*33} {'-'*10} {'-'*12}")
+
 for e in entries:
-    label, f = e['label'], e['_fields']
+    label, f = e['label'], e['f']
     if not label:
         errors.append("an entry has no label")
         continue
 
     stale = LEGACY & set(f)
-    if stale:
-        errors.append(f"{label}: pre-registry field(s) {', '.join(sorted(stale))}; entry needs migrating")
+    schema = 'pre-registry' if stale else 'current'
+    conferred = 'yes' if 'assigned' in f else 'no'
+    owns_raw = f.get('owns', '')
+    shown = owns_raw if owns_raw else '(none recorded)'
+    print(f"  {label[:31]:<32}{shown[:33]:<34}{conferred:<11}{schema}")
 
+    if stale:
+        errors.append(f"{label}: pre-registry field(s) {', '.join(sorted(stale))}; needs migrating")
     for missing in sorted(REQUIRED - set(f)):
         errors.append(f"{label}: missing required field '{missing}'")
 
-    if 'assigned' not in f:
-        notes.append(f"{label}: no 'assigned' value, so this entry is provisional rather than conferred")
-
-    for p in (x.strip().rstrip('/') for x in f.get('owns', '').split(',') if x.strip()):
+    for p in (x.strip().rstrip('/') for x in owns_raw.split(',') if x.strip()):
         if p.startswith('/') or p.startswith('~') or re.match(r'^[A-Za-z]:', p):
             errors.append(f"{label}: absolute path in owns ({p}); paths are org-relative")
+            path_errors.append(p)
         owners.append((p, label))
 
-# Identical path claimed twice is the only hard collision. Containment is legal by design.
+
+cur_n = sum(1 for e in entries if not (LEGACY & set(e['f'])))
+conf_n = sum(1 for e in entries if 'assigned' in e['f'])
+print(f"\n  {len(entries)} entries: {cur_n} on the current schema, {len(entries)-cur_n} pre-registry")
+print(f"  {conf_n} developer-conferred, {len(entries)-conf_n} provisional")
+
 seen = {}
 for p, label in owners:
-    if p in seen and seen[p] != label:
-        errors.append(f"path '{p}' claimed by both {seen[p]} and {label}")
-    seen[p] = label
+    k = p.lower()
+    if k in seen and seen[k][1] != label:
+        prev_p, prev_l = seen[k]
+        same = "" if prev_p == p else f" (written '{prev_p}' and '{p}')"
+        errors.append(f"path '{p}' claimed by both {prev_l} and {label}{same}")
+    seen[k] = (p, label)
 
+if owners:
+    print("\nOWNERSHIP RESOLUTION  (longest matching prefix wins)")
+    for p, label in sorted(owners):
+        parents = [q for q, _ in owners if q.lower() != p.lower() and p.lower().startswith(q.lower() + '/')]
+        marker = "within " + max(parents, key=len) if parents else "top level"
+        print(f"  {'  ' * len(parents)}{p}  ->  {label}   ({marker})")
+
+    # A bare top-level segment is a family-root claim: by longest-prefix resolution its holder
+    # owns everything beneath it that no narrower entry claims. Correct for a family head and
+    # easy to write by accident for a component, so it is surfaced rather than assumed either way.
+    roots = sorted({(p, l) for p, l in owners if '/' not in p})
+    # Comparisons below are case-folded; casing is preserved for display only.
+    if path_errors:
+        # Every claim below rests on exact path comparison, so with a malformed path present a
+        # carve-out can read as a separate root and the counts below would be confidently wrong.
+        # A wrong answer in the section a reader opens to check is worse than no answer.
+        print("\n  Family-root claims suppressed: path errors above make these counts unreliable.")
+    elif roots:
+        print("\n  Family-root claims, worth confirming are intended:")
+        for p, label in roots:
+            narrower = [q for q, _ in owners if q.lower() != p.lower() and q.lower().startswith(p.lower() + '/')]
+            print(f"    {label} owns '{p}', so it is family head for everything under it")
+            verb = 'entry carves' if len(narrower) == 1 else 'entries carve'
+            print(f"      {len(narrower)} narrower {verb} out of it; "
+                  f"everything else there resolves to this label")
+else:
+    print("\nOWNERSHIP RESOLUTION")
+    print("  Nothing resolvable: no entry records an `owns` path.")
+
+# Peer status is decided by workspace, so two spellings of one name split a workspace in two
+# and each half stops reading as peers of the other. Folded for comparison only: no casing is
+# canonical across workspaces, and an earlier heuristic that picked one flagged a correct entry.
+ws = {}
+for e in entries:
+    v = e['f'].get('workspace', '').strip()
+    if v:
+        ws.setdefault(v.lower(), set()).add(v)
+for _, spellings in sorted(ws.items()):
+    if len(spellings) > 1:
+        notes.append("one workspace is written " + str(len(spellings)) + " ways: "
+                     + ", ".join(sorted(spellings))
+                     + "; its members are peers regardless, align at the owners' discretion")
+
+# The board carries two shapes. A request wants an owner to act and its poster clears it; a
+# notice reports a change already made and its recipient clears it, since only they know they
+# have read it. Nothing pushes either to anyone, so counting them here is the only nudge.
+b = re.search(r'^## Requests\b.*?\n(.*?)(?=^## |\Z)', text, re.S | re.M)
+items = []
+if b:
+    body = re.sub(r'```.*?```', '', b.group(1), flags=re.S)
+    it = None
+    for line in body.splitlines():
+        k = re.match(r'\s*-\s+(for|fyi):\s*(.*)$', line)
+        if k:
+            it = {'kind': k.group(1), 'who': k.group(2).strip(), 'f': {}}
+            items.append(it)
+            continue
+        f = re.match(r'\s+([a-z_]+):\s*(.*)$', line)
+        if f and it is not None:
+            it['f'][f.group(1)] = f.group(2).strip()
+
+reqs = [i for i in items if i['kind'] == 'for']
+fyis = [i for i in items if i['kind'] == 'fyi']
+if items:
+    print("\nBOARD")
+    if reqs:
+        print(f"  {len(reqs)} request(s) open, cleared by whoever 'from' names:")
+        for i in reqs:
+            print(f"    {i['who']}  <-  {i['f'].get('from','?')}  ({i['f'].get('re','no subject')})")
+    if fyis:
+        print(f"  {len(fyis)} notice(s) unread, cleared by the recipient:")
+        for i in fyis:
+            print(f"    {i['who']}  <-  {i['f'].get('from','?')}  ({i['f'].get('re','no subject')}"
+                  f", by {i['f'].get('by','UNSTATED AUTHORITY')})")
+    for i in fyis:
+        if 'heard' in i['f']:
+            errors.append(f"notice for {i['who']} carries 'heard'; a notice needs no answer")
+        if not i['f'].get('by'):
+            errors.append(f"notice for {i['who']} states no authority in 'by'")
+    for i in items:
+        posted = i['f'].get('posted', '')
+        if not posted:
+            errors.append(f"board item for {i['who']} has no 'posted' date")
+        # The board's only staleness signal is this field, and a zeroed time is a guess that
+        # reads as a real reading. Flagged rather than failed: a genuine midnight post exists.
+        elif 'T00:00' in posted:
+            notes.append(f"board item for {i['who']} posted at {posted}; a zeroed time is "
+                         "usually a placeholder, and it ages the entry falsely")
+        if i['f'].get('via') and not i['f'].get('from'):
+            errors.append(f"board item for {i['who']} has 'via' but no 'from'; "
+                          "'from' names who holds the need and who clears it")
+
+print("\nINTEGRITY")
 if errors:
     for e in errors:
         print(f"  FLAG: {e}")
 else:
-    print(f"  ok: {len(entries)} entries, {len(owners)} owned paths, no collisions")
-
+    print(f"  ok: no collisions, no absolute paths, no pre-registry fields")
 for n in notes:
     print(f"  note: {n}")
 
-# Resolution tree: what longest-prefix matching actually yields, so nesting is eyeballable.
-if owners:
-    print("\n  ownership resolution (longest prefix wins):")
-    for p, label in sorted(owners):
-        parents = [q for q, _ in owners if q != p and p.startswith(q + '/')]
-        depth = len(parents)
-        marker = "within " + max(parents, key=len) if parents else "top level"
-        print(f"    {'  ' * depth}{p}  ->  {label}   ({marker})")
+# The limits are part of the report. A reader who mistakes this for the whole picture will
+# believe the registry is a census, which is the error the convention warns about.
+print("""
+NOT KNOWABLE FROM THIS FILE, AND NOT A GAP IN IT
+  - Whether any session currently holds each label. Conferral happens in a session and is
+    recorded nowhere, so a listed entry does not mean someone is holding it right now.
+  - Whether a session that holds a label knows that it does. Only that session can say.
+  - Which live sessions exist. This script cannot see a session listing, and the registry
+    deliberately excludes task threads, so it is never a census of anything.
+  Each of these resolves only by asking. That is a property of the design, not a shortfall
+  here: identity is conferred rather than derived, so no file can answer these.""")
 
 sys.exit(1 if errors else 0)
 PYEOF
