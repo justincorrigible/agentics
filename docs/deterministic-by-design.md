@@ -119,3 +119,15 @@ Bucket 1 gets to something close to actually deterministic: either the script ru
 ## Applying this to your own system
 
 For each existing rule: would a person or agent following it perfectly, every time, actually need to exercise judgment, or are you just hoping they remember to run a check that has one right answer? If the latter, that's bucket 1, and it should already be a script wired into something that runs automatically, not a line in a document. If a rule keeps getting silently skipped despite being clearly written, check whether it's actually bucket 2 dressed up as a plain instruction, missing the explicit override it needs. And if the same class of mistake keeps recurring in slightly different shapes no matter how the rule is reworded, ask whether the underlying pattern should be disallowed structurally instead of caught after the fact, bucket 3, not bucket 2.
+
+## Stating a check explicitly does not make it fire
+
+Reported by the Lyric and Maestro session, and it is evidence against a load-bearing assumption in this corpus rather than against one rule.
+
+`review-conduct.md` § Draft, never post already says to run the discrete style-conformance check on anything about to leave your control, and already names "no dashes" as **the recurring case**. That session held the same rule a second time in its own global context, tied to a prior incident of exactly this shape. Holding it in two places, with the reason on record, it drafted a reply to a review comment containing two em dashes and presented it for approval without running the check. The developer caught it.
+
+**So this is not a coverage gap, it is a reliability gap.** The rule existed, was maximally explicit, named this failure as recurring, and did not fire. Their framing is the part worth keeping: much of this corpus's design assumes that stating something explicitly is what makes it happen, and that assumption now has a counterexample at its strongest point, since a rule cannot be more explicit than one that names its own recurrence.
+
+The repository already knows the shape of the answer and had not applied it here: the cheapest rule is one nobody has to remember because a check enforces it, and a script someone must remember to run sits inside the failure it exists to fix. The dash rule *has* a mechanical form, and `check-consistency.sh` runs it, but only over files in the repository. **The recurring failure is in outbound text that never becomes a file**, a PR comment, a message, a draft for approval, so the enforcement covers the case that does not fail and misses the one that does. A second instance is already recorded in the developer's own global context, from a project with no agentics adoption at all.
+
+The cheap mitigation, short of making a draft into a file: **require the count to be reported alongside the draft.** It does not force the check, but it converts a silent omission into a visible fabrication, which is the same trade a commit hook makes when it turns forgetting into deciding.

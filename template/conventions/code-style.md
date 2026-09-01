@@ -142,6 +142,16 @@ sendEmail(user.email);
 
 Apply to new code from the start. When touching existing `!` usages in scope, replace them; otherwise log as tech-debt rather than doing a blanket rewrite out of scope.
 
+## A type assertion points at a typing gap upstream
+
+**Treat an assertion as a symptom to trace, not a wart to remove locally.** The developer's instruction was to avoid them, and the sentence that matters is the one that followed: *"would it help if we fixed buildQuery?"* He did not ask for the assertion to be deleted, he asked whether the thing forcing it could be fixed. That reframing is the whole rule, because deleting an assertion locally either loses type safety or moves the same lie somewhere else, while fixing what forced it removes every instance at once.
+
+Reported by the Arranger session with the numbers. A type annotated with a bare generic, itself a type error, was forcing seventeen assertions at call sites; supplying the argument removed all of them. An untyped JavaScript module whose `= []` default inferred as `never[]` forced the rest, and a JSDoc `@param` block fixed it with no rewrite and no conversion to TypeScript. **Twenty-two assertions gone, and the package's type-error count fell by two.**
+
+**The finding worth more than the count: typing the parameter honestly then exposed a call site passing a possibly-undefined value.** Not a runtime bug, since a guard above it throws, but the invariant lived in a function the type system cannot see through and nothing recorded it. The assertions had been hiding that, which is what an assertion does in general: it silences the question rather than answering it.
+
+**Two boundaries, because the obvious phrasing of this rule causes harm.** An `any` at a genuine external boundary is a different thing and is not swept in here. And fixing an upstream type can legitimately **raise** the error count by exposing real problems, so a rule phrased as "assertions removed" or "errors down" invites re-suppression: the measure is whether the gap that forced them is gone.
+
 ## Explicit return types
 
 Declare return types explicitly on named or declared functions. Anonymous functions passed as arguments (a callback, a `.map`/`.filter` predicate) may omit them: the surrounding context already constrains the type, and annotating every inline lambda adds noise without adding safety.
@@ -153,6 +163,14 @@ All functions, types, and interfaces exported from a module require a brief TSDo
 This is distinct from the general "no comments" rule above, which applies to inline implementation code. TSDoc is documentation for library consumers, not internal readers.
 
 Apply when writing new exports. When touching existing exports that lack TSDoc, add it in scope if quick; otherwise log it as tech-debt.
+
+**Put documentation in the declaration's own TSDoc block, not scattered through the type it happens to be typed with.** A function's parameters are documented with `@param` on the function, never as doc comments inside the parameter's inline type. The information is identical and the placement is not: one block is where a reader looks and where an IDE surfaces it.
+
+**Members of a named type are the exception, because TSDoc has no tag for them.** `@property` is a JSDoc-ism and is not a TSDoc tag; do not reach for it. For a small type, describe the members in the type's own block. For a larger interface, per-member doc comments are correct, and consolidating a forty-member interface into a paragraph would make it unreadable. State the exception rather than leaving someone to discover it mid-conversion.
+
+**A `/** */` block only ever attaches to a declaration.** On a statement inside a function body it documents nothing, and `//` is the correct form. This is the part of the rule that is unambiguously wrong rather than a placement preference, and the reason is not cosmetic: doc syntax on a non-declaration reads as API documentation to anyone skimming, while being invisible to every tool that would treat it as such. Where a project lints, this belongs in the lint configuration rather than in a bespoke check.
+
+Reported by the Arranger session from the developer's instruction, who separated the three cases before proposing anything, because a rule stated only as "no inline doc comments" over-applies in two directions at once. Their `@property` claim was checked against a real corpus rather than asserted: `@param` 145, `@returns` 65, `@example` 23, `@see` 6, `@remarks` 6, `@throws` 5, `@property` 0.
 
 ## Scope discipline
 

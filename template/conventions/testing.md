@@ -76,6 +76,20 @@ Two independent instances surfaced in one week, in repositories sharing no code,
 
 **A "passing" suite is evidence about the inputs it contains and nothing else.** When a test is meant to prove a transformation happens, assert the transformation, since a fixture needing no transformation makes an identity function pass the same test.
 
+## Assert what the code should do, not what it does
+
+The same family as the section above, seen from the other end: that one is about the input the author never constructed, this one about the expectation the author copied out of the implementation.
+
+**When writing a test against existing behaviour, state the requirement first and check the code against it.** An expectation read off the implementation passes permanently and certifies whatever is there, so fixing the defect then means editing the test that vouched for it. That moment is usually the first time anyone notices the test was pinned to the behaviour rather than to the requirement.
+
+**The tell is a justification that restates the mechanism.** `is healthy for an empty set of catalogues (nothing has failed)` explains how the code arrives at its answer instead of why that answer is right. Written from the requirement it reads *knowing nothing about the catalogues is not knowing they are fine*, which is the opposite assertion. Reported by the Arranger session: `computeAggregateServerStatus({})` returned `HEALTHY` because no catalogues means none failed, a Kubernetes readiness probe reads it, and the effect is putting a replica that can serve nothing into rotation. The test had passed since the function was written and would have passed forever.
+
+**The adversarial question is not "is this branch covered" but "if this assertion is wrong, what breaks, and would I notice?"** Coverage was complete in that case. The defect sat in the branch the author had thought of first, which is what makes it worse than an untested branch rather than better: an untested branch is visibly absent, while a test asserting the wrong expectation is indistinguishable from a passing one and carries the authority of having been considered.
+
+**It applies with most force to degenerate inputs.** Empty, zero, absent and unknown are where a permissive default hides, and where the code's own behaviour is most likely to be an accident rather than a decision.
+
+**The rule is about the expectation's provenance, not its agreement with the code.** Pinning current behaviour is legitimate where the behaviour is the contract, as in a regression pin or a compiler-output snapshot, and a requirement-derived expectation that happens to match the implementation is fine. A second instance from the same day shows the family is not one defect: an assertion that a clause was present in a compiled query passed while being unable to distinguish a clause that restricts from one under `must_not` doing the opposite. Same shape, agreeing with the code and not testing the property claimed.
+
 ## When to actually run the suite, not just write it
 
 A `session-discipline.md` § "Refinement passes" concern, not a separate mechanism: the full suite gets run at the semiregular in-session checkpoint specifically, not just the tests for what was just written, since that's the checkpoint an involuntary session end (a usage or context limit, a crash) can still reach even when the final "before ending a session" one can't. "Before committing" and "before ending a session" still get a full run too; the point is that neither can be the only line of defence.

@@ -25,20 +25,24 @@ Here only because a session that opens this file may act before reading the conv
 ```
 - label:
   owns:
+  main:      <heads only; omit otherwise>
   expert:
   workspace:
-  assigned:  <UTC date, e.g. 2026-08-19>
+  assigned:  <presence is the claim; a UTC date when known, otherwise `yes`>
 ```
 
-`owns` is org-relative paths, never absolute, and may be a subtree, so one repo can have several owners. Ownership resolves by longest matching `owns` prefix. `assigned` marks developer conferral; an entry without it is provisional.
+`owns` is org-relative paths, never absolute, and may be a subtree, so one repo can have several owners. Ownership resolves by longest matching `owns` prefix. `assigned` marks developer conferral; an entry without it is provisional. Its presence is the claim: the date is never compared, and where the conferral was not witnessed write `yes` rather than inventing one. Never leave the field empty: an empty field has nothing holding its boundary open and the next line runs into it.
+
+`main` is the space a head holds, and it is a different claim from `owns`, which names where the expertise is: a head responds for anything in its space with no dedicated owner, collaborates with any owner that does exist rather than answering for them, and defers once an unclaimed component gets its own session. Heads nest and resolve by the same longest-prefix rule. Designation is the developer's, never self-assigned. Routing is the visible use; the intent is context relevance in both directions.
 
 **No runtime handles are stored in this file, in any field.** They rotate, cannot be observed by the session holding them, and routing by them misrouted more than one message in ten.
 
 ## Requests
 
 ```
-- for:      <label of the owner needed>
-  from:     <label of whoever holds the need; they clear it>
+- for:      <label of the owner needed, or the component or path they own>
+  from:     <label of whoever holds the need; they clear it. A poster holding no
+            label writes a plain description instead, never a handle>
   via:      <your label, when posting on someone else's behalf; a relayer never clears>
   re:       <short topic, a name and never a finding or task detail>
   heard:    <label that answered; omit the line entirely while unanswered>
@@ -49,6 +53,13 @@ Here only because a session that opens this file may act before reading the conv
   re:       <what changed, named rather than described>
   by:       <the authority that permitted it>
   posted:   <UTC read from a clock>
+
+- sync:     <org/repo[/subtree] whose agentics tag was advanced>   a broadcast, addressed to a
+  to:       <the version the tag now reads>                        repository rather than a label
+  from:     <your label>
+  posted:   <UTC read from a clock>
 ```
+
+A sync notice is addressed to a repository and read by every session whose `owns:` matches it by longest prefix, so one entry reaches all of them. Nobody clears it: the next sync of that repository replaces it, which keeps the list bounded by repository rather than by sync. Leaving one too long costs a reader one comparison; removing one too early costs a session running conventions that were replaced.
 
 Handshake only, no payload: `re:` names a thing, never a finding or task detail. Every entry names a label, never a role. **The responder writes `heard:` after answering, whatever route the answer took**, since most contact succeeds by direct message and success does not propagate back on its own; record it even if identity was unconfirmed, because "someone answered, possibly not reaching you" beats silence. Omit `heard:` entirely while unanswered rather than leaving it valueless, since these entries sit outside a code fence and an empty field lets the next line run into it. Whoever `from:` names clears a request; the recipient clears a notice, having no `heard:` to write. Surface anything still open after a day.

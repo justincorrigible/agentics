@@ -2,7 +2,7 @@
 
 A design for one session per product family acting as the routing point for components that have no dedicated session of their own. Developer-originated, worked out with the `iMicroSeq Portal UI` session on 2026-08-19 and confirmed by the developer directly rather than inferred from a peer's report.
 
-**Not shipped as a convention, deliberately.** No head has been designated and none has operated, so this fails this repo's own "prove it before templating it" bar. It is written up here in enough detail to implement without re-deriving the reasoning, once a real one has run for long enough to say whether it works.
+**Shipped as a convention on 2026-08-31, in a form this document did not anticipate.** The blocker recorded here was that no head had been designated and none had operated. The developer designated three (Usher over `overture`, Arranger over `overture/arranger`, iMS Portal UI over `iMicroSeq`) and supplied a definition that reframes the role away from routing: a head holds the whole space, responds for what has no dedicated expert, and **collaborates** on whatever does. The field is `main:` carrying an explicit path, which resolves the open question below about field versus entry, and the explicit path is what allows heads to nest. The live rules are in `template/conventions/agent-index.md`; what stays here is the reasoning, the superseded framings, and the questions still open. Note that § Largely superseded for routing below stands: it is correct that a head earns little as a routing device, and the definition that shipped agrees, naming routing as the visible use and context relevance as the intent.
 
 ## The gap it closes
 

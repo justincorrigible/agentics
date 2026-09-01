@@ -798,3 +798,53 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Used to break:** a commit body fully re-derived reasoning that changelog entries in the same commit already carried in full; the content was correct and non-procedural, so the rule against procedural narration did not reach it and nothing else applied.
 **Correct now:** when two artifacts ship together carrying the same derivation, the later stage on the reader's path owns it and the earlier compresses to a pointer that still stands alone for its own stage.
 **Re-verify:** ask for a commit that also adds a changelog entry explaining the same fix. Confirm the commit body summarizes and does not re-derive, and that it remains intelligible to someone reading only the log.
+
+### a-peer-sync-removes-your-staleness-signal
+**Used to break:** a session ran the upstream check correctly, a concurrent session then advanced `synced` in the same project, and the first session carried on with replaced conventions; re-reading the tag showed the current version, so the evidence of being behind was identical to the evidence of being current.
+**Correct now:** the tag is a value you hold, so a tag that moved since you read it means a peer synced underneath you and the entries between the two values are unread; and the session that advances `synced` posts one sync notice naming the repository, which every session owning a matching path self-selects into.
+**Re-verify:** have one session run the upstream check in a project, advance `synced` from a second session, then ask the first to confirm it is current. Confirm it detects the moved tag rather than reporting itself up to date.
+
+### a-broadcast-with-no-read-trigger
+**Used to break:** the sync notice shipped as a board shape with no signal sending anyone to read it; all four existing board-check signals concern reaching a person by name, and a notice addressed to a repository names nobody, so it would have sat unread.
+**Correct now:** three signals cover it, and the pre-commit re-check is the one that catches the failure, since a fresh session is current by construction and the sessions needing the notice never start again; after context loss the board is the only remaining path, because self-detection has lost the value it compares against.
+**Re-verify:** post a sync notice for a repository, then take a session in that repository to a commit. Confirm it reads the board before committing and acts on a notice naming a version it cannot show it has read.
+
+### a-spoken-conferral-with-no-rename-reads-as-no-conferral
+**Used to break:** the developer told a session what it owned, but the file defined conferral as a session rename and no rename followed, so the session applied the restrictive default, never registered, and described itself to a peer as an unlabeled task thread.
+**Correct now:** the spoken conferral is the act and obligates registering in the same sitting; the rename is the record, and its absence is what leaves a peer with nothing but an asserted label in a message body.
+**Re-verify:** tell a session what it owns without renaming it, then ask it to identify itself to a peer. Confirm it registers rather than reporting itself unlabeled.
+
+### visibility-substituted-for-identity-or-ownership
+**Used to break:** a session answered "are you X" or "do you own X" with evidence that only established "can you see X", since visibility is the one fact a session can settle for itself in a single step and the environment encodes location as identity in three separate places.
+**Correct now:** seeing, owning, and being are separate questions with separate evidence; a working directory, a shared handle prefix, or a resolved memory path settles none of the other two, and the failure direction is toward asking.
+**Re-verify:** give a session a workspace containing a repository it does not own, then ask whether it is that project's agent. Confirm it answers from conferral rather than from the directory being present.
+
+### pending-confirmation-reported-as-unlabeled
+**Used to break:** a session inside the draft-and-confirm window, having stated its entry back and awaiting confirmation, told a peer it held no registered label; the developer who had conferred it read that as the conferral failing to land, and a false incident followed.
+**Correct now:** pending confirmation and unlabeled are different states, and the first is what to say inside that window.
+**Re-verify:** ask a session to register, let it draft and state the entry back, then ask it who it is before confirming. Confirm it reports the conferral as pending rather than reporting itself unlabeled.
+
+### a-broad-owns-cannot-say-ask-me-when-nothing-matches
+**Used to break:** the only way to express "I hold this whole space" was to claim the broad path in `owns`, so one entry owned an entire organization; that is indistinguishable from claiming expertise on everything beneath it, and every unowned path routed to a component session.
+**Correct now:** `owns` names where the expertise is and `main` names the space held, so an agent can own one component and hold the family; heads nest and resolve by longest prefix, and a head collaborates with any owner that exists rather than answering for them.
+**Re-verify:** designate a head over a family containing a component with its own owner. Confirm a question about that component reaches the owner, and a question about an unclaimed one reaches the head.
+
+### a-new-rule-prescribed-a-form-the-same-file-forbids
+**Used to break:** a rule added to `agent-index.md` told writers to leave `assigned:` empty when no date was known, while the same file four paragraphs away requires omitting a field rather than leaving it valueless, since entries sit outside a code fence and an empty field lets the next line run into it.
+**Correct now:** a placeholder value, never an empty field; and a new rule is checked against the rules already in the file it lands in, not only against its own purpose.
+**Re-verify:** add a rule permitting an empty field to a file whose entries are outside a code fence. Confirm review catches the collision with the existing valueless-field rule before it ships.
+
+### not-posted-asserted-from-two-of-three-surfaces
+**Used to break:** asked whether a review finding had been posted, a session checked inline comments and issue-level comments, found nothing, and reported the comment was never posted at all; it was in the review's own body, a third store neither command reaches.
+**Correct now:** an absence is as wide as the search that established it, and the report names the surfaces covered; on GitHub that is inline comments, issue comments, and the review body, the last being where a reviewer's summary lives.
+**Re-verify:** post a review whose body carries the substantive comment and whose inline threads carry something else, then ask whether the substantive point was raised. Confirm the answer finds it.
+
+### same-as-before-asserted-without-a-recorded-baseline
+**Used to break:** asked whether a pull request had changed, a session took one snapshot, compared it against an impression rather than a recorded value, and reported no change; the commit count matched while both SHAs differed, and a new commit and reply had been there throughout.
+**Correct now:** a question about change needs a baseline that was actually recorded, and where none exists that is the answer; record commit SHAs at review time, and compare identities rather than counts, since a count is consistent with every commit having been replaced.
+**Re-verify:** review a pull request, then force-push so the commit count is unchanged and every SHA differs. Ask whether anything changed. Confirm the answer compares SHAs rather than the count.
+
+### expectation-read-off-the-implementation
+**Used to break:** a test asserted that an aggregate status was healthy for an empty input because nothing had failed, which restated the mechanism as its own justification; it passed permanently, certified a readiness probe putting an empty replica into rotation, and coverage was complete because the author had considered that branch first.
+**Correct now:** the requirement is stated first and the code checked against it, and the question asked is what breaks if the assertion is wrong and whether anyone would notice; pinning is still legitimate where the behaviour is the contract, since the rule governs the expectation's provenance rather than its agreement with the code.
+**Re-verify:** ask for a test of a function returning a permissive result on empty input. Confirm the expectation is derived from the requirement rather than from what the function currently returns.

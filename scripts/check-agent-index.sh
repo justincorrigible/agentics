@@ -107,9 +107,15 @@ if owners:
         marker = "within " + max(parents, key=len) if parents else "top level"
         print(f"  {'  ' * len(parents)}{p}  ->  {label}   ({marker})")
 
-    # A bare top-level segment is a family-root claim: by longest-prefix resolution its holder
-    # owns everything beneath it that no narrower entry claims. Correct for a family head and
-    # easy to write by accident for a component, so it is surfaced rather than assumed either way.
+    # Family heads are DECLARED in `main`, not inferred from a broad `owns`. Inferring them was
+    # this script's original behaviour and it went wrong the moment `main` shipped: an entry was
+    # narrowed from `iMicroSeq` to `iMicroSeq/portal-ui` and its headship moved to `main`, after
+    # which the inference found no root, printed nothing, and reported INTEGRITY ok. A peer read
+    # that output and concluded the family had lost its owner, which is the natural reading of
+    # silence. A bare top-level `owns` with no `main` beside it is now the thing worth flagging,
+    # since post-`main` it is most likely the conflation `main` exists to undo.
+    heads = sorted({(e['f']['main'].strip().rstrip('/'), e['label'])
+                    for e in entries if e['f'].get('main', '').strip()})
     roots = sorted({(p, l) for p, l in owners if '/' not in p})
     # Comparisons below are case-folded; casing is preserved for display only.
     if path_errors:
@@ -117,14 +123,27 @@ if owners:
         # carve-out can read as a separate root and the counts below would be confidently wrong.
         # A wrong answer in the section a reader opens to check is worse than no answer.
         print("\n  Family-root claims suppressed: path errors above make these counts unreliable.")
-    elif roots:
-        print("\n  Family-root claims, worth confirming are intended:")
-        for p, label in roots:
-            narrower = [q for q, _ in owners if q.lower() != p.lower() and q.lower().startswith(p.lower() + '/')]
-            print(f"    {label} owns '{p}', so it is family head for everything under it")
-            verb = 'entry carves' if len(narrower) == 1 else 'entries carve'
-            print(f"      {len(narrower)} narrower {verb} out of it; "
-                  f"everything else there resolves to this label")
+    else:
+        if heads:
+            print("\n  Family heads, declared in `main`:")
+            for m, label in heads:
+                carved = [q for q, _ in owners if q.lower().startswith(m.lower() + '/')]
+                inner = [x for x, _ in heads if x.lower() != m.lower() and x.lower().startswith(m.lower() + '/')]
+                print(f"    {label} holds '{m}'")
+                verb = 'entry carves' if len(carved) == 1 else 'entries carve'
+                print(f"      {len(carved)} owned {verb} out of it; anything else there is the head's")
+                if inner:
+                    print(f"      nested head(s) below it: {', '.join(inner)}")
+        else:
+            print("\n  No family heads declared. Nothing holds a space; unowned paths resolve to nobody.")
+        unheaded = [(p, l) for p, l in roots if not any(m.lower() == p.lower() for m, _ in heads)]
+        if unheaded:
+            print("\n  Top-level `owns` with no matching `main`, worth confirming is intended:")
+            for p, label in unheaded:
+                print(f"    {label} owns the whole of '{p}' without declaring headship of it.")
+                print(f"      Either the conflation `main` exists to undo, or an accurate claim "
+                      f"about a space with one owner.")
+                print(f"      Nothing here distinguishes them: only that owner or the developer can say.")
 else:
     print("\nOWNERSHIP RESOLUTION")
     print("  Nothing resolvable: no entry records an `owns` path.")

@@ -68,6 +68,16 @@ This matters most producing several governed artifacts in one batch: initializat
 
 If a convention's own example under-specifies a requirement stated in prose nearby, that's a defect in the convention worth fixing, not something to route around silently: flag it the same way any other convention gap gets flagged.
 
+## Correcting a claim: the blast radius, and where the retraction has to reach
+
+**A stale read invalidates every claim resting on it, not the one that happened to get caught.** The observation is the SoftEng session's and the phrasing is theirs: the blast radius of a stale read is every claim resting on that read. The incident is Singularity's. They read a convention fresh and in full, the uncommitted delta then grew from 22 insertions to 58, and that delta both added a field and redefined another. Working from the stale read they made **two** wrong claims in one message. Corrected on the first, they diagnosed the stale read precisely, and then scoped the fix to the claim that had been caught while the second sat untouched in the same message. So the diagnosis was right and the response was still too narrow. **On discovering a read was stale, re-derive everything that rested on it, rather than patching the member that surfaced.**
+
+**Recategorising is not verifying, and this is the sharper sub-case.** The same session then sent a correction fixing a miscount before it reached a report, and that correction moved the invalid claim between categories without ever asking whether it was true. A correction arrives wearing the credibility of having just corrected something, which is exactly when nobody re-examines what it carries along.
+
+**A retraction is not complete until it reaches everywhere the claim went, and only its author knows that list.** This is the one that tells you what to do rather than what to avoid, and it cannot be discharged by anyone else. When a finding was withdrawn, the session that withdrew it could correct its own report and had no way to know the claim had already gone to the developer by a second route. The author of that second report is the only party who knew, so the obligation was theirs alone.
+
+**A closing courtesy can suppress exactly the thing only you hold.** The finding above was nearly withheld because the other session had written "nothing needed back", and what was nearly withheld was the one item they could not have recovered independently. So read a sign-off as the sender's estimate of what is outstanding on *their* side, never as a statement about what you know and they do not. If you hold something whose absence they cannot detect, it survives their sign-off.
+
 ## Refinement passes: not just once at the end
 
 `documentation.md`'s cold-reader and "rewrite freely until committed" rules, and "Say it once" above, are easy to apply to whatever's being written in the exact moment of writing it, and easy to never revisit afterward. A long session accumulates uncommitted prose across several files (session log, roadmap, tech-debt, conventions, CHANGELOG) faster than any single moment of writing catches. Left to one pass at the very end, the accumulated draft only gets checked once, too late to be worth much and too large to review well in one sweep.

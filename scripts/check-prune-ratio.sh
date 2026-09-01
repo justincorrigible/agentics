@@ -40,6 +40,12 @@
 # 60000 came from release history, and any multiplier for always-read characters would be invented
 # rather than derived, so the split is reported and left for a person to weigh.
 #
+# It measures the working tree, not HEAD. An earlier version compared committed state only, so
+# between releases, when this repository's own rules leave a batch uncommitted, it reported +0 and
+# saw nothing. That is the advisory reading dead in exactly the window where it could still change
+# a decision: while content is being added and could still be declined. At the release commit the
+# two readings coincide, which is why the blindness went unnoticed.
+#
 # Usage: bash scripts/check-prune-ratio.sh [base-ref]   (default: origin/main)
 
 set -uo pipefail
@@ -59,12 +65,15 @@ base, threshold = sys.argv[1], int(sys.argv[2])
 def run(*args):
     return subprocess.run(args, capture_output=True, text=True).stdout
 
-changed = run("git", "diff", "--name-only", f"{base}..HEAD", "--", "template/", "docs/").split()
+changed = run("git", "diff", "--name-only", base, "--", "template/", "docs/").split()
 existing = set(run("git", "ls-tree", "-r", "--name-only", base).split())
 
 grew, shrunk, new = [], [], []
 for path in changed:
-    now = len(run("git", "show", f"HEAD:{path}"))
+    try:
+        now = len(open(path).read())
+    except OSError:
+        now = 0
     if path in existing:
         was = len(run("git", "show", f"{base}:{path}"))
         (shrunk if now < was else grew).append((path, now - was))
