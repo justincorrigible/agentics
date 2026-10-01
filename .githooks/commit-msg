@@ -24,7 +24,7 @@ FAIL=0
 if grep -niE 'co-authored-by|generated (with|by) claude|written by claude' "$MSG_FILE" >/dev/null; then
   echo "commit-msg: AI-tool attribution found in the message." >&2
   grep -niE 'co-authored-by|generated (with|by) claude|written by claude' "$MSG_FILE" | sed 's/^/  /' >&2
-  echo "  session-discipline.md overrides your agent's default commit template for this." >&2
+  echo "  git.md overrides your agent's default commit template for this." >&2
   FAIL=1
 fi
 

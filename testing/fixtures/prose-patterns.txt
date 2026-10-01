@@ -1,0 +1,134 @@
+# Pattern fixture: cases every prose pattern in check-consistency.sh must decide correctly.
+#
+# Format: one case per line, `<pattern-id> <CATCH|PASS> <text>`. CATCH means the pattern must
+# match this line; PASS means it must not. A pattern that misses a CATCH or matches a PASS fails
+# the run, so the two columns are equally load-bearing: a pattern with no PASS cases has not
+# been shown to discriminate, only to fire.
+#
+# This file lives outside template/ and docs/, so the corpus scans never read it and the
+# instances below need no quoting or exclusion. Add a case here before changing a pattern,
+# not after: the defect this file exists for was introduced by an edit that looked correct.
+#
+# SCOPE, stated because a green run here otherwise overclaims: this exercises the patterns and
+# not the normalization around them. Quote-masking, list-marker stripping and wrap-flattening
+# all run before a pattern sees the corpus, each is length-preserving so that offsets survive,
+# and two shipped defects lived in that layer rather than in any regex. A case here passing says
+# the pattern discriminates, never that the check is correct end to end.
+
+# --- attribution: does the phrase resolve to someone a reader could go and ask? ---
+# Capitalization is the whole discriminator, so every PASS case below is a lowercase near-miss.
+# An ignore-case flag on this pattern turns four of the seven PASS lines into false positives,
+# which is exactly how it shipped first. Four rather than seven because the remaining three
+# miss for an unrelated reason, and that is worth knowing: a fixture case can pass while
+# testing nothing, so the four are the ones actually holding this decision in place.
+attribution CATCH   Reported by the Arranger session, who hit it twice in one day.
+attribution CATCH   Confirmed by the Usher owner rather than inferred here.
+attribution CATCH   Reported by Arranger, whose padded name was caught by the developer.
+attribution CATCH   Reported by the Singularity session, who could not tell whether it worked.
+# These two exercise patterns that had no case at all until coverage was asserted. `by
+# construction` was firing six times in the corpus while being tested by nothing.
+attribution CATCH   The format was settled per the Arranger owner last week.
+attribution CATCH   As the Usher session confirmed, the constraint still holds.
+attribution PASS    as a peer confirmed when asked directly.
+attribution PASS    Reported by a session that had read this file that morning.
+attribution PASS    Reported by the developer, who pointed out the coordination half.
+attribution PASS    Raised by an adopting session during the upgrade procedure.
+attribution PASS    Confirmed by asking rather than by inferring from the listing.
+attribution PASS    Reported by the session that owns the registry entry.
+attribution PASS    Reported by a peer who had sent two messages already.
+attribution PASS    Established against the code rather than from a deployed instance.
+
+# --- dashes: all four banned forms, and the three lookalikes that are not violations ---
+dashes CATCH   The terminology table defined the old premise — that much is settled.
+dashes CATCH   A hyphen with spaces - like this - is the connector form.
+dashes CATCH   Ranges written 2026–2027 use an en dash.
+dashes CATCH   A double hyphen -- used as a connector.
+# The shape the shipped check missed until a fresh-context test runner found two live instances:
+# a connector following markdown formatting, which a letters-only left-hand class could not see.
+dashes CATCH   **CNPG does this** - no extra config is needed.
+dashes CATCH   Check the output of `kubectl get pods` - if it is empty, stop.
+dashes PASS    A well-formed compound adjective keeps its hyphen.
+dashes PASS    The flag is spelled --recursive and is not a connector.
+dashes PASS    - A list marker at line start is structural, not prose.
+
+# ONE PROPERTY, FOUR FACES. Every false positive found in these patterns so far is the same thing:
+# a pattern matches words and cannot see the situation the sentence sits in. Stated once here, with
+# its faces under it, so the fifth is predicted rather than discovered as a surprise. It accumulated
+# as three separate exclusions each with its own story before anyone noticed they were one property.
+#
+#   face                                    example                              excludable by pattern?
+#   a property of the system                "worth having"                        yes, it has a fixed word
+#   the reader's own future writing         "if it is worth stating, state it"    no
+#   where content should go                 "attribution belongs in git history"  no
+#   where something sits in the system      "`plane` lives here, not per row"     no
+#
+# Only the first can be excluded. The other three are the reading step, which is why a pattern of
+# this family ships as candidate-raising and never as a defect count.
+#
+# THREE VERDICTS, because PASS is nearly unreachable for this family: only the one face with a
+# fixed word can ever be correctly refused.
+#   PASS  the pattern must not raise the line at all.
+#   KEEP  it must raise the line AND the line is a real instance that stays as written.
+#   KNOWN it must raise the line AND the line is not a real instance, and no pattern can tell.
+# KEEP and KNOWN are identical in what they demand of the pattern and differ only in what the
+# reader concludes. Both mean: never narrow the pattern to silence this flag. Filing a keeper as
+# KNOWN asserts it is a false positive, which is the opposite of what a keeper is.
+#
+# WHAT A CLEAN RESULT HERE DOES NOT MEAN. This file's own placement cases come back four for four
+# as keepers, and that is a fact about this corpus rather than about the pattern: the pattern
+# fires on a sentence where the location word points at the system instead of the file, and this
+# corpus simply contains no such sentence. A corpus describing a schema would produce them. The
+# mandatory deictic is what keeps the other faces out, and it is exactly what lets that one in. Pinning those matters: without them, someone narrows the pattern to stop it
+# flagging a known-good line and silently loses the genuine candidates that share its shape.
+
+# --- derivational register: a CANDIDATE-raising pattern, so the columns mean something else ---
+# CATCH here means the pattern must raise the line for a reader, not that the line is a defect.
+# PASS means it must not raise at all. The PASS cases are the ones that matter: every one is
+# ordinary English sharing a word with the register, which is the false-positive class that made
+# the Usher session drop `obtains` from their pattern after every corpus hit was the transitive
+# verb. Their fixture found that, not their reading of the regex.
+register CATCH   The conservation law falls out of the symmetry.
+register CATCH   The decision turns on whether the owner is registered.
+register CATCH   Whether a check fires does not turn on which kind of rule it enforces.
+register CATCH   What this buys us is a shorter read.
+register CATCH   The relation cashes out as a dependency.
+register CATCH   Correct on pain of a silent mismatch.
+register CATCH   The two encodings are identical modulo whitespace.
+register CATCH   Modulo naming, the two schemas agree.
+register CATCH   An entry with no label is unresolvable by construction.
+# Was PASS and was never true of the shipped check: the fixture held five register patterns while
+# the corpus scan shipped eight, so `trivially` was enforced everywhere and tested nowhere. Unifying
+# the two sources surfaced it immediately. It is KNOWN: the ordinary sense means easily, the
+# register sense means in a degenerate case, and one word carries both.
+register KNOWN   It can be worked around trivially by assembling the path from variables.
+register PASS    The rule cannot be reduced to one line and still earn its place.
+register PASS    A reader gets that information at no extra cost.
+register PASS    Turn on the flag before running the suite.
+# `goes through` was a pattern here and was dropped, not tightened: this line is literal motion
+# and no wording of the pattern separates it from the register sense. The case stays as the
+# record of why, and because a dropped pattern is invisible once it is gone.
+register PASS    The argument goes through the middle of the diagram.
+
+# --- self-reference: a document explaining its own present (candidate-raising) ---
+# Measured here at four genuine instances from sixty-six raw, a sixteen-to-one instructional ratio,
+# and all four were keepers: every one constrains a future editor from relocating something. The
+# inverse result of the corpus that reported the class, and not a contradiction of it, since a
+# corpus about where things go has placement clauses that are all real constraints.
+selfref CATCH   A consequence worth stating separately: the memory may not be yours to write into.
+selfref CATCH   The two failure modes are worth naming separately.
+# An exclusive case for `stated rather than`, which had none: its only coverage was the line below,
+# which `placement` also matches. Deleting the pattern outright left every check green, so a second
+# assertion now requires each pattern to have a case that exercises only it.
+selfref KEEP    The constraint is recorded in the roadmap rather than in the tech-debt file.
+selfref KEEP    That exemption is stated here rather than left to the checker's path list.
+selfref KEEP    Held inline rather than as a pointer, deliberately.
+# These two were written as PASS and the fixture refused them on its first run, correctly: both
+# are faces the table above says no pattern can exclude, so marking them PASS asserted a
+# discrimination that does not exist. They are KEEP because the pattern must go on raising them
+# and a reader clears them. KEEP therefore covers two different reader outcomes with one
+# expectation of the pattern: a real self-reference that is load-bearing, and a line the pattern
+# cannot help matching. Both mean do not narrow the pattern to make this go away.
+selfref KNOWN   If a pragmatic consideration is worth stating at all, state it as a separate point.
+selfref KNOWN   This class feels the most worth recording, which is what makes it dangerous.
+selfref PASS    Attribution belongs in git history, not in documents.
+selfref KNOWN   Each sits wholly in one plane, which lets plane live here rather than on each capability.

@@ -58,13 +58,28 @@ Only approve packages you have reviewed. Treat a new entry in `allowBuilds` the 
 
 **The split resolves the design record completely and does not resolve a stopgap at all.** Where a hole is still open and an operator can protect themselves today by forcing a flag, "set this flag" is not actionable without "because the default does not restrict", so the protective value and the disclosure are the same sentence and no wording separates them. **The answer to an unpublishable stopgap is to close the hole faster, not to find better wording.** That is a second reason for the priority order below, beyond a fixed hole making its description harmless: an unfixed hole can generate guidance that cannot be safely written anywhere. If it outlives the ability to warn, the only channel left is direct contact with affected operators, which is never an agent's decision. Reported as two different questions wearing the same shape, which is worth watching for whenever one distinction appears to resolve a conflict cleanly.
 
-**So record that the work happened, not what the weakness is.** A session entry can say a security issue was found in a named component and routed to its owner. It must not carry the mechanism, the reproduction, the vulnerable path, or the payload. The detail goes to the owner directly, or wherever that project actually tracks security issues, which is a channel the developer chooses rather than one you improvise.
+**A tech-debt entry for an unfixed vulnerability carries the requirement, the fix and the test, and nothing else.** The entry format pulls the other way: an issue field and a severity field invite the mechanism and the attack class, so an entry written in good faith comes out as a reproduction. The reproduction goes to the developer privately. Severity states urgency, such as "high: fix before the next release", and never the category of attack, which names the hole as surely as the payload does. Observed: an entry for a live defect carried the payload, how far it reached and an attack-category label, and was rewritten before the push.
+
+**The commit message is a second public channel, and it is the one most easily forgotten.** It is written after the entry, while the detail is fresh, and it is pushed with everything else, so the same split applies to it.
+
+**So record that the work happened, not what the weakness is.** A session entry can say a security issue was found in a named component and routed to its owner. It must not carry the mechanism, the reproduction, the vulnerable path, or the payload. The detail goes to the owner directly, or wherever that project actually tracks security issues, which is a channel of the developer's choosing rather than one you improvise.
+
+## Releasing the fix for a hole a published release carries
+
+**The release that fixes a vulnerability is also the one that discloses it, so the order of the steps around it decides whether it protects anyone.** Release notes describe what changed, and for a security fix that description is the map. Every step below exists because the description cannot be avoided, only timed.
+
+**A `SECURITY.md` at the repository root comes before any of this.** It says how to report a vulnerability privately, normally through the hosting platform's private reporting, which has to be switched on in the repository's settings, and which release lines receive fixes. Without one, the first report arrives as a public issue and the sequence below never gets to start.
+
+1. **Close it on your own deployments first.** Upgrade every installation the team runs, or mitigate it at its ingress, before anything is published. A release describing a hole the team itself still has is a disclosure with no upside.
+2. **Until the release ships, every public channel states what the code must do and never how earlier versions fail.** That is commits, the changelog, `.dev/` and documentation alike, under the prescriptive split above. The release is the moment the description becomes safe, because the remedy exists alongside it.
+3. **Draft a security advisory privately and publish it with the release.** It gives the affected and fixed versions, the severity and a workaround for anyone who cannot upgrade at once. Tooling that watches advisories then notifies affected users, which a changelog entry never reaches; see § Where the residue goes for why an advisory and not the repository.
+4. **Never write a documentation or upgrade-guide note before a fix exists.** It discloses the hole and offers the reader who finds it nothing to do.
 
 ## Once it is already published, the only moves are forward ones
 
 **This rule was preventive only, which left nothing for the situation an adopter reading it late is actually in.** The asymmetry above, that history survives the edit removing it, is exactly why remediation needs naming: since you cannot undo it, every remaining action is forward, and none of them were written down.
 
-**Read the material and count it before choosing a response, because a proxy count changes what is proportionate.** A session that had pushed an access-control audit to a public repository first reported 128 mechanism-bearing lines from a keyword grep, then read them and found 11 payload literals of which about four were genuinely disclosive, the rest being prose such as a table header. The first number justifies drastic action and the second does not. Counting by grep and acting on the count is the same proxy failure this repository has now recorded three times in a week.
+**Read the material and count it before choosing a response, because a proxy count changes what is proportionate.** A session that had pushed an access-control audit to a public repository first reported 128 mechanism-bearing lines from a keyword grep, then read them and found 11 payload literals of which about four were genuinely disclosive, the rest being prose such as a table header. The first number justifies drastic action and the second does not. Counting by grep and acting on the count is the same proxy failure, now recorded here three times in a week.
 
 **Do not rewrite public history, and expect this to be the instinct hardest to resist.** A force-push does not reach forks, existing clones, local caches, or dangling commits that stay fetchable through the hosting API. It does reliably signal that something in that range was worth hiding, which narrows the search for anyone who cares. And an inventory that was wrong leaves the map in place after paying the full cost, which is a control whose failure looks like success.
 
@@ -82,7 +97,7 @@ Only approve packages you have reviewed. Treat a new entry in `allowBuilds` the 
 
 **Prescriptive phrasing still applies inside a private atlas.** A private remote is not a safe assumption either, since remotes change and forks outlive the decision, so writing freely there moves the map behind a login rather than not drawing it.
 
-**An atlas nobody is required to read goes stale like any other document nobody is required to read.** `.dev/` works partly because the files sit beside the code and a session-start step reads them, and a remote atlas has neither property.
+**An optional atlas goes stale like any other optional document.** `.dev/` works partly because the files sit beside the code and a session-start step reads them, and a remote atlas has neither property.
 
 **So `.dev/` records that the atlas exists, and your global context records where it is.** These are two different facts and only the first is safe to commit. A committed pointer naming the location would defeat the guard below, while a committed pointer naming only the existence solves the staleness problem, because a session-start read finds it and then asks the developer or the global context for the address.
 
@@ -90,7 +105,7 @@ Only approve packages you have reviewed. Treat a new entry in `allowBuilds` the 
 
 **This is the committed-paths constraint rotated onto a different axis, and the rotation is the part that needs saying.** That rule forbids a machine- or user-specific path because a resolved path will not work for anyone else. This forbids a resolvable location because it should not work for anyone else. Same prohibition, opposite reason, and an adopter following the existing wording literally would not catch it, since an organization repository URL is neither machine-specific nor user-specific.
 
-**If local sessions share the atlas as a write surface, it inherits everything the agent index needed.** Several sessions edit concurrently, no two observe the same state, and a count quoted from it is a fact about one read rather than about the file. See `agent-index.md` for the three-step write.
+**If local sessions share the atlas as a write surface, it inherits all the agent index's needs.** Several sessions edit concurrently, no two observe the same state, and a count quoted from it is a fact about one read rather than about the file. See `agent-index.md` for the three-step write.
 
 ## A memory entry's description is a broadcast, not a label
 

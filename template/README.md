@@ -21,7 +21,7 @@ This directory contains template files for setting up AI agent collaboration. `A
 | `conventions/git.md`                 | Branching, staging, commit messages, pushing, and unattributed working-tree changes                                                                                          |
 | `conventions/testing.md`             | Test co-location, plan-first workflow, BDD style                                                                                                                             |
 | `conventions/code-style.md`          | Comments, scope discipline, library awareness: developer role only                                                                                                            |
-| `conventions/writing-style.md`       | Dashes, spelling, typos, property ordering: applies to any output, dev or not                                                                                                |
+| `conventions/writing-style.md`       | Dashes, spelling, typos: applies to any output, dev or not                                                                                                |
 | `conventions/code-review.md`         | Pre-review gate: problem, layer, necessity, before examining implementation                                                                                                  |
 | `conventions/review-conduct.md`      | Behavioral conventions for conducting a review: ground truth over claims, disposition per finding, draft-never-post                                                          |
 | `conventions/definition-of-done.md`  | Completion checklist tying together tests, docs, `.dev/` upkeep, lessons learned, CHANGELOG, and a final refinement pass                                                     |
@@ -38,10 +38,10 @@ This directory contains template files for setting up AI agent collaboration. `A
 
 1. Copy `AGENTS.md` to your project root; also copy `CLAUDE.md` if you use Claude Code (it auto-loads that file specifically, but stays a stub pointing at `AGENTS.md`)
 2. Copy `DEVELOPMENT.md` and fill in your project-specific setup steps
-3. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand the first time the developer permanently declines a convention's recommendation for this project (see `conventions/convention-levels.md` § Recording a permanent override): don't create it empty upfront
+3. Create a `.dev/` directory with `roadmap.md`, `tech-debt.md`, and a `sessions/` directory. A fourth file, `agentics-overrides.md`, is created on demand when the developer first permanently declines a convention's recommendation for this project (see `conventions/convention-levels.md` § Recording a permanent override): don't create it empty upfront
 4. Add `.claude/memory/` and `.claude/settings.local.json` to this project's `.gitignore`. Neither should ever exist, `AGENTS.md` § Memory and contribution hygiene says why, but an older adoption or another agent may have created one, and untracked is not the same as ignored: `git add -A` commits it. This is containment, separate from the rule that prevents it.
 5. Copy `.claude/settings.json` to enforce the credential file blocklist (Claude Code only; skip if you have the hook in your global `~/.claude/settings.json`)
-6. If your agent's global context doesn't yet define your role, your team's conventions (e.g. softeng), or your product family's (e.g. Overture), bootstrap it once from `AGENTS.roles/<role>.md`, `AGENTS.softeng.md`, and/or `AGENTS.overture.md`, the same way `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent). This is a one-time action on your global context, not a per-project step
+6. If your agent's global context doesn't yet define your role, your team's conventions (e.g. softeng), or your product family's (e.g. Overture), bootstrap it once from `AGENTS.roles/<role>.md`, `AGENTS.softeng.md`, and/or `AGENTS.overture.md`, just as `global-context/` templates get copied to `~/.claude/` (or your agent's equivalent). This is a one-time action on your global context, not a per-project step
 
 **`conventions/`, `AGENTS.roles/`, `AGENTS.softeng.md`, and `AGENTS.overture.md` are global-guideline material: they never belong copied into a project, under any circumstance.** See `conventions/convention-levels.md` § How much to keep locally for the full rule and why. The project `AGENTS.md` should contain only project-specific content: constraints, extension points, and repo structure notes.
 
@@ -55,7 +55,7 @@ If you already have a `CLAUDE.md`, `AGENTS.md`, or other agent instruction file,
 
 ## Security
 
-Agentics ships agent-facing security conventions, but part of the posture is yours and cannot be automated. Read [`docs/security-for-developers.md`](https://github.com/oicr-softeng/agentics/blob/main/docs/security-for-developers.md) in the agentics repo yourself, once: it covers what to verify yourself, which of your agent's claims about its own work are unreliable, and the trust boundaries only a person can hold. If you copied `.claude/settings.json`, it also gives you a short command to confirm the credential blocklist is actually live rather than silently allowing everything.
+Agentics ships agent-facing security conventions, but part of the posture is yours and cannot be automated. Read [`docs/security-for-developers.md`](https://github.com/oicr-softeng/agentics/blob/main/docs/security-for-developers.md) in the agentics repo yourself, once: it covers what to verify yourself, which of your agent's claims about its own work are unreliable, and the person-only trust boundaries. If you copied `.claude/settings.json`, it also gives you a short command to confirm the credential blocklist is actually live rather than silently allowing everything.
 
 ## Contributing back
 

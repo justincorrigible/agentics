@@ -20,4 +20,4 @@ Before examining how a PR is written, establish whether the proposed change is t
 
 5. **Only then:** review the implementation.
 
-This is not about blocking PRs. A comment that redirects work to the right layer, or points out a goal mismatch, "this solves X, but the stated problem is Y", is often the most useful review a PR can receive. It saves an implementation cycle and clarifies ownership.
+This is not about blocking PRs. A comment that redirects work to the right layer, or points out a goal mismatch, "this solves X, but the stated problem is Y", is often a PR's most useful review. It saves an implementation cycle and clarifies ownership.

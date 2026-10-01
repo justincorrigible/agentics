@@ -23,7 +23,7 @@ if ! command -v python3 >/dev/null 2>&1; then
 fi
 
 python3 - "$TARGET" <<'PYEOF'
-import re, sys, os
+import os, re, sys
 
 path = sys.argv[1]
 text = open(path).read()
@@ -162,18 +162,55 @@ for _, spellings in sorted(ws.items()):
                      + ", ".join(sorted(spellings))
                      + "; its members are peers regardless, align at the owners' discretion")
 
+# Which entry, if any, claims the directory this was run from. The match is on the last path
+# segment, because nothing else works: `owns` uses informal org shorthand (`softeng/agentics`
+# for a repo whose remote is `oicr-softeng/agentics`), so deriving an entry from a git remote
+# fails, and matching a full local path would require absolute paths this file forbids. A
+# basename match collides where two orgs share a repo name, and that is acceptable: the output
+# is orientation, not authorization, which is the standard already applied to a self-reported
+# label. Good enough to tell a session it is standing in someone else's project; never good
+# enough to tell it who it is.
+here = os.path.basename(os.getcwd().rstrip('/'))
+claims = [(o, l) for o, l in owners if o.rstrip('/').split('/')[-1].lower() == here.lower()]
+heads_here = [(m, l) for m, l in (heads if 'heads' in dir() else [])
+              if m.rstrip('/').split('/')[-1].lower() == here.lower()]
+print(f"\nTHIS DIRECTORY  ('{here}')")
+if claims or heads_here:
+    for o, l in claims:
+        print(f"  claimed by {l}, which owns '{o}'")
+    for m, l in heads_here:
+        print(f"  held by {l} as a family head over '{m}'")
+    print("  Standing here is not being them. A label is held only if the developer conferred")
+    print("  it in this session; if they did not, you are a task thread in someone's project.")
+else:
+    print("  No entry claims a path ending in this name.")
+    print("  That is not evidence you own it: the registry holds owners and most work is not.")
+
 # The board carries two shapes. A request wants an owner to act and its poster clears it; a
 # notice reports a change already made and its recipient clears it, since only they know they
 # have read it. Nothing pushes either to anyone, so counting them here is the only nudge.
+BOARD_KINDS = {'for', 'fyi', 'sync'}
 b = re.search(r'^## Requests\b.*?\n(.*?)(?=^## |\Z)', text, re.S | re.M)
 items = []
 if b:
     body = re.sub(r'```.*?```', '', b.group(1), flags=re.S)
     it = None
     for line in body.splitlines():
-        k = re.match(r'\s*-\s+(for|fyi):\s*(.*)$', line)
+        k = re.match(r'\s*-\s+([a-z_]+):\s*(.*)$', line)
         if k:
-            it = {'kind': k.group(1), 'who': k.group(2).strip(), 'f': {}}
+            kind = k.group(1)
+            if kind not in BOARD_KINDS:
+                # Not skipped: an unrecognized shape must break the parse loudly. Matching only
+                # known kinds meant a `sync:` entry started no item, so its indented fields folded
+                # into the entry above and its `from:` overwrote that entry's, producing a listing
+                # that named a real label genuinely posting to a real owner. Silent, plausible, and
+                # exit 0. Erroring here catches the next shape before it ships rather than after.
+                errors.append(f"board entry of unknown kind '{kind}:' (known: "
+                              + ", ".join(sorted(BOARD_KINDS)) + "); its fields would otherwise "
+                              "fold into the entry above and overwrite them")
+                it = None
+                continue
+            it = {'kind': kind, 'who': k.group(2).strip(), 'f': {}}
             items.append(it)
             continue
         f = re.match(r'\s+([a-z_]+):\s*(.*)$', line)
@@ -182,6 +219,7 @@ if b:
 
 reqs = [i for i in items if i['kind'] == 'for']
 fyis = [i for i in items if i['kind'] == 'fyi']
+syncs = [i for i in items if i['kind'] == 'sync']
 if items:
     print("\nBOARD")
     if reqs:
@@ -193,6 +231,18 @@ if items:
         for i in fyis:
             print(f"    {i['who']}  <-  {i['f'].get('from','?')}  ({i['f'].get('re','no subject')}"
                   f", by {i['f'].get('by','UNSTATED AUTHORITY')})")
+    if syncs:
+        print(f"  {len(syncs)} sync notice(s), superseded by the next sync of the same path:")
+        for i in syncs:
+            print(f"    {i['who']}  ->  {i['f'].get('to','VERSION UNSTATED')}"
+                  f"  (from {i['f'].get('from','?')})")
+        seen_paths = {}
+        for i in syncs:
+            k = i['who'].lower().rstrip('/')
+            if k in seen_paths:
+                errors.append(f"two sync notices for '{i['who']}'; one per path, "
+                              "the later replacing the earlier")
+            seen_paths[k] = i
     for i in fyis:
         if 'heard' in i['f']:
             errors.append(f"notice for {i['who']} carries 'heard'; a notice needs no answer")

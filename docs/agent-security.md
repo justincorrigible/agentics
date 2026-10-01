@@ -39,10 +39,10 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 **How it works:**
 
 - **HTML injection (ZombAIs):** Hidden instructions in white-on-white text, collapsed HTML, or off-screen elements. An agent browsing a malicious page executes the hidden commands: downloading and running binaries, connecting to command-and-control servers.
-- **Document injection:** Invisible text in PDF metadata, hidden content in email attachments, encoded instructions in files the agent reads.
+- **Document injection:** Invisible text in PDF metadata, hidden content in email attachments, encoded instructions in files read by the agent.
 - **Tool output injection:** A compromised external API or database returns a payload that the agent treats as trusted data and acts on.
 
-**What to look for:** Unexpected tool invocations after reading a file or visiting a page; output that describes taking actions the user did not request; credentials or environment variables being referenced in tool calls.
+**What to look for:** Unexpected tool invocations after reading a file or visiting a page; output that describes taking unrequested actions; credentials or environment variables being referenced in tool calls.
 
 ---
 
@@ -92,7 +92,7 @@ This is not a bug that gets patched. It is structural to how agents work. The mi
 
 **How it works:** Adversarial self-replicating prompts are embedded in content one agent generates for another (emails, messages, shared documents). When the receiving agent processes the content, it is instructed to replicate the payload and act on hidden commands. Demonstrated in 2024 against Gmail AI assistants and generative AI email tools; not yet observed in the wild for coding agents specifically, but the mechanism is proven.
 
-**Why it matters for agentics users:** Multi-agent workflows (one agent delegating to another, agents reviewing each other's output) create the propagation channels this attack requires.
+**Why it matters for agentics users:** Multi-agent workflows (one agent delegating to another, agents reviewing each other's output) create the propagation channels required by this attack.
 
 ---
 

@@ -18,13 +18,29 @@ Sort every rule you're tempted to add into one of three buckets, and treat each 
 
 **3. Structural: the ambiguity itself is avoidable, not just catchable.** Some failure classes don't need a check after the fact, because the pattern that causes them can be disallowed outright. A relative path with no stated base directory reads correctly from wherever it was written and incorrectly from everywhere else; that's not a rule to remember to apply, it's a shape of writing to stop producing, the same way you'd ban a footgun API instead of writing a linter for every way to misuse it. This repo's `global-guideline-material-never-in-project` incident (a dispatch table's bare relative paths, ambiguous the moment they were copied into a different project) was this bucket. The fix wasn't "review paths more carefully", it was stating explicitly, once, that this class of content is always a live pointer, never a local path, and checking for the regression of that one sentence going missing, not for every way a bad path could be written.
 
+## Prefer a rule with a tell, and ask how a reader would know it was violated
+
+The developer's direction, and the organizing question for everything below, which arrived after most of it was written. **Ask of any convention: how would a reader know this was violated?** If the only honest answer is that they would have to already agree with the principle, the rule states something undisputed and compliance is asserted rather than checked.
+
+**The two kinds are easy to tell apart once the question is asked.** A tell names something checkable by a reader who does not know the domain: a name whose meaning changes with the type beside it, a number standing where the items would have fit, a definition whose first sentence has not said what the term denotes, an imperative verb opening a bolded lead inside a reference document. The other kind is the familiar list, avoid jargon, write clearly, be consistent, keep it simple, which nobody disagrees with and nobody can audit.
+
+**Handle these as a codebase handles a bug: fix it, test it, or file it, in that order.** Reframing the rule to state its tell is the fix. Where the tell is mechanizable, adding the check is the test. **Filing it is the fallback and not the default**, for something that genuinely has no tell and is still load-bearing, and it goes in `.dev/tech-debt.md` rather than inline, because an inline marker is read by everyone who reads the rule and useful only to whoever maintains it. That is the distinction between a constraint on *applying* a rule, which must travel with it, and a note about the rule's *quality*, which belongs where maintenance is queued.
+
+**Reframe before trimming, because most principle-shaped rules have a tell hiding inside them**, and finding it is usually what makes the rule true rather than merely agreeable. Trim only where no tell exists and the rule is not load-bearing alone. Some genuinely cannot be reduced to one and still earn their place: *fail closed* has no grep.
+
+**Checkable is necessary and not sufficient, and this is the caveat that keeps the direction from producing check-theatre.** A review of one onboarding document found nineteen problems in text that had already passed the density limits, the affirmative-framing rule and the dash rules. All three are mechanical, all three ran, and all three caught nothing, **because they check things that were not the defects**. So a tell has to point at a failure that has actually happened rather than at something merely countable.
+
+**Ask first whether the thing is a rule at all, because a corpus contains navigation as well as instruction.** A dispatch stub saying where two conventions moved to has no tell and needs none: it asserts nothing to comply with or violate. Tested against a sample here, one section in five was of that kind, so a count of tell-less sections overstates the trim target by however much navigation it contains. **The prior question is whether a reader could be non-compliant with it**, and only then whether they could be caught.
+
+**This also gives a corpus that accretes something concrete to remove.** A convention with no tell is the cleanest trim candidate available, since it occupies reading budget without changing behaviour and removing it has no visible cost. Measured here by a crude proxy, roughly half the convention sections carry something checkable and roughly half do not, which is a target list rather than a verdict: the proxy counts the presence of a test and cannot tell whether the test points at a real failure. Reading a sample of five moved the estimate further down rather than confirming it, finding two rules whose tells were hidden inside them, one section that was navigation rather than instruction, and no trim candidate at all.
+
 ## A check implements a rule; it is never a source of one
 
 When a check and the convention it enforces disagree, **the convention wins and the check is a defect**, every time. This needs saying because the instinct runs the other way: a script is concrete, it just ran, and it returned a specific complaint about a specific line, while prose sits in a file being general. Concreteness reads as authority.
 
 **A check enforcing something undocumented is worse than an undocumented rule.** An unwritten convention at least announces its own softness when someone states it. A check states it with machine authority nobody granted, in the imperative, at the moment of action, to a reader with no easy way to tell whether the prose behind it exists.
 
-**Never cite a script as the basis for asserting a rule to someone else.** Cite the convention, and if you cannot find the passage, that is the finding: either the rule is undocumented or the check is wrong, and both want fixing before anyone acts on it. Reported by a session that had read the relevant convention fresh that morning, then read a script later, treated it as authoritative, and asserted a rule to two other sessions that the convention never contained. Its own summary is the sharpest statement of the gap: a freshness rule governs **when** to read the convention, not **which artifact wins** when a script and a convention disagree.
+**Never cite a script as the basis for asserting a rule to someone else.** Cite the convention, and if you cannot find the passage, that is the finding: either the rule is undocumented or the check is wrong, and both want fixing before anyone acts on it. Reported by a session that had read the relevant convention fresh that morning, then read a script later, treated it as authoritative, and asserted to two other sessions a rule absent from the convention. Its own summary is the sharpest statement of the gap: a freshness rule governs **when** to read the convention, not **which artifact wins** when a script and a convention disagree.
 
 **The damage is asymmetric in one direction worth naming.** A flag phrased in the imperative invites correction, so a wrong check does not merely misinform, it recruits the reader into changing correct data. In the case above, an entry that was right would have been "fixed" into an entry that was wrong, by someone doing exactly what the tool told them.
 
@@ -44,7 +60,7 @@ When a check and the convention it enforces disagree, **the convention wins and 
 
 **The remedy is a separate pass at a moment the work is not moving, because no judgement made during the work can see the total.** That is the same shape as this repository's own release simplification pass, which exists because convention text accumulates the same way and no single addition ever looks like the problem. Scale differs and the mechanism does not.
 
-**So when a rule is per-item, ask what its aggregate looks like after fifty applications.** If the answer is a defect nobody would have accepted in one step, the rule needs a pass rather than a better statement.
+**So when a rule is per-item, ask what its aggregate looks like after fifty applications.** If the answer is a defect unacceptable in one step, the rule needs a pass rather than a better statement.
 
 ## Before crediting a coverage defect, check that the rule was invoked
 
@@ -54,7 +70,7 @@ When a check and the convention it enforces disagree, **the convention wins and 
 
 **Only the actor can settle it, so ask rather than reconstruct.** The reconstruction was plausible, which is the problem: it was accepted, written down, and used to exonerate someone who then corrected it unprompted. The same asymmetry governs any first-hand account of an internal state, invisible from outside and decisive for who owns the fix.
 
-**The structural claim survives; its evidence does not.** A binary keep-or-drop test on a composite cannot examine parts, so it will pass a whole on one part's merit, and that follows from the shape of the test rather than from any observation. No verified instance exists yet, because the candidate turned out to be an uninvoked rule. A real one needs a case where the per-part rules genuinely do not reach the riding-along content, which this was not. Left standing as unwitnessed rather than quietly evidenced by the case that failed to demonstrate it.
+**The structural claim survives; its evidence does not.** A binary keep-or-drop test on a composite cannot examine parts, so it will pass a whole on one part's merit, and that follows from the shape of the test rather than from any observation. No verified instance exists yet, because the candidate turned out to be an uninvoked rule. A real one needs a case where the per-part rules genuinely do not reach the riding-along content, and this was not one. Left standing as unwitnessed rather than quietly evidenced by the case that failed to demonstrate it.
 
 ## What a convention actually costs, which is not its size
 
@@ -64,21 +80,21 @@ Size is the obvious measure and it misleads. Four things matter more, and they p
 
 **Occupancy is a hard cost, not a soft one.** Always-read material sits in the context window for the whole session and displaces the work. On-demand material is read and can fall away. This is why the two tiers are not interchangeable at equal size.
 
-**Every rule dilutes the others.** A file of 133 rules gives each one 132 competitors, so the marginal cost of adding one is partly paid by the rules already there. That cost is invisible in a byte count and it is the reason a corpus can be individually reasonable and collectively unusable.
+**Every rule dilutes the others.** A file of 133 rules gives each one 132 competitors, so the marginal cost of adding one is partly paid by the rules already there. That cost is invisible in a byte count and it is why a corpus can be individually reasonable and collectively unusable.
 
-**Redundancy is cheap; contradiction is not.** A restated rule wastes bytes. A rule that conflicts with another spends a decision every time both are in scope, and the reader may resolve it either way. Hunting duplication is the lower-value pass.
+**Redundancy is cheap; contradiction is not.** A restated rule wastes bytes. A rule that conflicts with another spends a decision whenever both are in scope, and the reader may resolve it either way. Hunting duplication is the lower-value pass.
 
-**The cheapest rule is one nobody reads, because a check enforces it.** Moving a rule into a script grows the repository and shrinks the cost to near zero: it fires without anyone holding it in mind. So `testing/scripts/` growing is not the same event as `session-discipline.md` growing, and a size budget that treats them alike is measuring the wrong thing.
+**The cheapest rule goes unread, because a check enforces it.** Moving a rule into a script grows the repository and shrinks the cost to near zero: it fires without anyone holding it in mind. So `testing/scripts/` growing is not the same event as `session-discipline.md` growing, and a size budget that treats them alike is measuring the wrong thing.
 
 **What follows for a pass.** Cut tier one before anything else. Prefer removing a rule to shortening it, since dilution is per-rule rather than per-character. Move what can be mechanised. Resolve conflicts before hunting restatements. And check proportion: agentics' largest file is `agent-index.md` at 14% of the corpus, documenting a capability its own opening paragraph calls optional and never a dependency.
 
 ## A rule whose test requires the judgement it produces is a restatement of the goal
 
-**Some rules can only be applied by someone who already has the answer, and they read as instructions.** "Emit a shape only where the content has one" and "name an operation, not a property" both ask the reader to make the judgement the rule exists to produce. A reader who has understood the failure applies them correctly; a reader who has not agrees with them and carries on. That is worse than a rule going unread, because agreement feels like compliance.
+**Some rules can only be applied by someone who already has the answer, and they read as instructions.** "Emit a shape only where the content has one" and "name an operation, not a property" both ask the reader to make the rule's intended judgement. A reader who has understood the failure applies them correctly; a reader who has not agrees with them and carries on. That is worse than a rule going unread, because agreement feels like compliance.
 
 **Three of one section's rules had this shape and it was invisible until its author tested them cold.** They were asked one question about a convention written from their own failures: would this wording have stopped you at the time, reading it without knowing what went wrong. Four rules failed, three of them by circularity, and none of the four looked defective to me when I wrote them.
 
-**The fix is a proxy on something observable, not a better statement of the principle.** Each of the three had one available once the circularity was named. For operation versus property, the object of the verb rather than the verb, since both forms open with an imperative and only one takes a constraint as its object. For container fit, state the content as a sentence and keep the sentence unless it is worse. For reasoning versus derivation, the writer's own motive, since a writer can see whether they expect the reader to push back where they cannot see which category their paragraph belongs to. **In each case the proxy moved the test from the content onto something the writer can observe without having made the judgement first.**
+**The fix is a proxy on something observable, not a better statement of the principle.** Each of the three had one available once the circularity was named. For operation versus property, the object of the verb rather than the verb, since both forms open with an imperative and only one takes a constraint as its object. For container fit, state the content as a sentence and keep the sentence unless it is worse. For reasoning versus derivation, the writer's own motive, since a writer can see whether they expect the reader to push back where they cannot see which category their paragraph belongs to. **In each case the proxy moved the test from the content onto something observable without first making the judgement first.**
 
 **A paragraph that predicts how the failure feels from inside does work the rule cannot, so it goes before the rule.** The same report found that the one paragraph likely to make a reader actually run the test was positioned after the rule as justification, where it reads as support for something already accepted and gets skipped by anyone short on time. Its function is prospective rather than explanatory. Placement carries the difference, which is the same argument as moving a rule to the moment of writing.
 
@@ -96,7 +112,7 @@ Size is the obvious measure and it misleads. Four things matter more, and they p
 
 ## A control whose failure looks like success is worse than no control
 
-Mechanising a check moves it out of memory, which is the point of everything above. It also creates a failure this document has now seen three times, and it is the most expensive one available: **a control that cannot distinguish its own failure from success, sitting in the artifact whose entire job is to be checkable.**
+Mechanising a check moves it out of memory, which is the point of everything above. It also creates a failure seen three times now in this document, and it is the most expensive one available: **a control that cannot distinguish its own failure from success, sitting in the artifact whose entire job is to be checkable.**
 
 The three, none of them predicted and each found by someone using the thing rather than reviewing it:
 
@@ -104,13 +120,13 @@ The three, none of them predicted and each found by someone using the thing rath
 - **An announcement that cannot be verified.** Nothing records that one was made, the sender learns nothing about who received it, and a session that heard none cannot distinguish "never announced" from "announced, missed me".
 - **A registry checker that printed a confident false claim.** It compared paths exactly, so a casing difference split one ownership tree into two, and the section reporting how many entries carve out of a root used the same comparison and answered zero. It did not fail to notice the split; it asserted the tree was intact, under a heading a reader opens precisely to verify that.
 
-**The shape is always the same: the check runs, returns, and looks like it worked.** A control that errors is self-announcing and gets fixed. A control that silently passes accumulates trust in proportion to how long it has been wrong, and the trust is what makes it costly: nobody re-derives by hand something a green check already answered.
+**The shape is always the same: the check runs, returns, and looks like it worked.** A control that errors is self-announcing and gets fixed. A control that silently passes accumulates trust in proportion to how long it has been wrong, and the trust is what makes it costly: nobody re-derives by hand what a green check already answered.
 
 **So when you mechanise a check, spend the extra minute on the failure mode rather than the happy path.** Three questions, in order of how often they catch something here:
 
 1. **Make it fail on purpose and watch it fail.** Not "does it pass on good input" but "does it flag bad input, and does the run exit non-zero". Every one of the three above passed the first test.
 2. **Ask what the check silently assumes**, and whether that assumption is checkable too. Exact string comparison assumes normalised input. A hook assumes it receives the fields it reads.
-3. **When any input is malformed, suppress the derived claims rather than computing them anyway.** A count derived from bad data is not a smaller truth, it is a confident falsehood, and it appears in exactly the place someone went looking for certainty.
+3. **When any input is malformed, suppress the derived claims rather than computing them anyway.** A count derived from bad data is not a smaller truth, it is a confident falsehood, and it appears exactly where someone went looking for certainty.
 
 ## What this doesn't solve
 
@@ -122,12 +138,114 @@ For each existing rule: would a person or agent following it perfectly, every ti
 
 ## Stating a check explicitly does not make it fire
 
-Reported by the Lyric and Maestro session, and it is evidence against a load-bearing assumption in this corpus rather than against one rule.
+Reported from two repositories sharing no code, and it is evidence against a load-bearing assumption in this corpus rather than against one rule.
 
 `review-conduct.md` § Draft, never post already says to run the discrete style-conformance check on anything about to leave your control, and already names "no dashes" as **the recurring case**. That session held the same rule a second time in its own global context, tied to a prior incident of exactly this shape. Holding it in two places, with the reason on record, it drafted a reply to a review comment containing two em dashes and presented it for approval without running the check. The developer caught it.
 
 **So this is not a coverage gap, it is a reliability gap.** The rule existed, was maximally explicit, named this failure as recurring, and did not fire. Their framing is the part worth keeping: much of this corpus's design assumes that stating something explicitly is what makes it happen, and that assumption now has a counterexample at its strongest point, since a rule cannot be more explicit than one that names its own recurrence.
 
-The repository already knows the shape of the answer and had not applied it here: the cheapest rule is one nobody has to remember because a check enforces it, and a script someone must remember to run sits inside the failure it exists to fix. The dash rule *has* a mechanical form, and `check-consistency.sh` runs it, but only over files in the repository. **The recurring failure is in outbound text that never becomes a file**, a PR comment, a message, a draft for approval, so the enforcement covers the case that does not fail and misses the one that does. A second instance is already recorded in the developer's own global context, from a project with no agentics adoption at all.
+The repository already knows the shape of the answer and had not applied it here: the cheapest rule needs no remembering because a check enforces it, and a script that depends on being remembered sits inside the failure it exists to fix. The dash rule *has* a mechanical form, and `check-consistency.sh` runs it, but only over files in the repository. **The recurring failure is in outbound text that never becomes a file**, a PR comment, a message, a draft for approval, so the enforcement covers the case that does not fail and misses the one that does. A second instance is already recorded in the developer's own global context, from a project with no agentics adoption at all.
 
-The cheap mitigation, short of making a draft into a file: **require the count to be reported alongside the draft.** It does not force the check, but it converts a silent omission into a visible fabrication, which is the same trade a commit hook makes when it turns forgetting into deciding.
+The cheap mitigation, short of making a draft into a file: **require the count to be reported alongside the draft.** It does not force the check, but it converts a silent omission into a visible fabrication, which is a commit hook's own trade when it turns forgetting into deciding.
+
+## A named category beats an unnamed constraint
+
+Reported from the inside by the session it happened to, which is why it is stated as a mechanism rather than inferred from an outcome.
+
+A session was asked to persist a correction. Two rules applied. One said never write an instruction into shared memory. The other was that persistent memory is keyed to a session's launch directory, so the write would land in another agent's space. It wrote anyway, and its own account of why is the finding: what it held looked like **feedback**, which is a named first-class memory category with a place to go, while the directory-keying constraint had no category behind it at all. **The categorized rule won because it was the only one offering somewhere to put the thing.**
+
+So this is not two rules competing on strength or specificity. It is a rule with a home competing with a constraint that is merely true. A constraint expressed only as a fact about the world loses to any rule that names a slot, because naming a slot answers the question actually in front of the writer, which is where does this go.
+
+**The practical consequence for anything written here: if a constraint needs to win against a category, give it one.** The remedy that shipped is a check phrased as an action rather than a fact, asking where the write would land before it happens, which competes on the same terms. Stating the keying more emphatically would not have helped, because emphasis is not what it lost to.
+
+## When a measurement moves, check an item rather than the aggregate
+
+Two near-misses in one afternoon, one from each of two sessions, both caught the same way and both nearly written up as findings first.
+
+Fixing a density check to reassemble paragraphs moved its count from 95 to 149, which read as the fix working. It was an artifact: the reassembly had welded bullets onto the prose above them and the joined text escaped the bullet filter. What exposed it was the extreme printed beside the count, a 146-word "sentence" that turned out to be two blocks stitched together. Independently, a peer re-measuring the same class read a five-file total against a single-file number from an earlier run, concluded their method was off by two and a half times, and had begun writing the correction before checking one file both ways, where the two methods agreed within four percent.
+
+**Both reached for the total first, and in both cases the total is what lied.** An aggregate is a single number with no structure to contradict it, so a wrong one is indistinguishable from a right one until an item is opened. This is why a count here is reported next to its extreme rather than alone: the extreme is an item, and an item can be read.
+
+**The asymmetry that makes this urgent is that the two failure directions do not announce themselves equally.** A measurement that inflates looks like a finding and invites scrutiny. One that undercounts looks like a clean file and invites nothing. The same bullet filter produced both within a day, welding in one implementation and discarding in the other, and only the welding was noticed by anyone looking at output.
+
+## Run a rule's own check against its own file
+
+`writing-style.md` carries the most instances of abstract back-reference in this repository, at 19 against a corpus total of 93. **The file that teaches writing style leads the corpus in the defect it teaches against.**
+
+The peer who reported it made the argument for why this matters more than an ordinary instance: their own regression could be read as one agent's lapse, and this cannot, because the file is the convention. A rule whose own text fails it is not evidence that people forget rules; it is evidence the rule was written without being applied once.
+
+So a check belonging to a rule runs against the rule's own file as a condition of shipping changes to it, and the number goes in the section, which is what `§ Density` already does by stating its own measurement inside itself. Where a check is advisory rather than gating, the obligation is to report the number rather than to pass it.
+
+## Precision belongs to a class, not to a tool, so a check reports its own
+
+Two sweeps by the same session over the same corpus with the same method. One returned 56 matches of which 16 were real. The other returned 29 paragraph-opening negations of which approximately none were, because "Usher is not an authentication service" is the content rather than a delay before it.
+
+**Same instrument, same reader, precision from roughly one in three to roughly zero.** So precision is not a property of grep, of the person, or of the corpus. It belongs to the class being searched for, and it cannot be inferred from any of the three.
+
+The consequence is that a match count is not actionable on its own. A reviewer handed 29 hits has no way to know whether to expect a third of them to be real or none, and the same output supports opposite responses. **So a check states the precision it expects, and where that is unknown it says so**, which is a different claim from staying silent: silence reads as high precision, because a tool that reports is assumed to have something to report.
+
+This is also why a check that condemns matches is a different artifact from one that raises candidates. The first is only honest where precision is high and stable, and the second is honest anywhere, provided it says which it is.
+
+## A check must be able to print failure
+
+Sitting beside the precision rule above, and the pair is the whole point: that one says a result whose precision is unstated cannot be acted on, this one says a result that could not have differed cannot be either.
+
+Reported by a session that ran a damage scan after a mechanical replacement across twelve files and printed a line reading "(none above = clean)" unconditionally, **directly below a grep that was at that moment listing four breakages**. They reported the sweep as clean. The next command found the breakages, so nothing was lost, but nothing in the check ever would have.
+
+**The defect is shape rather than carelessness: the reassuring line was a literal, not a result.** An unfalsifiable verification is worse than no verification, because it converts an unchecked state into a reported-clean one, and a reader who skims sees the same thing in both cases.
+
+**Confirm a check can fail by making it fail once on purpose.** This repository's committed checks were audited against the class when it was reported and all guard their success lines behind the branch that earned them, but the same session found an instance in its own ad-hoc output within the hour: a line reading "nothing above = one paragraph per line throughout" printed below two files that were hard-wrapped. Ad-hoc checks are where this lives, because a committed check gets read again and a one-off never does.
+
+**Making it fail once is necessary and not sufficient, because a check can print a failure that is not the one under test.** A pattern for agent attribution here was written to key on a capital letter, since the whole discriminator was whether a phrase named a referent a reader could go and ask. It shipped with an ignore-case flag, which case-folds the character class and deletes that property, and the check then printed eight plausible-looking hits over phrases like "Reported by an" and "Confirmed by asking". It would have passed a make-it-fail-once test, and it found nothing it existed to find. **So the deliberate failure has to be an instance of the class, not any output at all**: plant the thing the rule forbids, confirm that specific line comes back, and confirm a near-miss does not.
+
+**The general form is that a global answer to a per-pattern question fails silently in both directions.** A peer reported the opposite defect the same day, three sentence-initial phrases never matching since their check was written, and prescribed setting ignore-case once for every pattern; applying that prescription to the pattern above turns zero hits into twenty-five false ones. Neither of us was wrong about our own corpus and both of us generalized from it. The question a pattern has to answer for itself is whether capitalization carries meaning in what it matches, which is no for a phrase and yes for a proper noun. Both failures look identical at a terminal, which is why the fixture rather than the reasoning is what finds them: a file of instances the check must catch beside near-misses it must not, run after every edit to a pattern.
+
+## A file check cannot reach a message, and a clean corpus hides that
+
+Reported by a peer after the developer corrected them four times in one day on a defect their documents had already been swept clean of. A script ran over the artifacts before anything was written. Nothing ran over a message before it was sent, and this was recorded here as impossible, on the reasoning that a message is the output rather than a product of it. **That was wrong for anything that leaves through a tool, and the workaround is one step: write the message to a file, check the file, then send it.** The message becomes an artifact before it becomes output, so nothing has to run over it. **The limit is that ordinary conversational text does not leave through a tool**, so applying this there means drafting and then retyping, and the retype is an uncontrolled copy. It also still depends on choosing to do it, which makes it one remembered habit replacing many remembered rules rather than the end of remembering. Neither the reporter nor this session had it while both were arguing about whether the class could be attested instead.
+
+So the corpus gets cleaner while the conversation does not, and from outside that reads as the convention working. **A clean grep over a corpus is evidence about that corpus and nothing else**, which makes this repository's own tooling an instance: its summary line read "All checks passed" until this was reported, a claim about files phrased so it could be read as a claim about conduct.
+
+**The conversation is the harder case rather than the easier one.** The defect is produced by compression, compression happens at transitions, and a heading, a summary or a reference back to earlier work are exactly when an agent is least likely to re-read, because it is moving between topics rather than composing. The feedback loop is worse too: a reader of a document can scroll back, while a reader of a message often cannot tell whether they missed something or the writer left it out, which is the property that makes them blame themselves instead of reporting it.
+
+**Three things follow for how the conversational half is written.** State it as a phrasing constraint narrow enough to apply mid-sentence rather than as a quality to aim for, since "a number or a definite article carries its noun in the same clause" can be applied while composing and "be clear about referents" cannot. Name the moments rather than the whole output, because headings, summaries and references to earlier turns are where it happens and "always" is unenforceable and therefore ignored. And expect the artifact check to conceal the behavioural failure rather than reveal it.
+
+**A clean run states coverage, not quality, and the two read identically.** A footer hedging about precision says how many hits are likely real and nothing about what was never looked for, so a reader takes a clean pass as meaning the corpus is clean when it means these patterns found nothing. Reported by a peer against their own checker while this one carried the same defect. **A defect no pattern looks for is indistinguishable from its absence**, which is why the summary here names what it covered rather than announcing success.
+
+**The attestation that looked like the answer was weaker than it appeared, and the way it failed is the general lesson.** The dash rule requires running the check and **reporting the count**, on the grounds that a count you did not compute has to be invented rather than merely omitted. That was cited here as the one rule enforced in conversation. It is not: the count had always been taken over files, never over a message, so the attestation covered artifacts while being offered as evidence about conduct. **That is the same defect as a summary line reading "All checks passed"**, committed in the exchange that fixed it. An attestation is only as good as what it was computed over, and saying which is part of making it one.
+
+The reporter offers the narrow-phrasing approach as an open problem rather than a fix, having written the rule into their own conventions and violated it four times the same day. Recorded on those terms.
+
+## Enumerate the moments your runtime exposes, because they decide which rules can be enforced
+
+The recurring failure in this corpus is a rule with no trigger. Every fix found for it has attached the rule to a moment: a commit-message hook, a check before a release commit, writing a message to a file so something can run over it. Those were reached one at a time, and the general form is worth stating once. **A runtime exposes a set of moments, and that set determines which rules can be enforced and which must stay behavioural.** A rule attached to a moment fires; a rule attached to memory does not.
+
+So the first question about enforcing anything is not what to check but **where the runtime will let you stand**. Read your agent's own lifecycle documentation and enumerate what it offers, because the list is usually larger than assumed and it constrains everything else.
+
+Checked against one agent's documentation in September 2026, Claude Code exposes moments before and after a tool runs, when a turn finishes, when a turn fails on an error, when a task is created and when it completes, and when a peer agent goes idle. **Other agents expose a different set, or none**, so the list is an example of the shape rather than a specification: what travels is the act of enumerating, not this enumeration.
+
+**Two consequences worth holding.** A moment that exists but sits after the thing it would govern is not an attachment point: a gate on turn completion runs after the text exists and after it has been displayed, so it can correct and cannot prevent. And where no moment reaches a class of output, that class is behavioural and nothing can make it otherwise and should be recorded as such rather than treated as a rule awaiting a check.
+
+## A pattern written against one instance always underfits
+
+Where the defect is a relationship between words rather than a word, the words move, so a pattern fitted to the one sentence that prompted it will miss the next one. Reported with the instance: a check for a thing being configured or stored missed the very sentence that motivated it, "that field is per-catalogue plugin configuration", because two modifiers sat between the verb and the noun. Widening the permitted gap to two intervening words and retesting caught it.
+
+**So the test of a new pattern is not whether it catches the instance you have.** It is whether it still catches that instance after the words are moved, which means writing the variants before trusting the pattern, and testing against correct usage as well as against defects so that widening does not buy coverage with noise.
+
+**A related limit on what a zero means.** Two patterns returning zero against a clean corpus are regression detectors rather than a cleanup tool. The same patterns pointed at a corpus where the ambiguity is already established would return volume and would need ranked output rather than pass or fail, which is precision belonging to the corpus as well as to the class.
+
+## Exclude the file that documents a defect from the check for it
+
+Any file explaining a defect quotes it, so it registers as an instance. This has now arisen twice in one day against two unrelated classes, which is what makes it general rather than a quirk of either: a checker reporting on its own rule's documentation buries the real hits, and a check whose first run is unreadable is never run again.
+
+State the exclusion where the check is defined rather than discovering it per class, and note that it applies to a message reporting on a defect as much as to a convention describing one.
+
+**The general answer is to blank quoted spans rather than exclude whole files, because a quotation is not an instance.** Per-pattern substring exclusions work and do not generalize; masking backticked and quoted text does, since documenting a defect almost always means quoting it while committing one almost never means being inside quotation marks. Measured here against one class: eleven of twenty-two hits were quotations, so masking halved the output and let the rule's own file be scanned for real instances instead of being skipped wholesale. Mask with same-width replacement so offsets keep indexing the original, and keep the residual honestly: a defect that cannot be quoted, or one deliberately shown unquoted, still needs a file-level exclusion, so this shrinks the special-casing rather than removing it.
+
+**An exclusion hides the false positives you need in order to tune the pattern, not only the true ones.** A peer adopting the masking approach found a false positive they had never seen, because it lived in a file excluded for an unrelated check, and seeing it was what let them fix the pattern by requiring a determiner before the noun. So a file-level exclusion costs twice: the instances it suppresses, and the feedback that would have made the check more precise. Their measurement is the stronger version of this one: eight hits before masking and zero after, every one a quotation, so the exclusion they had been carrying was hiding the entire signal in exchange for suppressing nothing real.
+
+**A checker that ranks candidates is dishonest under a pass-or-fail attestation.** Reporting zero or reporting hits leaves no way to say that one was raised, looked at, and kept, so the number implies a verdict never made by the check. Report the raised count and the judgement separately wherever the check ranks rather than decides.
+
+**Two mechanical failures in the same family, both from a peer's own checker.** A multi-word pattern matched line by line is blind to any phrase a hard wrap splits, silently and for as long as the check exists. Flattening single newlines to spaces fixes it, and the version that flattens before computing line numbers reports paragraph indices instead, which looks plausible and is wrong; substituting one character for one keeps every offset valid. And a pattern can be case-sensitive by accident, so a sentence-initial instance never matches in any run, which is invisible because the check is reporting on the same corpus each time.
+
+**And a search that could not run looks exactly like a search that found nothing.** `grep -r` against a path that does not exist prints nothing and exits quietly, so an absence claim can rest on a directory that was never there. Confirm the target exists before believing that it is empty, which costs one line and is the same shape as verifying a paraphrase with a paraphrase.

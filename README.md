@@ -39,9 +39,15 @@ This doesn't duplicate step 1 from scratch: it adds persistent project memory (`
 
 It stores your answers in project memory (or your global context, for the propagation-suggestions default) and does not ask again.
 
-**Once it's done, verify independently, don't just trust the summary.** Run `git status` yourself: you should see exactly `AGENTS.md`, `CLAUDE.md`, `DEVELOPMENT.md`, and `.dev/` as new. If `conventions/`, `AGENTS.roles/`, or `AGENTS.softeng.md` show up too, that's a bug, they're global-guideline material and should never be copied into a project (see "What gets installed" below); remove them and re-read `conventions/convention-levels.md` § How much to keep locally. Once it looks right, `git add` and commit those specific files yourself.
+**Once it's done, verify independently, don't just trust the summary.** Run `git status` yourself: you should see exactly `AGENTS.md`, `CLAUDE.md`, `DEVELOPMENT.md`, `.dev/`, `.gitignore`, and `.claude/settings.json` as new. If `conventions/`, `AGENTS.roles/`, or `AGENTS.softeng.md` show up too, that's a bug, they're global-guideline material and should never be copied into a project (see "What gets installed" below); remove them and re-read `conventions/convention-levels.md` § How much to keep locally. Once it looks right, `git add` and commit those specific files yourself.
 
 **One thing worth setting expectations on:** this doesn't change what your agent can do the moment you run it. It's a place for your team to put what it's already learned, so the next session doesn't start from zero. The difference shows up over several sessions of actual use, not on first install; judging it by whether it feels different immediately is the wrong test.
+
+**The other expectation to set: this is pre-release software and is versioned that way on purpose.** It sits at `0.y.z` and will until productization is explicitly decided, which means **breaking changes are routine rather than exceptional**. Nine of the eighty-eight entries in the last release were marked breaking. Breaking here means an adopting project needs to take an action, usually re-syncing a file or adding a line to its dispatch table, and it is tracked separately from the version bump rather than driving it.
+
+What that asks of you is small and worth knowing before adopting. Pin by the version number in your project's `agentics-template-version` tag, not by the commit SHA beside it: the SHA is advisory and is expected to stop resolving, because the release commit is amended until it publishes. Run the upstream check when you want to move, read the entries marked breaking, and apply them deliberately. Nothing here updates itself, and nothing breaks underneath you until you choose to re-sync.
+
+Known gaps are tracked in `.dev/tech-debt.md` rather than discovered by adopters, which is the practice you should expect from anything calling itself pre-release.
 
 ---
 

@@ -65,7 +65,7 @@ Each environment has exactly two Terraform roots: `stateless/` and `stateful/`. 
 
 When a new tool requires a Terraform provider (e.g. the Keycloak admin provider), add it as a second provider in the stateless root alongside `hashicorp/helm`. Use `depends_on` to sequence it after the service it configures.
 
-**Ordering within a Terraform file.** `conventions/writing-style.md` § Property ordering covers named entries generally; the softeng-specific reading is that named resource blocks are alphabetized by resource name, meaning the second label rather than the type, and that a VSO companion block follows its primary resource directly instead of being sorted independently. That exception exists because the companion is meaningless apart from the resource it serves, so keeping the pair adjacent beats a strict global sort.
+**Ordering within a Terraform file.** `conventions/code-style.md` § Property ordering covers named entries generally; the softeng-specific reading is that named resource blocks are alphabetized by resource name, meaning the second label rather than the type, and that a VSO companion block follows its primary resource directly instead of being sorted independently. That exception exists because the companion is meaningless apart from the resource it serves, so keeping the pair adjacent beats a strict global sort.
 
 ### CI and deployment
 
@@ -93,7 +93,7 @@ When adding a stateful service to an environment for the first time, three thing
 
 Jenkins holds an `admin` RoleBinding per application namespace. Kubernetes `admin` covers standard API groups but does NOT automatically cover custom CRDs.
 
-Some operators use RBAC aggregation: they label their ClusterRoles with `rbac.authorization.k8s.io/aggregate-to-admin: "true"`, which merges their rules into `admin` automatically. **CNPG does this** - no extra config is needed for CNPG clusters.
+Some operators use RBAC aggregation: they label their ClusterRoles with `rbac.authorization.k8s.io/aggregate-to-admin: "true"`, which merges their rules into `admin` automatically. **CNPG does this**: no extra config is needed for CNPG clusters.
 
 Operators that do not use aggregation require a manual entry in the Jenkins ClusterRole. The file to edit is:
 
@@ -118,7 +118,7 @@ Add a rule to the `ClusterRole jenkins-agent-cluster-resources`:
 
 Open a PR to `config-jenkins-instances` and get it merged before attempting the Jenkins deploy job. You will get a `forbidden` error on the CRD get if this is missing.
 
-**How to check if an operator uses aggregation:** `kubectl get clusterrole -l rbac.authorization.k8s.io/aggregate-to-admin=true` - if the operator's ClusterRole appears here, no manual entry is needed.
+**How to check if an operator uses aggregation:** `kubectl get clusterrole -l rbac.authorization.k8s.io/aggregate-to-admin=true`: if the operator's ClusterRole appears here, no manual entry is needed.
 
 ### 2. Credential bootstrapping: direction depends on the operator
 
@@ -150,7 +150,7 @@ The operator creates an `<cluster-name>-admin-password` secret automatically. Sa
 
 Operators (Strimzi, CNPG, opensearch-k8s-operator, MongoDB Community) generate NetworkPolicies for their own internal component traffic: broker-to-broker, operator-to-pod, controller-to-api. They do not generate NPs allowing application clients to reach the service port.
 
-**Always verify:** when deploying or debugging a stateful service, confirm that a NetworkPolicy exists allowing ingress from client pods to the service's main listener port. This is separate from any egress the operator pods may need (e.g. broker → K8s API for secret reads).
+**Always verify:** when deploying or debugging a stateful service, confirm that a NetworkPolicy exists allowing ingress from client pods to the service's main listener port. This is separate from any egress needed by the operator pods (e.g. broker → K8s API for secret reads).
 
 **How to apply:** use the kustomize postrender pattern (supplemental manifests in `kustomize/manifests/np.yaml`) to add client ingress NPs without modifying the operator chart. A NP ingress rule with no `from:` selector allows all pods in the namespace, appropriate for internal cluster services. Tighter scoping by `app.kubernetes.io/name` is a follow-up once the service is confirmed working.
 

@@ -1,6 +1,6 @@
 # Security: what you need to do yourself
 
-**Written for the developer, not for your agent to act on.** This is your half of agentics' security posture: the things no convention file can handle for you, because they depend on a person actually looking. `agent-security.md` covers the threat model and the checks an agent runs; this covers what you check, what you should not take on trust, and what to do when something has already gone wrong.
+**Written for the developer, not for your agent to act on.** This is your half of agentics' security posture: the things beyond any convention file's reach, because they depend on a person actually looking. `agent-security.md` covers the threat model and the checks an agent runs; this covers what you check, what you should not take on trust, and what to do when something has already gone wrong.
 
 Read it once when you adopt agentics, and again if you ever find yourself relying on a control rather than verifying it.
 
@@ -12,7 +12,7 @@ Agentics shipped a credential blocklist for months that never blocked anything. 
 - **The documentation asserted it was working**, which turned the absence of evidence into positive reassurance.
 - **It had been tested, and the test passed.** The test fed sample paths to the pattern list and confirmed the patterns were correct. They were correct. The test exercised the half that already worked and never touched the part that was broken.
 
-That last point is the one to carry forward. When an agent tells you a control is tested, the useful question is not "did it pass?" but **"what input did the test use, and where did that input come from?"** A test that builds its own input in the shape the code expects cannot discover that the real caller uses a different shape. Ask to see a test that uses a real, captured payload.
+That last point is the one to carry forward. When an agent tells you a control is tested, the useful question is not "did it pass?" but **"what input did the test use, and where did that input come from?"** A test that builds its own input in the code's expected shape cannot discover that the real caller uses a different shape. Ask to see a test that uses a real, captured payload.
 
 ## Verify the credential blocklist yourself
 
@@ -24,15 +24,15 @@ Do this on adoption, and again after any change to `settings.json`. It takes a f
 SETTINGS=.claude/settings.json
 
 CMD=$(python3 -c "import json,sys;print(json.load(open('$SETTINGS'))['hooks']['PreToolUse'][0]['hooks'][0]['command'])")
-check() { printf '%s' "$2" | eval "$CMD" | python3 -c "import json,sys;print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])"; }
+check() { out=$(printf '%s' "$2" | eval "$CMD"); [ -z "$out" ] && echo none || printf '%s' "$out" | python3 -c "import json,sys;print(json.load(sys.stdin)['hookSpecificOutput']['permissionDecision'])"; }
 
 check "env"    '{"tool_input":{"file_path":"/tmp/project/.env"}}'      # expect: deny
 check "ssh"    '{"tool_input":{"file_path":"/tmp/home/.ssh/id_rsa"}}'  # expect: deny
 check "bash"   '{"tool_input":{"command":"cat /tmp/project/.env"}}'    # expect: deny
-check "clean"  '{"tool_input":{"file_path":"/tmp/project/README.md"}}' # expect: allow
+check "clean"  '{"tool_input":{"file_path":"/tmp/project/README.md"}}' # expect: none
 ```
 
-Three denies and one allow means it is live. Four allows means it is inert, whatever anything else claims. Note the paths above do not need to exist: the hook decides before the file is ever opened, which is what makes this safe to run anywhere.
+Three denies and one `none` means it is live. **An `allow` anywhere is a defect, not a pass**: a PreToolUse hook returning `allow` skips the permission prompt for that call, so a guard that allows every path it does not block switches off the default prompts for every tool it does not cover, while looking like it is working. The denies are what prove the hook is live; a clean path should produce no output at all, which leaves the normal permission flow in charge. Note the paths above do not need to exist: the hook decides before the file is ever opened, which is what makes this safe to run anywhere. **An agent cannot run it inline in a session already protected by the hook**: the probe paths appear in the command text, and the hook scans command text, so it denies the self-test before it runs. Save it to a script file and run the file, or run it from your own terminal. A denial here is the hook working, not the test failing.
 
 ## Know what the blocklist does not cover
 
@@ -40,13 +40,14 @@ It is a speed bump on the most common accident, not a boundary. Being precise ab
 
 - **It is specific to Claude Code.** It is a `PreToolUse` hook, a Claude Code feature. If your team uses Cursor, Copilot, Codex, Aider, or anything else, **you have no mechanical credential enforcement at all**, only the prose rule in the conventions. If that is your situation, build the equivalent in your own tool's permission or deny-list system, and until you have, treat the credentials policy as entirely dependent on the agent's compliance.
 - **It matches on paths and command text, so it can be worked around trivially.** A path assembled from variables, a file copied to an innocuous name first, or a tool that passes a directory rather than a file (`Grep`, `Glob`) all pass straight through. It is not an adversarial control and should never be described as one.
+- **Two committed templates are exempt by design: `.env.schema` and `.env.example`.** They exist to be read and are secret-free by purpose, so blocking them protected nothing and stopped documentation being checked against them. The exemption is exact, so `.env.example.bak` and every other variant stay blocked. The cost is that a project which puts live values in one of these two files has moved them outside the guard: keep them free of real values.
 - **It does not stop a credential already in context from being written somewhere.** Once a secret has been read by any route, nothing here prevents it reaching a session log, a commit message, or a PR comment.
 
 The real control for secrets remains keeping them out of the working tree: a secrets manager, environment injection at runtime, and `.gitignore`. The hook exists to catch the routine accident, not a determined path around it.
 
 ## Agent output to distrust by default
 
-Not because agents are dishonest, but because these specific claims are ones an agent cannot reliably verify about itself. Each has a cheap check.
+Not because agents are dishonest, but because an agent cannot reliably verify these specific claims about itself. Each has a cheap check.
 
 | Claim | Why it is unreliable | What to do |
 |---|---|---|
@@ -75,7 +76,7 @@ The failure mode is narrower than "the agent got it wrong." It is that the chang
 - **Ask what the failure mode looks like.** If the answer is "it silently allows," insist on a test that would catch that, not just a test that the intended case works.
 - **Check the boundary, not the centre.** Patterns and rules are usually right. Extraction, parsing, and the contract with the caller are where the bugs are.
 - **Be suspicious of a passing test written in the same breath as the code.** It tends to encode the same assumption twice, so agreement between them proves nothing.
-- **For anything with a permissive failure mode, ask for the negative test**: break it deliberately, confirm the check fails, then restore. A check nobody has ever seen fail is not known to work.
+- **For anything with a permissive failure mode, ask for the negative test**: break it deliberately, confirm the check fails, then restore. A check never seen failing is not known to work.
 
 ## If something has gone wrong
 
@@ -86,4 +87,4 @@ The failure mode is narrower than "the agent got it wrong." It is that the chang
 
 ## Where this fits
 
-`agent-security.md` has the threat model, the attack vectors, the session-start integrity check agents run, and an honest account of what agents cannot catch automatically. `conventions/security.md` and `conventions/security-guidelines.md` are the agent-facing application-security conventions. This file is the part that only works if a person does it.
+`agent-security.md` has the threat model, the attack vectors, the agents' session-start integrity check, and an honest account of what agents cannot catch automatically. `conventions/security.md` and `conventions/security-guidelines.md` are the agent-facing application-security conventions. This file is the part that only works if a person does it.

@@ -4,6 +4,16 @@
 Ownership registry for agent sessions, plus a bulletin board for reaching an owner you have not spoken to. Agent-managed, not for manual editing.
 Place this file in your agent's global context directory (for Claude: `~/.claude/agent-index.md`; for other agents: consult your agent's docs), alongside `projects.md`.
 
+## You may reach another agent's repository long before you read any convention
+
+**Held inline rather than as a pointer, deliberately, and it is the only rule stated in full in this file.** Everything else here points at `conventions/agent-index.md`, because a pointer is fetched when needed. This one governs a session that has fetched nothing yet, so a pointer arrives after the moment it exists to protect.
+
+**Finding another agent's repository on disk, and being told what belongs in it, are both short of permission to write there.** A global context routinely names sibling projects and their filesystem paths so that work can be coordinated across them, which means a session that has read nothing but its global context already knows where those repositories are. Nothing about knowing the path confers standing to edit what is at the end of it, and the instruction that put the path in front of you was about where to *send* something.
+
+**"Communicate X to Y", "propagate this to Z", or "surface that improvement upstream" are instructions to deliver, never licences to write into another repository's files.** An instruction to tell someone something is satisfied by telling them. The developer deciding what belongs in another project does not make you the one who puts it there: send it, post it to the board, or hand it to the owner, and let them land the edit. **When no owner can be found, the recipient is the developer**, and telling them is the whole of the task. **This is the easier half to miss, because the instruction sounds like a task and delivering feels like leaving it undone.**
+
+**The failure is structural rather than careless, and a new session is the likeliest to commit it.** A session started fresh in a window, with no project loaded and no conventions read, holds exactly the tier that names other repositories and none of the tier that constrains writing to them. So the population most able to do this is the population least equipped to know better, and it will not be looking for a rule when the moment arrives. Reported by a developer who had to stop a session editing a peer's repository, where the only thing that prevented it was his intervention.
+
 ## Read the convention before you write here
 
 **This file does not state the rules. `conventions/agent-index.md` in the agentics repo does, and you read it fresh every time you are about to write.** Not from memory of an earlier read, not from what this header says, and not from what the entries below appear to imply. That convention is changing quickly, so a summary kept here would drift while still looking authoritative, which is the same failure the template forbids for project copies of conventions.
@@ -33,7 +43,7 @@ Here only because a session that opens this file may act before reading the conv
 
 `owns` is org-relative paths, never absolute, and may be a subtree, so one repo can have several owners. Ownership resolves by longest matching `owns` prefix. `assigned` marks developer conferral; an entry without it is provisional. Its presence is the claim: the date is never compared, and where the conferral was not witnessed write `yes` rather than inventing one. Never leave the field empty: an empty field has nothing holding its boundary open and the next line runs into it.
 
-`main` is the space a head holds, and it is a different claim from `owns`, which names where the expertise is: a head responds for anything in its space with no dedicated owner, collaborates with any owner that does exist rather than answering for them, and defers once an unclaimed component gets its own session. Heads nest and resolve by the same longest-prefix rule. Designation is the developer's, never self-assigned. Routing is the visible use; the intent is context relevance in both directions.
+`main` is a head's space, and it is a different claim from `owns`, which names where the expertise is: a head responds for anything in its space with no dedicated owner, collaborates with any owner that does exist rather than answering for them, and defers once an unclaimed component gets its own session. Heads nest and resolve by the same longest-prefix rule. Designation is the developer's, never self-assigned. Routing is the visible use; the intent is context relevance in both directions.
 
 **No runtime handles are stored in this file, in any field.** They rotate, cannot be observed by the session holding them, and routing by them misrouted more than one message in ten.
 
@@ -45,6 +55,7 @@ Here only because a session that opens this file may act before reading the conv
             label writes a plain description instead, never a handle>
   via:      <your label, when posting on someone else's behalf; a relayer never clears>
   re:       <short topic, a name and never a finding or task detail>
+  see:      <repository-relative path in your own project where the ask is recorded>
   heard:    <label that answered; omit the line entirely while unanswered>
   posted:   <UTC read from a clock, e.g. 2026-08-19T03:06Z>
 

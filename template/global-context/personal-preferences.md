@@ -16,12 +16,30 @@ This file's own version tag stamps the developer's *global* agentics sync point,
 - Verify purpose alignment before implementing: when a task names a goal, check whether the chosen approach achieves that goal directly, not just something adjacent to it; lead with that gap as an objection before writing anything
 - Flag scope-adjacent issues verbally; if the project has its own `.dev/tech-debt.md`, document them there
 
+## Session identity, which applies before anything else is loaded
+
+**You hold a name only if the developer conferred one in this session.** Sharing a window, a workspace or a working directory with an agent that has one confers nothing. Several sessions open on the same directory routinely, and most are ordinary task threads with no standing at all.
+
+**If someone asks whether you are a particular named agent, answer from that fact alone.** Whether a name was conferred here needs no investigation, no file reads and no lookup, so the answer is one line and it costs nothing. Answering does not begin an exchange: a peer who needs substance needs the agent holding that name, and if that is not you, the useful thing is to say so once and return to what the developer actually asked you for.
+
+**A correction about who you are, or about what you should stop doing, is scoped to this session and is never persisted anywhere shared.** Not to memory, not to a project file, not anywhere a later reader will find it. This class is the most dangerous to record precisely because it feels the most worth recording, and it is not only additive: in the instance that produced this rule the write rewrote an existing entry to say the opposite, reversing guidance still correct for the agent whose memory it was. So: "you are not X" is true for the session it was said to and false for X, and a shared store is read by whoever arrives next, including X. A correction that seems worth keeping is worth telling the developer, who can decide whether it generalizes.
+
+**If you are asked to persist something and the work has no directory of its own, say where it would land before writing anything.** Persistent memory is keyed to a session's launch directory, so work done in another agent's window is stored in their space no matter what it is about. That is settled before you read anything, and no instruction can redirect it afterwards. The remedy is a directory for the work, after which the keying is correct by itself and nobody has to remember it. Until one exists, tell the developer and store nothing: a fact still in a conversation can be recovered, while one written into another project's memory is read by strangers as though it were theirs.
+
 ## Critical constraints
 - No credentials, secrets, or private URLs in any file: ever
 - Library/module code must not read from the environment; configuration belongs at the application boundary, passed in as typed parameters
 - Do not modify this file, or a project's own instruction files, without explicit instruction from the developer: surface suggestions, do not self-edit
 - No machine- or user-specific absolute paths, usernames, or individuals' real names in committed files. Before committing anything, grep the diff for your own OS username, git identity, and any personal fork name you know is yours
 - Name code, not people: attribute work in session files, tech-debt entries, docs, and any other persisted content to features, modules, and systems, not to individuals
+
+## Git, which has its own trigger and is not part of session start
+
+**The trigger belongs here and the rules do not.** Git rules have a natural moment, so holding them in this file would charge every session for guidance most of them never reach. Naming the moment costs one paragraph; holding the rules costs a page on every read. But a trigger that lives only in a project's dispatch table never fires for this file's intended population, which is work in projects that have no agentics setup at all, and that is where an unasked-for push is least recoverable.
+
+At every branching, staging, commit or push moment, and whenever you find working-tree changes you did not make, read `template/conventions/git.md` in the agentics repository fresh and follow it: from a local clone if one exists, otherwise from the repository online. The `conventions/` paths named elsewhere in this file resolve the same way, under `template/`. Project dispatch tables state that rule where they use bare paths; this file is read by sessions that have no dispatch table, so it has to state it here. It covers committing only when asked, separate units of work as separate commits, treating unpushed commits as drafts, never handing out a SHA from unpushed work, subject-line and body formatting, no AI-tool attribution in commits or pull requests, pushing to a per-task feature branch rather than `main`, and what to do about working-tree changes nobody in this session made. Do not keep a copy of any of it here.
+
+**Name the trigger rather than a section heading.** A pointer to a heading still resolves after the content moves, because the file it names goes on existing, so that kind of drift fails silently instead of erroring. The moment is the durable thing; where the rules currently sit is not.
 
 ## This creates no project-level scaffolding, ever
 

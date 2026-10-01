@@ -93,6 +93,24 @@ hot = sum(d for path, d in grew + shrunk if path in always)
 print(f"  of that, {hot:+d} in the always-read tier "
       f"({len(always)} file(s) every session loads, unweighted)")
 
+# Net growth hides whether anything was read before being added. A batch appending thirty
+# sections and editing none has the same net as one appending ten and consolidating twenty, and
+# the budget passes both. The ratio says whether the corpus is being revised or accreted.
+# Measured across three releases it ran 4.5, then 16.6, then 43.5 lines added per line removed,
+# worsening each time, and the one release with real deletions is the one where content moved
+# rather than being appended.
+ins = dele = 0
+for line in run("git", "diff", "--numstat", base, "--", "template/", "docs/").splitlines():
+    parts = line.split()
+    if len(parts) >= 2 and parts[0].isdigit() and parts[1].isdigit():
+        ins += int(parts[0]); dele += int(parts[1])
+if ins:
+    shown = "no lines removed at all" if not dele else f"{ins/dele:.1f} lines added per line removed"
+    print(f"  {ins} lines added, {dele} removed: {shown}")
+    if dele == 0 or ins / dele > 20:
+        print("     Accretion rather than revision. Check whether new sections belong inside")
+        print("     existing ones before shipping: a high ratio is where contradictions form.")
+
 if net > threshold:
     print(f"  FAIL: net growth of {net} characters across {len(grew)} file(s) exceeds the budget.")
     print(f"        Budget is {threshold}, derived from every prior release of this repository.")

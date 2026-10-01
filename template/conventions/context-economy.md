@@ -46,7 +46,7 @@ A split that leaves dangling pointers has made things worse, not better. These a
 - **Leave an entry point behind.** Keep the original file with a short pointer to the new location. An adopter whose copied dispatch table predates your split still resolves the old path and gets forwarded, so the change degrades gracefully instead of breaking them. This is usually what lets a split ship as non-breaking.
 - **Repoint every live reference, and verify by grep, not by memory.** Search for the old section name and the old file path across the whole repo. Fix live files; leave already-released changelog entries and historical session logs alone, since those record what was true at the time.
 - **Wire the new file in.** A new convention file needs a dispatch line and a row in the file table (see `CONTRIBUTING.md` § Proposing changes). A file that exists but is reachable from nothing is worse than no file.
-- **Re-run the mechanical checks.** If a check now fails because of a legitimate, intended difference your change introduced, fix the check to model that difference explicitly, then confirm by reintroducing a real fault that it still fails. Do not weaken a check to make it pass.
+- **Re-run the mechanical checks.** If a check now fails because of a legitimate, intended difference introduced by your change, fix the check to model that difference explicitly, then confirm by reintroducing a real fault that it still fails. Do not weaken a check to make it pass.
 
 ## Step 5: report both reading models, honestly
 
@@ -67,4 +67,4 @@ Reporting only the favourable number is the easiest way to overstate this work, 
 
 ## When to run this
 
-Not continuously; that is its own waste. Run it when a measurement threshold is crossed rather than on a feeling, for example when the unconditional read set grows past a budget the project has set for itself, or when any single always-read file doubles. Setting that budget as a mechanical check is better than remembering to look.
+Not continuously; that is its own waste. Run it when a measurement threshold is crossed rather than on a feeling, for example when the unconditional read set grows past the project's own budget, or when any single always-read file doubles. Setting that budget as a mechanical check is better than remembering to look.

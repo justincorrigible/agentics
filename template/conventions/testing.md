@@ -16,6 +16,8 @@ For any feature or non-trivial change, follow this order:
 
 Designing tests first forces the interface to be thought through from the caller's perspective, surfacing architectural and API issues before they are baked into code.
 
+**The tell, so this is checkable rather than asserted: in the history, does the test for a behaviour appear before or with the code implementing it, or after?** Tests written afterward describe what was built, which is the same defect as an expectation read off the implementation, one stage earlier. `git log --follow --oneline <test-file> <source-file>` answers it, and a reviewer who knows nothing about the feature can read the answer.
+
 **Pragmatic exceptions:** Skip for pure structural/wiring work (type propagation, config plumbing, renaming) where a test would only verify "does this compile." BDD pays off most on logic with clear inputs and outputs: validation, transformations, business rules, utilities.
 
 ## BDD test style
@@ -48,13 +50,13 @@ suite('getNetworkPassthroughHeaders', () => {
 
 A package referenced via `"file:../other-package"` resolves through that package's built output (`dist/`, per its `package.json`'s `main`/`exports`), not its live source. Editing that dependency's source and testing a consumer without rebuilding it first silently exercises stale compiled output. No error, no warning, just wrong behaviour.
 
-Unit tests that import from a package's own source, via internal path aliases, within the same package, never cross this boundary and cannot catch it. Only a test that imports the dependency the way a real consumer does, by package name, through its resolved entry point, will.
+Unit tests that import from a package's own source, via internal path aliases, within the same package, never cross this boundary and cannot catch it. Only a test that imports the dependency as a real consumer does, by package name, through its resolved entry point, will.
 
 **Before trusting a "changed the dependency, tests still pass" result:** rebuild the dependency first, or write at least one test that exercises the real cross-package resolution path rather than importing from source.
 
 ## Prefer bare test-runner invocation over a shell-glob pattern in `test` scripts
 
-`"test": "tsx --test ./src/**/*.test.ts"` (or the `node --test` equivalent) depends on the invoking shell expanding `**` recursively. `npm run <script>` executes through a non-interactive `sh`, which does not support globstar the way an interactive bash/zsh session does.
+`"test": "tsx --test ./src/**/*.test.ts"` (or the `node --test` equivalent) depends on the invoking shell expanding `**` recursively. `npm run <script>` executes through a non-interactive `sh`, which does not support globstar as an interactive bash/zsh session does.
 
 Under plain `sh`, `**` behaves like a single `*` for one path segment: it silently matches only files at that exact depth, skipping everything shallower or deeper. No error, no warning. The only symptom is a lower-than-expected test or suite count, easy to miss unless someone happens to be watching for it.
 
@@ -66,25 +68,27 @@ Under plain `sh`, `**` behaves like a single `*` for one path segment: it silent
 
 Two independent instances surfaced in one week, in repositories sharing no code, reported by the sessions that found them:
 
-- A suite exercising string handling where **no input contained a quote character**, so the escaping contract was never exercised at all. Escaping is the reason that code path exists.
+- A suite exercising string handling where **no input contained a quote character**, so the escaping contract was never exercised at all. That code path exists for escaping.
 - A suite exercising access control where **every test passed a null filter**, so nothing ever exercised a filter that filters. Every assertion passed and the feature under test was absent from all of them.
-- A query builder whose `IN` clause construction was **never tested against a multi-element array**, so the one case the clause exists for was the one case never constructed. The same fix also reimplemented an `inArray()` helper the codebase already provided, which is the same assumption going unchallenged in two directions at once.
+- A query builder whose `IN` clause construction was **never tested against a multi-element array**, so the clause's own case was the one never constructed. The same fix also reimplemented an `inArray()` helper the codebase already provided, which is the same assumption going unchallenged in two directions at once.
 
 **The failure is not a security-testing failure, and filing it as one is how it survives.** Two of the instances above look like security dimensions and the third is ordinary correctness, which is the point: a reader who files this under injection or access control will not apply it to a query builder. The mechanism is indifferent to the dimension, because it comes from the author's assumption about input shape rather than from anything about what the code does. Reported by a session noting the same failure hit one file twice in a single day, once on an injection dimension and once on an ordinary one.
 
-**The check is one question per test double or fixture: what value would a real caller supply that I have not written here?** Then write that one. The high-yield answers are consistent across both cases above and worth walking deliberately: the value that needs escaping, the non-empty version of a filter, the absent field rather than the present one, the input that is already encoded, and the case that another component produces rather than the one you would type.
+**The check is one question per test double or fixture: what value would a real caller supply that I have not written here?** Then write that one. The high-yield answers are consistent across both cases above and worth walking deliberately: the value that needs escaping, the non-empty version of a filter, the absent field rather than the present one, the input that is already encoded, and the case produced by another component rather than the one you would type.
 
 **A "passing" suite is evidence about the inputs it contains and nothing else.** When a test is meant to prove a transformation happens, assert the transformation, since a fixture needing no transformation makes an identity function pass the same test.
 
+**Where the defect is an overwrite, the fixture has to make the two values differ.** A neighbour whose value already matches the one being written yields a passing test of nothing, because the wrong answer and the right answer coincide. Reported from a verification of someone else's defect report: the first reproduction placed the offending entry after the one record whose field already held the same value, the output came out correct, and the defect was nearly filed as absent. Moved to a neighbour holding a different value, the same script produced a corrupted line and still exited zero.
+
 ## Assert what the code should do, not what it does
 
-The same family as the section above, seen from the other end: that one is about the input the author never constructed, this one about the expectation the author copied out of the implementation.
+The same family as the section above, seen from the other end: that one is about input never constructed, this one about an expectation copied out of the implementation.
 
-**When writing a test against existing behaviour, state the requirement first and check the code against it.** An expectation read off the implementation passes permanently and certifies whatever is there, so fixing the defect then means editing the test that vouched for it. That moment is usually the first time anyone notices the test was pinned to the behaviour rather than to the requirement.
+**When writing a test against existing behaviour, state the requirement first and check the code against it.** An expectation read off the implementation passes permanently and certifies whatever is there, so fixing the defect then means editing the test that vouched for it. That moment is usually when anyone first notices the test was pinned to the behaviour rather than to the requirement.
 
-**The tell is a justification that restates the mechanism.** `is healthy for an empty set of catalogues (nothing has failed)` explains how the code arrives at its answer instead of why that answer is right. Written from the requirement it reads *knowing nothing about the catalogues is not knowing they are fine*, which is the opposite assertion. Reported by the Arranger session: `computeAggregateServerStatus({})` returned `HEALTHY` because no catalogues means none failed, a Kubernetes readiness probe reads it, and the effect is putting a replica that can serve nothing into rotation. The test had passed since the function was written and would have passed forever.
+**The tell is a justification that restates the mechanism.** `is healthy for an empty set of catalogues (nothing has failed)` explains how the code arrives at its answer instead of why that answer is right. Written from the requirement it reads *knowing nothing about the catalogues is not knowing they are fine*, which is the opposite assertion. Reported from a live instance: `computeAggregateServerStatus({})` returned `HEALTHY` because no catalogues means none failed, a Kubernetes readiness probe reads it, and the effect is putting a replica that can serve nothing into rotation. The test had passed since the function was written and would have passed forever.
 
-**The adversarial question is not "is this branch covered" but "if this assertion is wrong, what breaks, and would I notice?"** Coverage was complete in that case. The defect sat in the branch the author had thought of first, which is what makes it worse than an untested branch rather than better: an untested branch is visibly absent, while a test asserting the wrong expectation is indistinguishable from a passing one and carries the authority of having been considered.
+**The adversarial question is not "is this branch covered" but "if this assertion is wrong, what breaks, and would I notice?"** Coverage was complete in that case. The defect sat in the branch that occurred to the author first, which is what makes it worse than an untested branch rather than better: an untested branch is visibly absent, while a test asserting the wrong expectation is indistinguishable from a passing one and carries the authority of having been considered.
 
 **It applies with most force to degenerate inputs.** Empty, zero, absent and unknown are where a permissive default hides, and where the code's own behaviour is most likely to be an accident rather than a decision.
 
@@ -92,4 +96,4 @@ The same family as the section above, seen from the other end: that one is about
 
 ## When to actually run the suite, not just write it
 
-A `session-discipline.md` § "Refinement passes" concern, not a separate mechanism: the full suite gets run at the semiregular in-session checkpoint specifically, not just the tests for what was just written, since that's the checkpoint an involuntary session end (a usage or context limit, a crash) can still reach even when the final "before ending a session" one can't. "Before committing" and "before ending a session" still get a full run too; the point is that neither can be the only line of defence.
+A `definition-of-done.md` § Refinement passes concern, not a separate mechanism: the full suite gets run at the semiregular in-session checkpoint specifically, not just the tests for what was just written, since that's the checkpoint an involuntary session end (a usage or context limit, a crash) can still reach even when the final "before ending a session" one can't. "Before committing" and "before ending a session" still get a full run too; the point is that neither can be the only line of defence.

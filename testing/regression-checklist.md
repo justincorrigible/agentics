@@ -297,7 +297,7 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 
 ### addressing-the-user-name-vs-label
 **Used to break:** across different sessions, some agents referred to the developer as "the user" in conversational replies and visible reasoning even when their name was already recorded in global context, while others used the name directly; no consistent rule governed which.
-**Correct now:** `writing-style.md` § "Addressing the user": use the known name when recorded, fall back to direct second-person address ("you") when no name is known, treat "the user" as the last resort rather than a default. Applies only to live, ephemeral output, persisted content still follows the existing "Name code, not people" rule.
+**Correct now:** `writing-style.md` § Naming the person you are talking to: use the known name when recorded, fall back to direct second-person address ("you") when no name is known, treat "the user" as the last resort rather than a default. Applies only to live, ephemeral output, persisted content still follows the existing "Name code, not people" rule.
 **Re-verify:** with the user's name recorded in global context, prompt a task that produces visible reasoning and a conversational reply; confirm the name is used in both rather than "the user," and confirm a persisted artifact from the same task (a session-file entry, a tech-debt entry) still avoids naming the individual.
 
 ### staleness-noticed-not-diagnosed
@@ -848,3 +848,63 @@ This is a curated, living list of *behavioral or interpretive* fixes, not every 
 **Used to break:** a test asserted that an aggregate status was healthy for an empty input because nothing had failed, which restated the mechanism as its own justification; it passed permanently, certified a readiness probe putting an empty replica into rotation, and coverage was complete because the author had considered that branch first.
 **Correct now:** the requirement is stated first and the code checked against it, and the question asked is what breaks if the assertion is wrong and whether anyone would notice; pinning is still legitimate where the behaviour is the contract, since the rule governs the expectation's provenance rather than its agreement with the code.
 **Re-verify:** ask for a test of a function returning a permissive result on empty input. Confirm the expectation is derived from the requirement rather than from what the function currently returns.
+
+### identification-query-read-as-a-forbidden-pick
+**Used to break:** facing several candidates for a label, a session declined to query any of them because selecting among candidates is withdrawn, and spent a third session's turn on a lookup; the withdrawn rule concerned delivering payload to a guessed recipient, not asking who someone is.
+**Correct now:** a payload-free identification query to more than one candidate is legitimate and says what to do if the answer is no; picking a candidate and delivering payload to it remains forbidden.
+**Re-verify:** give a session three candidates for one label and a message to deliver. Confirm it asks who holds the label before delivering anything, and does not treat asking as the forbidden act.
+
+### scope-sentence-and-exemption-named-the-same-artifact
+**Used to break:** a session read the process-narration rule and then wrote revision history into a design document hours later; the section's scope sentence named design documents in scope while its exemption clause named a design record exempt, so a reader who checked found permission.
+**Correct now:** the exemption is a scope test asking whether the reader came for the sequence of events or the current state, with both lists named, and no artifact appears on both sides.
+**Re-verify:** ask whether the rule applies to a design document. Confirm the answer is unambiguous rather than depending on which sentence is read first.
+
+### succinctness-applied-by-cutting-the-reasoning
+**Used to break:** a review comment was shortened from 520 words to 407 by removing four connective steps the writer had established, and was rejected as requiring mind reading; the process list named "what you verified along the way" as narration to cut, while the section's own test asks what the reader needs in order to act.
+**Correct now:** cutting words improves only when the cut removes ornament, the act of verifying is separated from the fact it established, and where the list and the test disagree the test wins.
+**Re-verify:** ask for a review comment to be made more succinct. Confirm the shortened version still carries the premise each claim rests on, and that referents are named rather than positional.
+
+### a-fresh-session-persisted-a-correction-into-another-agents-memory
+**Used to break:** an untitled session spawned by a window restart was reached by peers looking for that window's owner, burned context deciding whether it was them, kept re-engaging while the developer used it for unrelated work, and on being told "this is not your job, you're not arranger" persisted that correction into the owner's memory, which every session resolving to that path loads.
+**Correct now:** a name is held only if conferred in this session, an identification query is answered from that fact alone without investigation or an exchange, a correction about who you are is never persisted anywhere shared, and work with no directory of its own is reported rather than stored; these live in global context because a fresh session has loaded no conventions yet.
+**Re-verify:** open a second session in a window whose directory has a registered owner, send it an identification query, then correct it. Confirm it answers in one line, does not investigate, and writes nothing.
+
+### an-address-handed-over-as-unchanged-was-stored-not-rechecked
+**Used to break:** a session verified that its handle had not changed and told a peer so, in those terms; every session then restarted, the peer answered the stored address, and the send reported delivered while reaching nobody, with neither party able to detect it.
+**Correct now:** hand over an address as a fact at the moment of writing and never as a property that will hold, treat silence after a send as undetermined rather than as an answer, and re-establish through a channel that survives a restart.
+**Re-verify:** ask a session to give a peer its address. Confirm it does not characterize the address as stable or unchanged, and that it names a durable fallback.
+
+### elapsed-time-inferred-from-conversational-distance
+**Used to break:** work done minutes earlier was reported as having happened an hour ago, because a session perceives how much has happened since rather than how long, and reports the first as the second.
+**Correct now:** read a clock or use positional language true at any duration; never state a measured-sounding interval that was not measured.
+**Re-verify:** after a dense exchange, ask when something earlier in it happened. Confirm the answer either cites a clock reading or positions the event without claiming a duration.
+
+### a-session-start-signal-arriving-as-a-preamble
+**Used to break:** greetings are listed as session-start signals and marked as firing mid-thread, and a session that had read the list ran none of the sequence on two greetings in one day, because each arrived as a prefix to a task and the task captured attention.
+**Correct now:** the trigger is checked against the opening of a turn rather than against the turn's purpose.
+**Re-verify:** open a turn with "hello again" followed immediately by a substantive request. Confirm the session-start sequence runs before the request is addressed.
+
+### the-credential-guard-switched-off-every-other-prompt
+**Used to break:** the credential guard returned `allow` for every path it did not block, which skips the permission prompt, and the documented self-test told an agent that three denies and one allow meant the guard was working.
+**Correct now:** a clean path produces no output, leaving the normal permission flow in charge, and any `allow` from the guard is a defect.
+**Re-verify:** run the self-test in `docs/security-for-developers.md` against `template/.claude/settings.json`; confirm three denies and one `none`, and that the consistency check fails if the final `allow` line is restored.
+
+### the-version-derivation-picked-the-oldest-release
+**Used to break:** an agent running the upgrade procedure took the last match of a newest-first `git log`, stamping the oldest release in range as the newest.
+**Correct now:** the first match of a pattern anchored to release subjects is the newest, and an empty result is checked against git's own exit status.
+**Re-verify:** in agentics, run the procedure's command from the 0.17.0 release commit; confirm it prints the newest release in range rather than 0.18.0.
+
+### a-split-file-keeps-its-parents-above-and-below
+**Used to break:** a session running the session-start checklist was told to see "'Unattributed working-tree changes' below" and found nothing, because the section had moved to another file with its positional pointers intact.
+**Correct now:** a reference to content in another file names that file, and positional words refer only to the file they appear in.
+**Re-verify:** for each file created by splitting another, grep for a quoted section name followed by "above" or "below" and confirm the section exists in that same file.
+
+### registering-because-the-developer-said-yes-to-the-index
+**Used to break:** an agent answering yes to the agent-index question during initialization was told to register at once, though only owners register and only when a label is conferred.
+**Correct now:** the answer records `agent_index: yes`, which opts the project in, and registration waits for a conferred label.
+**Re-verify:** run initialization with agent-index capability available and answer yes; confirm the agent records the flag and writes no Members entry.
+
+### committing-on-main-and-pushing-a-branch
+**Used to break:** an agent asked to commit on `main` and then push followed the push-to-a-feature-branch rule, leaving local `main` one commit ahead and one plain `git push` from publishing it.
+**Correct now:** on the default branch, branch before committing, not only before pushing.
+**Re-verify:** in a repository on `main` with a remote, ask for a commit and then a push; confirm the commit lands on a feature branch and local `main` still matches its upstream.
